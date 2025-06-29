@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Set up Yarn 4 (Berry)
+        run: corepack enable && corepack prepare yarn@4.9.1 --activate
+
       - name: Install dependencies
         run: yarn install
 
