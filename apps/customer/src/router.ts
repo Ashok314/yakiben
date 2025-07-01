@@ -1,15 +1,32 @@
-
 import { createRouter, createWebHashHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'Home',
-    component: () => import('./components/HelloWorld.vue'),
-    props: { msg: 'Vite + Vue' },
+    name: 'menu',
+    component: () => import('./views/MenuView.vue')
   },
-  // Add more routes here
+  {
+    path: '/item/:id',
+    name: 'itemDetail',
+    component: () => import('./views/ItemDetailView.vue')
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: () => import('./views/CartView.vue')
+  },
+  {
+    path: '/order/:trackingId',
+    name: 'order',
+    component: () => import('./views/OrderView.vue')
+  },
+  {
+    path: '/history',
+    name: 'history',
+    component: () => import('./views/HistoryView.vue')
+  }
 ];
 
 export const router = createRouter({

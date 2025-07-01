@@ -1,4 +1,24 @@
-# yakiben
+# やきべん (Yakiben)
+
+Modern Japanese lunch box pre-order system built with Vue 3 and TypeScript.
+
+## Features
+
+### Customer App
+- 🍱 Beautiful, mobile-first menu browsing
+- 🛒 Smart cart with customizations and quantity management
+- 📝 Order tracking with user-friendly IDs
+- 🖨️ Advanced printing support for orders and receipts
+- 💾 Customer info persistence and quick reordering
+- 🕒 Smart pickup time validation with business hours
+- 🌐 Internationalization-ready UI text system
+- 📱 PWA-ready for mobile installation
+
+### Admin App (Coming Soon)
+- 📊 Order management dashboard
+- 🗂️ Menu and inventory control
+- 👥 Role-based access control
+- 🚚 Delivery management
 
 ## Monorepo Structure
 
@@ -24,17 +44,46 @@
   - Customer app: `https://<username>.github.io/<repo>/customer/`
   - Admin app: `https://<username>.github.io/<repo>/admin/`
 
-## PWA Support
+## Architecture
 
-- Both apps are configured as PWAs (offline support, installable on mobile, etc.).
+### PWA Support
+- 📱 Installable on mobile devices
+- 🔄 Offline support and asset caching
+- 🚀 Optimized for performance
 
-## Shared Tooling
+### Configuration
+- 🏢 Centralized restaurant info configuration
+- 🌐 Hierarchical UI text system for i18n
+- ⚙️ Business hours and validation rules
+- 🎨 Shared design tokens and Tailwind theme
 
-- ESLint, Prettier, Tailwind, TypeScript, Husky, and lint-staged are configured at the root for all apps.
+### Development Tools
+- 🛠️ ESLint, Prettier for code quality
+- 🎯 TypeScript for type safety
+- 🎨 Tailwind CSS for styling
+- 🔄 Husky and lint-staged for git hooks
+- 🧪 Mock API layer for development
 
-## Environment Variables
-
+### Environment Variables
 - Place `.env` files in each app for secrets (see `.env.example` in each app).
+
+## Project Structure
+
+```
+yakiben/
+├── apps/
+│   ├── customer/           # Customer-facing app
+│   │   ├── src/
+│   │   │   ├── config/    # App configuration
+│   │   │   ├── constants/ # UI text and constants
+│   │   │   ├── data/     # Mock API and data
+│   │   │   ├── stores/   # State management
+│   │   │   ├── types/    # TypeScript types
+│   │   │   └── views/    # Vue components
+│   │   └── public/       # Static assets
+│   └── admin/            # Admin panel (WIP)
+└── shared/              # Shared configurations
+```
 
 ---
 
