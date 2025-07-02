@@ -32,8 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue';
-import { STORAGE_KEYS } from '../constants';
+import { ref, watchEffect } from 'vue';
 import { ordersApi } from '../data/api/orders';
 import type { Order } from '../types';
 

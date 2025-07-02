@@ -29,7 +29,7 @@
       <div class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-2">
-            <img src="/yakiben/customer/assets/menu/placeholder.jpeg" alt="やきべん" class="h-8 w-8 rounded-lg" />
+            <img src="/assets/menu/placeholder.jpeg" alt="やきべん" class="h-8 w-8 rounded-lg" />
             <h1 class="text-lg font-bold text-gray-900">やきべん</h1>
           </div>
           <div class="flex items-center space-x-2">
@@ -160,13 +160,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { getCategories, getMenuItemsByCategory } from '../data/menu';
-import type { MenuItem } from '../types';
 import MenuCard from '../components/MenuCard.vue';
 import { useCart } from '../stores/cart';
 
 const categories = getCategories();
 const selectedCategory = ref(categories[0]);
-const { cartItems, cartItemCount, cartTotal, addToCart, getItemQuantity } = useCart();
+const { cartItemCount, cartTotal } = useCart();
 
 const showAnnouncement = ref(true);
 const showInfo = ref(false);

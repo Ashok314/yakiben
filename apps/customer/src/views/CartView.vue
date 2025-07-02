@@ -380,7 +380,7 @@ const validationErrors = ref<ValidationErrors>({
 });
 
 // Reactive validation
-watch(orderForm, (newValue) => {
+watch(orderForm, (_newValue) => {
   validateForm();
 }, { deep: true });
 

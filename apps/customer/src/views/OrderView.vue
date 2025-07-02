@@ -386,7 +386,7 @@ async function reorder() {
     
     // Extract address parts with proper error handling
     const addressMatch = order.value.companyAddress.match(/〒(\d{3}-\d{4})\s+(.+?)[都道府県](.+)$/);
-    const [_, postalCode = '', prefecture = '', city = ''] = addressMatch || [];
+    const [_fullMatch, postalCode = '', prefecture = '', city = ''] = addressMatch || [];
     
     const customerInfo = {
       lastName,
