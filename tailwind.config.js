@@ -1,11 +1,14 @@
 import forms from '@tailwindcss/forms';
 import aspectRatio from '@tailwindcss/aspect-ratio';
+import lineClamp from '@tailwindcss/line-clamp';
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./apps/customer/index.html",
+    "./apps/customer/src/**/*.{vue,js,ts,jsx,tsx}",
+    "./apps/admin/index.html", 
+    "./apps/admin/src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -33,5 +36,6 @@ export default {
   plugins: [
     forms,
     aspectRatio,
+    lineClamp,
   ],
 }
