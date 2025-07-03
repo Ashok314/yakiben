@@ -7,7 +7,7 @@ const ORDER_CONSTANTS = {
   MAX_ITEMS_PER_ORDER: 20,
 } as const;
 
-const menuItems: MenuItem[] = [
+export const menuItems: MenuItem[] = [
   {
     id: '1',
     name: '唐揚げ弁当',
