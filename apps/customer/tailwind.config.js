@@ -1,6 +1,5 @@
 import forms from '@tailwindcss/forms';
 import aspectRatio from '@tailwindcss/aspect-ratio';
-import lineClamp from '@tailwindcss/line-clamp';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -34,6 +33,5 @@ export default {
   plugins: [
     forms,
     aspectRatio,
-    lineClamp,
   ],
 }
