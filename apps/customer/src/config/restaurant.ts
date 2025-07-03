@@ -10,15 +10,15 @@ export const RESTAURANT_INFO = {
   email: 'info@yakiben.jp',
   hours: {
     open: 10, // 24-hour format
-    close: 15, // 24-hour format
-    orderDeadline: 14, // Last order time
+    close: 21, // 24-hour format
+    orderDeadline: 20, // Last order time
     minAdvanceTime: 30, // minutes
-    maxAdvanceDays: 7,
-    businessDays: [1, 2, 3, 4, 5], // Monday-Friday (0 = Sunday)
+    maxAdvanceDays: 30,
+    businessDays: [0, 1, 2, 3, 4, 5], // Monday-Friday (0 = Sunday)
   },
   support: {
     phone: '03-1234-5678',
-    hours: '平日 9:00-17:00',
+    hours: '平日 9:00-21:00',
     email: 'support@yakiben.jp'
   }
 } as const;

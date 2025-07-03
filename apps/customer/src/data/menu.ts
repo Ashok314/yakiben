@@ -1,7 +1,13 @@
 import type { MenuItem } from '../types';
-import { ORDER_CONSTANTS } from '../constants';
 
-export const menuItems: MenuItem[] = [
+const ORDER_CONSTANTS = {
+  TRACKING_ID_LENGTH: 6,
+  TRACKING_ID_CHARS: '23456789ABCDEFGHJKLMNPQRSTUVWXYZ',
+  MIN_ORDER_AMOUNT: 500,
+  MAX_ITEMS_PER_ORDER: 20,
+} as const;
+
+const menuItems: MenuItem[] = [
   {
     id: '1',
     name: '唐揚げ弁当',

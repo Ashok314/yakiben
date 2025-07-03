@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2016", "DOM"],
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["apps/*/src"]
+    },
+    "types": ["node", "vue", "vue-router"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["apps/*/src/**/*"]
+}
