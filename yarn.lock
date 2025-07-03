@@ -1840,6 +1840,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tailwindcss/line-clamp@npm:^0.4.4":
+  version: 0.4.4
+  resolution: "@tailwindcss/line-clamp@npm:0.4.4"
+  peerDependencies:
+    tailwindcss: ">=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1"
+  checksum: 10c0/53e74e75bff066469501b784ab70af444fa460d556a3adf95cb14ccf1a56b1e63c106f0c4bb94463ba0310f2ce1f71350f9b18a556048655cfd2a0ad308ccfb8
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:0.0.39":
   version: 0.0.39
   resolution: "@types/estree@npm:0.0.39"
@@ -2779,6 +2788,7 @@ __metadata:
   dependencies:
     "@tailwindcss/aspect-ratio": "npm:^0.4.2"
     "@tailwindcss/forms": "npm:^0.5.10"
+    "@tailwindcss/line-clamp": "npm:^0.4.4"
     "@vitejs/plugin-vue": "npm:^6.0.0"
     "@vue/tsconfig": "npm:^0.7.0"
     autoprefixer: "npm:^10.4.21"
@@ -5986,6 +5996,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tailwindcss@npm:^4.1.11":
+  version: 4.1.11
+  resolution: "tailwindcss@npm:4.1.11"
+  checksum: 10c0/e23eed0a0d6557b3aff8ba320b82758988ca67c351ee9b33dfc646e83a64f6eaeca6183dfc97e931f7b2fab46e925090066edd697d2ede3f396c9fdeb4af24c1
+  languageName: node
+  linkType: hard
+
 "tar@npm:^7.4.3":
   version: 7.4.3
   resolution: "tar@npm:7.4.3"
@@ -6789,17 +6806,27 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "yakiben@workspace:."
   dependencies:
+    "@tailwindcss/aspect-ratio": "npm:^0.4.2"
+    "@tailwindcss/forms": "npm:^0.5.10"
+    "@tailwindcss/line-clamp": "npm:^0.4.4"
     "@typescript-eslint/eslint-plugin": "npm:^8.35.0"
     "@typescript-eslint/parser": "npm:^8.35.0"
+    "@vitejs/plugin-vue": "npm:^6.0.0"
+    "@vue/tsconfig": "npm:^0.7.0"
+    autoprefixer: "npm:^10.4.21"
     eslint: "npm:^9.30.0"
     eslint-config-prettier: "npm:^10.1.5"
     eslint-define-config: "npm:^2.1.0"
     eslint-plugin-vue: "npm:^10.2.0"
     husky: "npm:^9.1.7"
     lint-staged: "npm:^16.1.2"
+    postcss: "npm:^8.5.6"
     prettier: "npm:^3.6.2"
+    tailwindcss: "npm:^4.1.11"
     typescript: "npm:^5.8.3"
+    vite: "npm:^7.0.0"
     vue-eslint-parser: "npm:^10.2.0"
+    vue-tsc: "npm:^2.2.10"
   languageName: unknown
   linkType: soft
 
