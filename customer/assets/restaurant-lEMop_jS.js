@@ -1,1 +1,0 @@
-const e={name:"やきべん",address:{postal:"100-0005",prefecture:"東京都",city:"千代田区",line1:"丸の内1-1-1"},phone:"03-1234-5678",email:"info@yakiben.jp",hours:{open:10,close:15,orderDeadline:14,minAdvanceTime:30,maxAdvanceDays:7,businessDays:[1,2,3,4,5]},support:{phone:"03-1234-5678",hours:"平日 9:00-17:00",email:"support@yakiben.jp"}};export{e as R};
