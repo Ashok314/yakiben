@@ -7,4 +7,6 @@
   --color-primary-dark: #b45309;
   --color-secondary: #059669;
   --color-secondary-dark: #047857;
+  --color-pending: #fecaca; /* Lighter red for pending status */
+  --color-nav-bg: #ffffcc; /* Navigation background color */
 }

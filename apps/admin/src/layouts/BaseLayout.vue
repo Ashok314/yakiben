@@ -1,9 +1,21 @@
 <template>
-  <div class="flex flex-row h-screen">
-    <AdminNav v-if="!isMobile" :userRole="userRole" @logout="handleLogout" class="w-64" />
-    <div class="flex-1 overflow-y-auto">
+  <div class="flex h-screen">
+    <!-- Navigation Container -->
+    <AdminNav
+      v-if="!isMobile"
+      :userRole="userRole"
+      @logout="handleLogout"
+      @toggle-collapse="handleNavToggle"
+      :class="isCollapsed ? 'w-16' : 'w-64'"
+      class="transition-all duration-300 flex-shrink-0"
+    />
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-y-auto transition-all duration-300">
       <router-view />
     </div>
+
+    <!-- Bottom Navigation for Mobile -->
     <BottomNav v-if="isMobile" :userRole="userRole" @logout="handleLogout" />
   </div>
 </template>
@@ -21,6 +33,7 @@ export default {
   data() {
     return {
       isMobile: window.innerWidth <= 640, // Tailwind's sm breakpoint
+      isCollapsed: false, // Track collapsed state
     };
   },
   computed: {
@@ -37,6 +50,9 @@ export default {
       const authStore = useAuthStore();
       authStore.logout();
       this.$router.push('/');
+    },
+    handleNavToggle(collapsed) {
+      this.isCollapsed = collapsed;
     },
   },
   mounted() {

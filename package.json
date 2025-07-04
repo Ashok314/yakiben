@@ -31,5 +31,9 @@
     "lint": "eslint . --ext .ts,.vue",
     "build:customer": "yarn workspace customer build",
     "build:admin": "yarn workspace admin build"
+  },
+  "dependencies": {
+    "@vue/compiler-sfc": "^3.5.17",
+    "vue": "^3.5.17"
   }
 }

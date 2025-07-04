@@ -14,7 +14,7 @@ const routes: RouteRecordRaw[] = [
         path: '',
         component: OrdersView,
         meta: { requiresAuth: true, roles: ['manager', 'staff', 'driver'] }
-      }
+      },
     ]
   },
   { 
