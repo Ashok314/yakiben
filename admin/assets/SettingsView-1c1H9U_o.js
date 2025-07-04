@@ -1,1 +1,0 @@
-import{d as s,c as n,b as t,o,_ as a}from"./index-j1Z0-Spg.js";const c={class:"p-4"},i=s({__name:"SettingsView",setup(p){return(_,e)=>(o(),n("div",c,e[0]||(e[0]=[t("h1",{class:"text-2xl font-bold mb-4"},"Settings",-1),t("p",null,"Manage application settings here.",-1)])))}}),l=a(i,[["__scopeId","data-v-bb28ec32"]]);export{l as default};
