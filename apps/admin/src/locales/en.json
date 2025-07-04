@@ -1,0 +1,14 @@
+{
+  "LOGIN_TITLE": "Login",
+  "EMAIL_LABEL": "Email",
+  "PASSWORD_LABEL": "Password",
+  "EMAIL_PASSWORD_REQUIRED": "Email and password are required.",
+  "INVALID_EMAIL_PASSWORD": "Invalid email or password.",
+  "UNEXPECTED_ERROR": "An unexpected error occurred.",
+  "LOGGING_IN": "Logging in...",
+  "SIGN_IN": "Sign In",
+  "DEMO_ACCOUNTS_TITLE": "Demo Accounts:",
+  "MANAGER_ACCOUNT": "Manager: manager@example.com password123",
+  "STAFF_ACCOUNT": "Staff: staff@example.com password123",
+  "DRIVER_ACCOUNT": "Driver: driver@example.com password123"
+}

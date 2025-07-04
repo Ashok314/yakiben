@@ -1,0 +1,80 @@
+<template>
+  <div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Menu Item Management</h1>
+    <form @submit.prevent="saveItem" class="space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+        <input 
+          v-model="menuItem.name" 
+          type="text" 
+          id="name" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+          required
+        />
+      </div>
+      <div>
+        <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+        <input 
+          v-model="menuItem.price" 
+          type="number" 
+          id="price" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+          required
+        />
+      </div>
+      <div>
+        <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+        <input 
+          v-model="menuItem.category" 
+          type="text" 
+          id="category" 
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+          required
+        />
+      </div>
+      <div>
+        <label for="available" class="block text-sm font-medium text-gray-700">Available</label>
+        <input 
+          v-model="menuItem.available" 
+          type="checkbox" 
+          id="available" 
+          class="mt-1"
+        />
+      </div>
+      <div>
+        <button 
+          type="submit" 
+          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+
+interface MenuItem {
+  name: string;
+  price: number;
+  category: string;
+  available: boolean;
+}
+
+const menuItem = ref<MenuItem>({
+  name: '',
+  price: 0,
+  category: '',
+  available: false,
+});
+
+const saveItem = () => {
+  alert(`Saving item: ${JSON.stringify(menuItem.value)}`);
+};
+</script>
+
+<style scoped>
+/* Add scoped styles here */
+</style>
