@@ -28,6 +28,7 @@ export interface Order {
   };
   paymentMethod: 'cash' | 'card' | 'online';
   paymentStatus: 'pending' | 'paid';
+  comments?: string; // Optional comments for the order
 }
 
 export interface OrderItem {

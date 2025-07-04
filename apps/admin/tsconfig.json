@@ -6,7 +6,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node", "vue", "vue-router"],
+    "types": ["node", "vue-router"],
     "typeRoots": ["./node_modules/@types"],
     "resolveJsonModule": true
   },
