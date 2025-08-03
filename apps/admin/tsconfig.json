@@ -1,7 +1,17 @@
 {
+  "compilerOptions": {
+    "lib": ["es2016", "dom"],
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "types": ["node", "vue-router"],
+    "typeRoots": ["./node_modules/@types"],
+    "resolveJsonModule": true
+  },
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ]
 }

@@ -1390,6 +1390,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@heroicons/vue@npm:^2.0.18":
+  version: 2.2.0
+  resolution: "@heroicons/vue@npm:2.2.0"
+  peerDependencies:
+    vue: ">= 3"
+  checksum: 10c0/8872f89cd033ce21363b5457adb7ea6cb9631cfbe85006b4131f9078c75c1c9701fd6d9d727d49c739b8716f4a46ccdd2ffae8c6635fc2528efaf0982759edb3
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.1":
   version: 0.19.1
   resolution: "@humanfs/core@npm:0.19.1"
@@ -1425,6 +1434,33 @@ __metadata:
   version: 0.4.3
   resolution: "@humanwhocodes/retry@npm:0.4.3"
   checksum: 10c0/3775bb30087d4440b3f7406d5a057777d90e4b9f435af488a4923ef249e93615fb78565a85f173a186a076c7706a81d0d57d563a2624e4de2c5c9c66c486ce42
+  languageName: node
+  linkType: hard
+
+"@intlify/core-base@npm:11.1.9":
+  version: 11.1.9
+  resolution: "@intlify/core-base@npm:11.1.9"
+  dependencies:
+    "@intlify/message-compiler": "npm:11.1.9"
+    "@intlify/shared": "npm:11.1.9"
+  checksum: 10c0/b92445bfd49c2cfabb770ea0296d50b1fbd7151e94f2063b1df0069dd07eee0e9dc61d540989ad137dd8b6667c88943c67aedeeffc931b4ad13cbe6960268b6a
+  languageName: node
+  linkType: hard
+
+"@intlify/message-compiler@npm:11.1.9":
+  version: 11.1.9
+  resolution: "@intlify/message-compiler@npm:11.1.9"
+  dependencies:
+    "@intlify/shared": "npm:11.1.9"
+    source-map-js: "npm:^1.0.2"
+  checksum: 10c0/5ebd76218083e63facc27c050bfde5e55575a419114d55bc623ebab0a2edc7eb9701c7c4106f87e7f7441d1054dd0d6844a544386c5e6edf0f54d1866017c972
+  languageName: node
+  linkType: hard
+
+"@intlify/shared@npm:11.1.9":
+  version: 11.1.9
+  resolution: "@intlify/shared@npm:11.1.9"
+  checksum: 10c0/3adf04068d3d4995e1fcb05e5cb417f778cb72d90dba25351e19c4f5c79d5fcfd5050c0c6fc69183e277601118a1c91146dba394c189f37536ebd7c005c2c30b
   languageName: node
   linkType: hard
 
@@ -1820,7 +1856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/aspect-ratio@npm:^0.4.2":
+"@tailwindcss/aspect-ratio@npm:^0.4.0, @tailwindcss/aspect-ratio@npm:^0.4.2":
   version: 0.4.2
   resolution: "@tailwindcss/aspect-ratio@npm:0.4.2"
   peerDependencies:
@@ -1829,7 +1865,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/forms@npm:^0.5.10":
+"@tailwindcss/forms@npm:^0.5.0, @tailwindcss/forms@npm:^0.5.10":
   version: 0.5.10
   resolution: "@tailwindcss/forms@npm:0.5.10"
   dependencies:
@@ -1861,15 +1897,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^24.0.10":
-  version: 24.0.10
-  resolution: "@types/node@npm:24.0.10"
-  dependencies:
-    undici-types: "npm:~7.8.0"
-  checksum: 10c0/11dbd869d3e12ee7b7818113588950e538783e45d227122174c763cb05977defbd1e01b44b5ccd4b8997e42c3df7f7b83c6ee05cfa43d924c8882886bc5f6582
-  languageName: node
-  linkType: hard
-
 "@types/resolve@npm:1.20.2":
   version: 1.20.2
   resolution: "@types/resolve@npm:1.20.2"
@@ -1881,24 +1908,6 @@ __metadata:
   version: 2.0.7
   resolution: "@types/trusted-types@npm:2.0.7"
   checksum: 10c0/4c4855f10de7c6c135e0d32ce462419d8abbbc33713b31d294596c0cc34ae1fa6112a2f9da729c8f7a20707782b0d69da3b1f8df6645b0366d08825ca1522e0c
-  languageName: node
-  linkType: hard
-
-"@types/vue-router@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@types/vue-router@npm:2.0.0"
-  dependencies:
-    vue-router: "npm:*"
-  checksum: 10c0/83b35100f220ea9e797cb7e818835fd8da3b055f49bcaf382237fec3867cfe73150b9b7f7f3b32d0e26e89255c90f90a62991b84ee8d2a6e95b1fd88b4e14d63
-  languageName: node
-  linkType: hard
-
-"@types/vue@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@types/vue@npm:2.0.0"
-  dependencies:
-    vue: "npm:*"
-  checksum: 10c0/847df06a6f27101cb8a483e297818267e69c84c179b7a571965cc5e947822c5eaa25abfb5e18ac226e5a95f99c0deb45ad4487d6fecb8c0e7b15e4674efcc2f4
   languageName: node
   linkType: hard
 
@@ -2100,7 +2109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/compiler-sfc@npm:3.5.17":
+"@vue/compiler-sfc@npm:3.5.17, @vue/compiler-sfc@npm:^3.5.17":
   version: 3.5.17
   resolution: "@vue/compiler-sfc@npm:3.5.17"
   dependencies:
@@ -2137,7 +2146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/devtools-api@npm:^6.6.4":
+"@vue/devtools-api@npm:^6.0.0-beta.11, @vue/devtools-api@npm:^6.5.0, @vue/devtools-api@npm:^6.6.3, @vue/devtools-api@npm:^6.6.4":
   version: 6.6.4
   resolution: "@vue/devtools-api@npm:6.6.4"
   checksum: 10c0/0a993ae23618166e1bee5a7c14cebd8312752b93c143cbdd48fb2d0f7ade070d0e6baf757cd920d4681fef8f9acf29515162160f38cc7410f9a684d2df21b6de
@@ -2259,17 +2268,22 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "admin@workspace:apps/admin"
   dependencies:
-    "@types/node": "npm:^24.0.10"
-    "@types/vue": "npm:^2.0.0"
-    "@types/vue-router": "npm:^2.0.0"
+    "@heroicons/vue": "npm:^2.0.18"
+    "@tailwindcss/aspect-ratio": "npm:^0.4.0"
+    "@tailwindcss/forms": "npm:^0.5.0"
     "@vitejs/plugin-vue": "npm:^6.0.0"
     "@vue/tsconfig": "npm:^0.7.0"
+    autoprefixer: "npm:^10.4.0"
+    pinia: "npm:^2.1.7"
+    tailwindcss: "npm:^3.3.0"
     typescript: "npm:~5.8.3"
     vite: "npm:^7.0.0"
     vite-plugin-pwa: "npm:^1.0.0"
     vue: "npm:^3.5.17"
+    vue-i18n: "npm:^11.1.9"
     vue-router: "npm:4"
     vue-tsc: "npm:^2.2.10"
+    vuex: "npm:4.0.2"
   languageName: unknown
   linkType: soft
 
@@ -2427,7 +2441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^10.4.21":
+"autoprefixer@npm:^10.4.0, autoprefixer@npm:^10.4.21":
   version: 10.4.21
   resolution: "autoprefixer@npm:10.4.21"
   dependencies:
@@ -5073,6 +5087,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pinia@npm:^2.1.7":
+  version: 2.3.1
+  resolution: "pinia@npm:2.3.1"
+  dependencies:
+    "@vue/devtools-api": "npm:^6.6.3"
+    vue-demi: "npm:^0.14.10"
+  peerDependencies:
+    typescript: ">=4.4.4"
+    vue: ^2.7.0 || ^3.5.11
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/e005883c26fe782e26803859db8703ead2e7053271d22828175c82d56e925ddab65ca2543a3f3a36686a11e6835f60c031f1eb2ef9159f9da05121495499c5f6
+  languageName: node
+  linkType: hard
+
 "pirates@npm:^4.0.1":
   version: 4.0.7
   resolution: "pirates@npm:4.0.7"
@@ -5741,7 +5771,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-js@npm:^1.2.1":
+"source-map-js@npm:^1.0.2, source-map-js@npm:^1.2.1":
   version: 1.2.1
   resolution: "source-map-js@npm:1.2.1"
   checksum: 10c0/7bda1fc4c197e3c6ff17de1b8b2c20e60af81b63a52cb32ec5a5d67a20a7d42651e2cb34ebe93833c5a2a084377e17455854fee3e21e7925c64a51b6a52b0faf
@@ -5983,7 +6013,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:^3.4.0":
+"tailwindcss@npm:^3.3.0, tailwindcss@npm:^3.4.0":
   version: 3.4.17
   resolution: "tailwindcss@npm:3.4.17"
   dependencies:
@@ -6233,13 +6263,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.8.0":
-  version: 7.8.0
-  resolution: "undici-types@npm:7.8.0"
-  checksum: 10c0/9d9d246d1dc32f318d46116efe3cfca5a72d4f16828febc1918d94e58f6ffcf39c158aa28bf5b4fc52f410446bc7858f35151367bd7a49f21746cab6497b709b
-  languageName: node
-  linkType: hard
-
 "unicode-canonical-property-names-ecmascript@npm:^2.0.0":
   version: 2.0.1
   resolution: "unicode-canonical-property-names-ecmascript@npm:2.0.1"
@@ -6425,6 +6448,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vue-demi@npm:^0.14.10":
+  version: 0.14.10
+  resolution: "vue-demi@npm:0.14.10"
+  peerDependencies:
+    "@vue/composition-api": ^1.0.0-rc.1
+    vue: ^3.0.0-0 || ^2.6.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  bin:
+    vue-demi-fix: bin/vue-demi-fix.js
+    vue-demi-switch: bin/vue-demi-switch.js
+  checksum: 10c0/a9ed8712fa36d01bc13c39757f95f30cebf42d557b99e94bff86d8660c81f2911b41220f7affc023d1ffcc19e13999e4a83019991e264787cca2c616e83aea48
+  languageName: node
+  linkType: hard
+
 "vue-eslint-parser@npm:^10.2.0":
   version: 10.2.0
   resolution: "vue-eslint-parser@npm:10.2.0"
@@ -6441,7 +6480,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue-router@npm:*, vue-router@npm:4":
+"vue-i18n@npm:^11.1.9":
+  version: 11.1.9
+  resolution: "vue-i18n@npm:11.1.9"
+  dependencies:
+    "@intlify/core-base": "npm:11.1.9"
+    "@intlify/shared": "npm:11.1.9"
+    "@vue/devtools-api": "npm:^6.5.0"
+  peerDependencies:
+    vue: ^3.0.0
+  checksum: 10c0/4eadc2e12a7e5a84a2da7410a02267d0b95a4931ba406cd43a99f5afe72d0a08fab737ff3c3d6619aabd4efbbc09fb26d448587e426d2df1aac1c23dc22801e4
+  languageName: node
+  linkType: hard
+
+"vue-router@npm:4":
   version: 4.5.1
   resolution: "vue-router@npm:4.5.1"
   dependencies:
@@ -6466,7 +6518,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue@npm:*, vue@npm:^3.5.17":
+"vue@npm:^3.5.17":
   version: 3.5.17
   resolution: "vue@npm:3.5.17"
   dependencies:
@@ -6481,6 +6533,17 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/271e7aeca24495145e0e00e8553c681ae4feb08309207aa7bf6e13d0603ca8e1b6a8091d62542041aef2f4874940ee3f0a186a7753f0729fa5a12576861b34a8
+  languageName: node
+  linkType: hard
+
+"vuex@npm:4.0.2":
+  version: 4.0.2
+  resolution: "vuex@npm:4.0.2"
+  dependencies:
+    "@vue/devtools-api": "npm:^6.0.0-beta.11"
+  peerDependencies:
+    vue: ^3.0.2
+  checksum: 10c0/1e7898091bd7f913ad200302fe0a0393f90618a8bbb4517357136042cb106e4adeb0e066d41ab15720706d10362c146a065c61765d11222d3d9b642b8be0a4d5
   languageName: node
   linkType: hard
 
@@ -6838,6 +6901,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.35.0"
     "@typescript-eslint/parser": "npm:^8.35.0"
     "@vitejs/plugin-vue": "npm:^6.0.0"
+    "@vue/compiler-sfc": "npm:^3.5.17"
     "@vue/tsconfig": "npm:^0.7.0"
     autoprefixer: "npm:^10.4.21"
     eslint: "npm:^9.30.0"
@@ -6851,6 +6915,7 @@ __metadata:
     tailwindcss: "npm:^4.1.11"
     typescript: "npm:^5.8.3"
     vite: "npm:^7.0.0"
+    vue: "npm:^3.5.17"
     vue-eslint-parser: "npm:^10.2.0"
     vue-tsc: "npm:^2.2.10"
   languageName: unknown

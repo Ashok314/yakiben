@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Restaurant System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Embedded content
+      const content = {
+        "header": {
+          "title": "Yakiben",
+          "nav": [
+            { "name": "About", "link": "#about" },
+            { "name": "Product", "link": "#product" },
+            { "name": "Pricing", "link": "#pricing" },
+            { "name": "Contact", "link": "#contact" }
+          ]
+        },
+        "sections": {
+          "about": {
+            "title": "About Yakiben",
+            "content": "Yakiben is a modern restaurant system designed to empower small business owners by reducing costs and providing modular, easy-to-use tools."
+          },
+          "product": {
+            "title": "Our Product",
+            "features": [
+              {
+                "group": "Cost Benefits",
+                "entries": [
+                  { "title": "Save Costs", "description": "Reduce commission fees to just 1-3% compared to 30-40% charged by mainstream apps.", "image": "/yakiben/images/benefit.svg", "details": "This graph shows the cost benefits of using Yakiben compared to competitors." },
+                  { "title": "Operational Costs", "description": "Highlight reduced operational costs with Yakiben.", "image": "/yakiben/images/cost.svg", "details": "This graph highlights the reduced operational costs with Yakiben." }
+                ]
+              },
+              {
+                "group": "Management Tools",
+                "entries": [
+                  { "title": "Easy Management", "description": "Manage your menu, orders, and promotions effortlessly with our admin panel.", "image": "/yakiben/images/customer-sp-screen.png", "details": "Screenshot of the customer app showcasing its user-friendly interface." },
+                  { "title": "Order Management", "description": "Seamless operations with our order management app.", "image": "/yakiben/images/orders-pc-screen.png", "details": "Screenshot of the order management app for seamless operations." }
+                ]
+              },
+              {
+                "group": "Branding",
+                "entries": [
+                  { "title": "Your Own Branding", "description": "Promote your restaurant directly to customers without relying on third-party apps.", "image": "/yakiben/images/own-branding-1.png", "details": "Promote your restaurant with personalized branding options." },
+                  { "title": "Showcase Identity", "description": "Showcase your unique identity with Yakiben's branding tools.", "image": "/yakiben/images/own-branding-2.png", "details": "Showcase your unique identity with Yakiben's branding tools." }
+                ]
+              },
+              {
+                "group": "Modular System",
+                "entries": [
+                  { "title": "Modular System", "description": "Quickly set up a system tailored to your restaurant's needs with our modular design.", "image": "/yakiben/images/modular-system.png" },
+                  { "title": "Customizable Features", "description": "Adapt Yakiben to your specific requirements with ease.", "image": "/yakiben/images/customizable-features.png" },
+                  { "title": "Scalable Design", "description": "Easily scale your restaurant operations with Yakiben's flexible and scalable design.", "image": "/yakiben/images/scalable-design.png", "details": "Illustration of Yakiben's scalable design enabling restaurant growth." },
+                  { "title": "Integrated Ecosystem", "description": "Experience seamless integration of tools and features for a unified restaurant management system.", "image": "/yakiben/images/integrated-ecosystem.png", "details": "Illustration of Yakiben's integrated ecosystem connecting all restaurant operations." }
+                ]
+              }
+            ]
+          },
+          "pricing": {
+            "title": "Pricing",
+            "content": "Our pricing is simple and transparent. Pay only for hosting and managing resources with a variable monthly cost. 0% per order, no hidden fees."
+          },
+          "contact": {
+            "title": "Contact Us",
+            "content": "Have questions or want to get started? Reach out to us at contact@yakiben.com."
+          },
+          "value": {
+            "title": "Our Philosophy",
+            "content": "We believe in returning the hard work of small business owners by providing tools that require minimal effort and deliver maximum impact."
+          }
+        },
+        "announcement": {
+          "text": "Explore our customer app for more features and benefits!",
+          "link": {
+            "url": "/yakiben/customer",
+            "label": "Click here"
+          }
+        }
+      };
+
+      async function loadContent() {
+        // Update header and banner classes dynamically
+        const header = document.querySelector('header');
+        header.classList.remove('bg-red-700');
+        header.classList.add('bg-[#DC143C]'); // Simrik red shade
+
+        const announcementBanner = document.getElementById('announcement-banner');
+        announcementBanner.classList.add('bg-blue-600'); // Dimmed blue shade
+
+        // Optimize main width for large screens
+        const main = document.querySelector('main');
+        main.classList.add('max-w-screen-xl', 'mx-auto');
+
+        // Load announcement banner
+        const announcementText = document.getElementById('announcement-text');
+        if (content.announcement) {
+          announcementText.innerHTML = `${content.announcement.text} <a href='${content.announcement.link.url}' class='underline font-bold'>${content.announcement.link.label}</a>`;
+          announcementBanner.classList.remove('hidden');
+        }
+
+        document.getElementById('header-title').textContent = content.header.title;
+        const nav = document.getElementById('nav-links');
+        content.header.nav.forEach(item => {
+          const link = document.createElement('a');
+          link.href = item.link;
+          link.textContent = item.name;
+          link.className = 'text-lg font-medium hover:underline mx-2';
+          nav.appendChild(link);
+        });
+
+        document.getElementById('about-title').textContent = content.sections.about.title;
+        document.getElementById('about-content').textContent = content.sections.about.content;
+
+        document.getElementById('value-title').textContent = content.sections.value.title;
+        document.getElementById('value-content').textContent = content.sections.value.content;
+
+        document.getElementById('pricing-title').textContent = content.sections.pricing.title;
+        document.getElementById('pricing-content').textContent = content.sections.pricing.content;
+
+        document.getElementById('contact-title').textContent = content.sections.contact.title;
+        document.getElementById('contact-content').textContent = content.sections.contact.content;
+
+        document.getElementById('value-title').classList.add('text-center'); 
+        document.getElementById('value-content').classList.add('text-center'); 
+        document.getElementById('pricing-title').classList.add('text-center');
+        document.getElementById('pricing-content').classList.add('text-center');
+        document.getElementById('value').classList.add('mx-auto', 'text-center', 'max-w-4xl'); 
+        document.getElementById('pricing').classList.add('mx-auto', 'text-center', 'max-w-4xl');
+        document.getElementById('product').classList.add('mx-auto', 'text-center', 'max-w-4xl'); 
+
+        const productSection = document.getElementById('product');
+        productSection.innerHTML = '';
+        content.sections.product.features.forEach(group => {
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'mb-12';
+          groupDiv.innerHTML = `<h2 class='text-3xl font-bold mb-6'>${group.group}</h2>`;
+
+          const featuresDiv = document.createElement('div');
+          featuresDiv.className = 'grid grid-cols-1 md:grid-cols-2 gap-8';
+
+          group.entries.forEach(entry => {
+            const featureDiv = document.createElement('div');
+            featureDiv.className = 'bg-white p-6 rounded-lg shadow-md overflow-hidden';
+            featureDiv.innerHTML = `
+              <h3 class='text-2xl font-bold mb-4'>${entry.title}</h3>
+              <p>${entry.description}</p>
+              <div class='bg-gray-100 p-4 rounded-md flex flex-col items-center mt-4'>
+                <img src='${entry.image}' alt='${entry.title}' class='w-full max-w-[600px] h-auto object-contain rounded-md mb-4 cursor-pointer' onclick='openCarousel("${entry.image}")'>
+                <p class='text-sm text-gray-500 mt-2'>This diagram illustrates the key features and benefits of the product. ${entry.details ? entry.details : ''}</p>
+              </div>
+            `;
+            featuresDiv.appendChild(featureDiv);
+          });
+
+          groupDiv.appendChild(featuresDiv);
+          productSection.appendChild(groupDiv);
+        });
+
+        const navLinks = document.getElementById('nav-links');
+        navLinks.classList.add('flex-wrap', 'justify-center');
+
+        const headerTitle = document.getElementById('header-title');
+        headerTitle.classList.add('sm:text-xl'); 
+      }
+
+      function openCarousel(imageSrc) {
+        const carouselOverlay = document.createElement('div');
+        carouselOverlay.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+        carouselOverlay.innerHTML = `
+          <div class='relative w-11/12 max-w-4xl max-h-[90vh] flex items-center justify-center p-4'>
+            <img src='${imageSrc}' alt='Carousel Image' class='max-w-full max-h-[90vh] object-contain rounded-md cursor-zoom-in' onclick='toggleZoom(this)'>
+          </div>
+        `;
+        carouselOverlay.addEventListener('click', (e) => {
+          if (!e.target.closest('img')) {
+            closeCarousel();
+          }
+        });
+        document.body.appendChild(carouselOverlay);
+      }
+
+      function toggleZoom(imageElement) {
+        if (imageElement.classList.contains('zoomed-in')) {
+          imageElement.classList.remove('zoomed-in');
+          imageElement.classList.add('cursor-zoom-in');
+          imageElement.classList.remove('cursor-zoom-out');
+          imageElement.style.transform = '';
+        } else {
+          imageElement.classList.add('zoomed-in');
+          imageElement.classList.remove('cursor-zoom-in');
+          imageElement.classList.add('cursor-zoom-out');
+          imageElement.style.transform = 'scale(2)';
+        }
+      }
+
+      function closeCarousel() {
+        const carouselOverlay = document.querySelector('.fixed.inset-0');
+        if (carouselOverlay) {
+          document.body.removeChild(carouselOverlay);
+        }
+      }
+
+      function closeBanner() {
+        const banner = document.getElementById('announcement-banner');
+        if (banner) {
+          banner.style.display = 'none';
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-gray-50 text-gray-800" onload="loadContent()">
+    <div id="announcement-banner" class="bg-blue-500 text-white text-center py-4 hidden">
+      <p id="announcement-text"></p>
+      <button onclick="closeBanner()" class="absolute top-2 right-4 text-white font-bold">×</button>
+    </div>
+    <header class="bg-yellow-400 text-white py-4 shadow-md">
+      <div class="container mx-auto flex justify-between items-center px-4">
+        <h1 id="header-title" class="text-2xl font-bold"></h1>
+        <nav id="nav-links" class="flex"></nav>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <section id="about" class="text-center mb-12">
+        <h2 id="about-title" class="text-4xl font-bold mb-4"></h2>
+        <p id="about-content" class="text-lg text-gray-600"></p>
+      </section>
+
+      <section id="value" class="text-center mb-12">
+        <h2 id="value-title" class="text-4xl font-bold mb-4"></h2>
+        <p id="value-content" class="text-lg text-gray-600"></p>
+      </section>
+
+      <section id="product" class="w-full text-center mx-auto px-4">
+        <div id="product-features"></div>
+      </section>
+
+      <section id="pricing" class="text-center mt-12">
+        <h2 id="pricing-title" class="text-4xl font-bold mb-4"></h2>
+        <p id="pricing-content" class="text-lg text-gray-600"></p>
+      </section>
+
+      <section id="contact" class="text-center mt-12">
+        <h2 id="contact-title" class="text-4xl font-bold mb-4"></h2>
+        <p id="contact-content" class="text-lg text-gray-600"></p>
+      </section>
+    </main>
+    <div class="text-center text-sm text-gray-400 mt-4">* Some images are AI-generated. Data in graphs are accurate as of July 2025.</div>
+    <footer class="bg-gray-800 text-white py-4 mt-12">
+      <div class="container mx-auto text-center">
+        <p>&copy; 2025 Yakiben. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
