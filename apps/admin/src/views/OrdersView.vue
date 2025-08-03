@@ -150,7 +150,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { Order } from '../types';
+import type { Order } from '../types/types';
 import { ordersApi } from '../mocks/orders';
 import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon } from '@heroicons/vue/24/solid';
 

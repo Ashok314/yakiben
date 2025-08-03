@@ -51,8 +51,8 @@ export interface MenuItem {
   description: string;
   price: number;
   category: string;
-  image: string;
-  available: boolean;
+  imageUrl?: string;
+  outOfStock?: boolean;
   options?: MenuItemOption[];
 }
 
