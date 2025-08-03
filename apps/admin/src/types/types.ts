@@ -60,20 +60,33 @@ export interface MenuItemOption {
 
 export interface RestaurantSettings {
   name: string;
-  description: string;
-  logo: string;
-  address: string;
+  address: {
+    postal: string;
+    prefecture: string;
+    city: string;
+    line1: string;
+  };
   phone: string;
   email: string;
-  openingHours: {
-    day: string;
-    open: string;
-    close: string;
-  }[];
-  announcement?: string;
-  orderingEnabled: boolean;
-  minimumOrderAmount?: number;
-  deliveryFee?: number;
-  estimatedDeliveryTime?: number;
-  estimatedPickupTime?: number;
+  hours: {
+    open: number;
+    close: number;
+    orderDeadline: number;
+    minAdvanceTime: number;
+    maxAdvanceDays: number;
+    businessDays: number[];
+  };
+  support: {
+    phone: string;
+    hours: string;
+    email: string;
+  };
+}
+
+export interface Banner {
+  id: number;
+  text: string;
+  url?: string; // Optional redirect URL
+  startDate: string;
+  endDate: string;
 }
