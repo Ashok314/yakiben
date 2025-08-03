@@ -1,12 +1,5 @@
 export type UserRole = 'manager' | 'staff' | 'driver';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-}
-
 export interface Order {
   id: string;
   trackingId: string;
