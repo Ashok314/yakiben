@@ -1,16 +1,16 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Menu Management</h1>
-    <p class="mb-4">Manage your restaurant's menu items here.</p>
+    <h1 class="text-2xl font-bold mb-4">{{ UI_TEXTS.menuManagement.title }}</h1>
+    <p class="mb-4">{{ UI_TEXTS.menuManagement.description }}</p>
 
     <table class="table-auto w-full border-collapse border border-gray-300">
       <thead>
         <tr class="bg-gray-100">
-          <th class="border border-gray-300 px-4 py-2">Name</th>
-          <th class="border border-gray-300 px-4 py-2">Price</th>
-          <th class="border border-gray-300 px-4 py-2">Description</th>
-          <th class="border border-gray-300 px-4 py-2">Out of Stock</th>
-          <th class="border border-gray-300 px-4 py-2">Actions</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.menuManagement.tableHeaders.name }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.menuManagement.tableHeaders.price }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.menuManagement.tableHeaders.description }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.menuManagement.tableHeaders.outOfStock }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.menuManagement.tableHeaders.actions }}</th>
         </tr>
       </thead>
       <tbody>
@@ -25,59 +25,59 @@
               {{ item.description.split(' ').slice(0, 30).join(' ') }}{{ item.description.split(' ').length > 30 ? '...' : '' }}
             </td>
             <td class="border border-gray-300 px-4 py-2">
-              <span v-if="item.outOfStock" class="text-red-500">Out of Stock</span>
-              <span v-else class="text-green-500">Available</span>
+              <span v-if="item.outOfStock" class="text-red-500">{{ UI_TEXTS.menuManagement.itemStatus.outOfStock }}</span>
+              <span v-else class="text-green-500">{{ UI_TEXTS.menuManagement.itemStatus.available }}</span>
             </td>
             <td class="border border-gray-300 px-4 py-2">
-              <button class="text-blue-500 hover:underline mr-2" @click="openEditModal(item)">Edit</button>
-              <button class="text-red-500 hover:underline" @click="confirmDelete(item.id)">Delete</button>
+              <button class="text-blue-500 hover:underline mr-2" @click="openEditModal(item)">{{ UI_TEXTS.menuManagement.actions.edit }}</button>
+              <button class="text-red-500 hover:underline" @click="confirmDelete(item.id)">{{ UI_TEXTS.menuManagement.actions.delete }}</button>
             </td>
           </tr>
         </template>
       </tbody>
     </table>
 
-    <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" @click="openAddModal">Add New Item</button>
+    <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" @click="openAddModal">{{ UI_TEXTS.menuManagement.actions.addNewItem }}</button>
 
     <!-- Modal -->
     <div v-if="isModalOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex">
       <div class="w-4/5 bg-white p-6 rounded shadow-lg overflow-auto ml-auto">
-        <h2 class="text-2xl font-bold mb-4">{{ isEditing ? 'Edit Item' : 'Add Item' }}</h2>
+        <h2 class="text-2xl font-bold mb-4">{{ isEditing ? UI_TEXTS.menuManagement.modals.editItem.title : UI_TEXTS.menuManagement.modals.addItem.title }}</h2>
         <form @submit.prevent="saveItem">
           <div class="mb-4">
-            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <label for="name" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.nameLabel }}</label>
             <input v-model="currentItem.name" type="text" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required />
           </div>
           <div class="mb-4">
-            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+            <label for="price" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.priceLabel }}</label>
             <input v-model="currentItem.price" type="number" id="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required />
           </div>
           <div class="mb-4">
-            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+            <label for="category" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.categoryLabel }}</label>
             <select v-model="currentItem.category" id="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required>
               <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
-              <option value="add-new">Add New Category</option>
+              <option value="add-new">{{ UI_TEXTS.menuManagement.modals.form.addNewCategory }}</option>
             </select>
             <div v-if="currentItem.category === 'add-new'" class="mt-2">
-              <input v-model="newCategory" type="text" placeholder="Enter new category" class="border rounded px-2 py-1 w-full" />
-              <button @click="addCategory(newCategory)" class="mt-2 px-4 py-2 bg-green-500 text-white rounded">Add Category</button>
+              <input v-model="newCategory" type="text" placeholder="{{ UI_TEXTS.menuManagement.modals.form.newCategoryPlaceholder }}" class="border rounded px-2 py-1 w-full" />
+              <button @click="addCategory(newCategory)" class="mt-2 px-4 py-2 bg-green-500 text-white rounded">{{ UI_TEXTS.menuManagement.modals.form.addCategoryButton }}</button>
             </div>
           </div>
           <div class="mb-4">
-            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <label for="description" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.descriptionLabel }}</label>
             <textarea v-model="currentItem.description" id="description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required></textarea>
           </div>
           <div class="mb-4">
-            <label for="imageUrl" class="block text-sm font-medium text-gray-700">Image URL</label>
+            <label for="imageUrl" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.imageUrlLabel }}</label>
             <input v-model="currentItem.imageUrl" type="text" id="imageUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required />
           </div>
           <div class="mb-4">
-            <label for="outOfStock" class="block text-sm font-medium text-gray-700">Out of Stock</label>
+            <label for="outOfStock" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.outOfStockLabel }}</label>
             <input v-model="currentItem.outOfStock" type="checkbox" id="outOfStock" class="mt-1" />
           </div>
           <div class="flex justify-end gap-2">
-            <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="confirmCloseModal">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
+            <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="confirmCloseModal">{{ UI_TEXTS.menuManagement.modals.form.cancelButton }}</button>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">{{ UI_TEXTS.menuManagement.modals.form.saveButton }}</button>
           </div>
         </form>
       </div>
@@ -99,6 +99,7 @@ import ConfirmDialog from '../components/ConfirmDialog.vue';
 import { ref } from 'vue';
 import type { MenuItem } from '../types';
 import { categoriesApi, MOCK_MENU_ITEMS } from '../mocks/menu';
+import { UI_TEXTS } from "../constants/ui-texts";
 
 const menuItems = ref<MenuItem[]>(MOCK_MENU_ITEMS);
 const categories = ref<string[]>([]);
@@ -125,8 +126,8 @@ const openAddModal = () => {
 
 const saveItem = () => {
   openConfirmDialog(
-    'Confirm Save',
-    'Are you sure you want to save changes?',
+    UI_TEXTS.menuManagement.modals.confirmDialogs.save.title,
+    UI_TEXTS.menuManagement.modals.confirmDialogs.save.message,
     () => {
       if (isEditing.value) {
         // Update existing item
@@ -159,8 +160,8 @@ const handleConfirmAction = () => {
 
 const confirmDelete = (id: number) => {
   openConfirmDialog(
-    'Confirm Delete',
-    'Are you sure you want to delete this item?',
+    UI_TEXTS.menuManagement.modals.confirmDialogs.delete.title,
+    UI_TEXTS.menuManagement.modals.confirmDialogs.delete.message,
     () => deleteItem(id)
   );
 };
@@ -179,8 +180,8 @@ const openEditModal = (item: MenuItem) => {
 const confirmCloseModal = () => {
   if (unsavedChanges.value) {
     openConfirmDialog(
-      'Unsaved Changes',
-      'You have unsaved changes. Are you sure you want to close?',
+      UI_TEXTS.menuManagement.modals.confirmDialogs.unsavedChanges.title,
+      UI_TEXTS.menuManagement.modals.confirmDialogs.unsavedChanges.message,
       closeModal
     );
   } else {

@@ -1,15 +1,15 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">User Management</h1>
-    <p class="mb-4">Manage users and roles here.</p>
+    <h1 class="text-2xl font-bold mb-4">{{ UI_TEXTS.userManagement.title }}</h1>
+    <p class="mb-4">{{ UI_TEXTS.userManagement.description }}</p>
 
     <table class="table-auto w-full border-collapse border border-gray-300">
       <thead>
         <tr class="bg-gray-100">
-          <th class="border border-gray-300 px-4 py-2">Name</th>
-          <th class="border border-gray-300 px-4 py-2">Email</th>
-          <th class="border border-gray-300 px-4 py-2">Role</th>
-          <th class="border border-gray-300 px-4 py-2">Actions</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.userManagement.tableHeaders.name }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.userManagement.tableHeaders.email }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.userManagement.tableHeaders.role }}</th>
+          <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.userManagement.tableHeaders.actions }}</th>
         </tr>
       </thead>
       <tbody>
@@ -18,30 +18,30 @@
           <td class="border border-gray-300 px-4 py-2">{{ user.email }}</td>
           <td class="border border-gray-300 px-4 py-2">{{ user.role }}</td>
           <td class="border border-gray-300 px-4 py-2">
-            <button class="text-blue-500 hover:underline mr-2" @click="openEditModal(user)">Edit</button>
-            <button class="text-red-500 hover:underline" @click="openDeleteDialog(user.id)">Delete</button>
+            <button class="text-blue-500 hover:underline mr-2" @click="openEditModal(user)">{{ UI_TEXTS.userManagement.actions.edit }}</button>
+            <button class="text-red-500 hover:underline" @click="openDeleteDialog(user.id)">{{ UI_TEXTS.userManagement.actions.delete }}</button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" @click="openAddModal">Add New User</button>
+    <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" @click="openAddModal">{{ UI_TEXTS.userManagement.actions.addNewUser }}</button>
 
     <!-- Edit User Modal -->
     <div v-if="isEditModalOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
       <div class="bg-white p-6 rounded shadow-lg w-96">
-        <h2 class="text-xl font-bold mb-4">Edit User</h2>
+        <h2 class="text-xl font-bold mb-4">{{ UI_TEXTS.userManagement.modals.editUser.title }}</h2>
         <form @submit.prevent="saveUser">
           <div class="mb-4">
-            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <label for="name" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.userManagement.modals.editUser.fields.name }}</label>
             <input v-model="currentUser.name" type="text" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required />
           </div>
           <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <label for="email" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.userManagement.modals.editUser.fields.email }}</label>
             <input v-model="currentUser.email" type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" required />
           </div>
           <div class="mb-4">
-            <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+            <label for="role" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.userManagement.modals.editUser.fields.role }}</label>
             <select v-model="currentUser.role" id="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
               <option value="staff">Staff</option>
               <option value="driver">Driver</option>
@@ -49,8 +49,8 @@
             </select>
           </div>
           <div class="flex justify-end gap-2">
-            <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="closeEditModal">Cancel</button>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Save</button>
+            <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="closeEditModal">{{ UI_TEXTS.userManagement.modals.editUser.buttons.cancel }}</button>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">{{ UI_TEXTS.userManagement.modals.editUser.buttons.save }}</button>
           </div>
         </form>
       </div>
@@ -60,8 +60,8 @@
     <ConfirmDialog
       v-if="isDeleteDialogOpen"
       :isOpen="isDeleteDialogOpen"
-      title="Confirm Delete"
-      message="Are you sure you want to delete this user?"
+      :title="UI_TEXTS.userManagement.modals.deleteUser.title"
+      :message="UI_TEXTS.userManagement.modals.deleteUser.message"
       @cancel="closeDeleteDialog"
       @confirm="deleteUser"
     />
@@ -73,16 +73,17 @@ import { ref } from 'vue';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
 import type { User } from '../types';
 import { MOCK_USERS } from '../mocks/users';
+import { UI_TEXTS } from "../constants/ui-texts";
 
 const users = ref<User[]>(MOCK_USERS);
-
 const isEditModalOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
 const currentUser = ref<User>({ id: 0, name: '', email: '', role: 'staff' });
 const deleteUserId = ref<number | null>(null);
 
 const openAddModal = () => {
-  currentUser.value = { id: 0, name: '', email: '', role: 'staff' };
+  // FIXME  remove id when adding a new user: handle in backend
+  currentUser.value = { id: Date.now(), name: '', email: '', role: 'staff' }; // Generate unique ID for new user
   isEditModalOpen.value = true;
 };
 
@@ -123,7 +124,9 @@ const saveUser = async () => {
     // FIXME Replace with API call
     const index = users.value.findIndex((user: User) => user.id === currentUser.value.id);
     if (index !== -1) {
-      users.value[index] = { ...currentUser.value };
+      users.value[index] = { ...currentUser.value }; // Update existing user
+    } else {
+      users.value.push({ ...currentUser.value }); // Add new user
     }
     closeEditModal();
   } catch (error) {

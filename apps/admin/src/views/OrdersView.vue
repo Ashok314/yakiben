@@ -1,12 +1,12 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Orders</h1>
+    <h1 class="text-2xl font-bold mb-4">{{ UI_TEXTS.orders.title }}</h1>
 
     <!-- Filter to hide delivered orders -->
     <div class="mb-4">
       <label class="flex items-center space-x-2">
         <input type="checkbox" v-model="hideDelivered" class="form-checkbox">
-        <span>Hide Delivered Orders</span>
+        <span>{{ UI_TEXTS.orders.hideDeliveredLabel }}</span>
       </label>
     </div>
 
@@ -15,7 +15,7 @@
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-x-auto">
         <div v-for="status in filteredStatuses" :key="status" :class="getStatusColor(status) + ' p-4 rounded-lg shadow'">
           <!-- Kanban Column Title -->
-          <h2 class="text-lg font-bold mb-2">{{ status }}</h2>
+          <h2 class="text-lg font-bold mb-2">{{ UI_TEXTS.orders.kanban.columnTitle[status] }}</h2>
 
           <div v-for="order in filteredOrdersByStatus[status]" :key="order.id" class="bg-white p-4 rounded-md mb-2 shadow cursor-pointer" @click="selectOrder(order)">
             <!-- Top Section: Time Remaining and Buttons -->
@@ -47,10 +47,10 @@
               </div>
             </div>
 
-            <p class="font-bold">Order #{{ order.trackingId }}</p>
+            <p class="font-bold">{{ UI_TEXTS.orders.kanban.orderDetails.trackingId }} {{ order.trackingId }}</p>
             <p class="text-sm text-gray-600">{{ blurName(order.customer.name) }}</p>
-            <p v-if="order.scheduledAt" class="text-sm text-gray-500">Scheduled At: {{ order.scheduledAt }}</p>
-            <p class="text-sm text-gray-500">Total: ${{ order.total.toFixed(2) }}</p>
+            <p v-if="order.scheduledAt" class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.scheduledAt }}: {{ order.scheduledAt }}</p>
+            <p class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.total }}: ${{ order.total.toFixed(2) }}</p>
           </div>
         </div>
       </div>
@@ -95,33 +95,33 @@
             </div>
           </div>
 
-          <h2 class="text-lg font-bold mb-4">Order Details</h2>
+          <h2 class="text-lg font-bold mb-4">{{ UI_TEXTS.orders.modal.title }}</h2>
 
           <!-- Customer Info -->
           <div class="mb-4 border-b border-gray-300 pb-4">
-            <h3 class="text-md font-semibold">Customer Information</h3>
-            <p><span class="font-semibold">Name:</span> {{ selectedOrder.customer.name }}</p>
-            <p><span class="font-semibold">Phone:</span> {{ selectedOrder.customer.phone }}</p>
+            <h3 class="text-md font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.title }}</h3>
+            <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.name }}:</span> {{ selectedOrder.customer.name }}</p>
+            <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.phone }}:</span> {{ selectedOrder.customer.phone }}</p>
           </div>
 
           <!-- Order Info -->
           <div class="mb-4 border-b border-gray-300 pb-4">
-            <h3 class="text-md font-semibold">Order Information</h3>
-            <p><span class="font-semibold">Order ID:</span> {{ selectedOrder.trackingId }}</p>
-            <p v-if="selectedOrder.scheduledAt"><span class="font-semibold">Scheduled At:</span> {{ selectedOrder.scheduledAt }}</p>
+            <h3 class="text-md font-semibold">{{ UI_TEXTS.orders.modal.orderInfo.title }}</h3>
+            <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.orderInfo.orderId }}:</span> {{ selectedOrder.trackingId }}</p>
+            <p v-if="selectedOrder.scheduledAt"><span class="font-semibold">{{ UI_TEXTS.orders.modal.orderInfo.scheduledAt }}:</span> {{ selectedOrder.scheduledAt }}</p>
           </div>
 
           <!-- Items -->
           <div class="mb-4">
-            <h3 class="text-md font-semibold">Order Items</h3>
+            <h3 class="text-md font-semibold">{{ UI_TEXTS.orders.modal.items.title }}</h3>
             <table class="table-auto w-full text-left border-collapse">
               <thead>
                 <tr>
-                  <th class="border-b border-gray-300 py-2">#</th>
-                  <th class="border-b border-gray-300 py-2">Item</th>
-                  <th class="border-b border-gray-300 py-2">Quantity</th>
-                  <th class="border-b border-gray-300 py-2">Customizations</th>
-                  <th class="border-b border-gray-300 py-2">Price</th>
+                  <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orders.modal.items.headers.index }}</th>
+                  <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orders.modal.items.headers.item }}</th>
+                  <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orders.modal.items.headers.quantity }}</th>
+                  <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orders.modal.items.headers.customizations }}</th>
+                  <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orders.modal.items.headers.price }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,12 +134,12 @@
                 </tr>
               </tbody>
             </table>
-            <p class="text-right font-bold mt-4">Total: ${{ selectedOrder.total.toFixed(2) }}</p>
+            <p class="text-right font-bold mt-4">{{ UI_TEXTS.orders.modal.items.total }}: ${{ selectedOrder.total.toFixed(2) }}</p>
           </div>
 
           <!-- Comments -->
           <div v-if="selectedOrder.comments" class="mb-4 bg-yellow-100 p-4 rounded">
-            <h3 class="text-md font-semibold">Customer Comments</h3>
+            <h3 class="text-md font-semibold">{{ UI_TEXTS.orders.modal.comments.title }}</h3>
             <p>{{ selectedOrder.comments }}</p>
           </div>
         </div>
@@ -153,6 +153,7 @@ import { ref, computed, onMounted } from 'vue';
 import type { Order } from '../types/types';
 import { ordersApi } from '../mocks/orders';
 import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon } from '@heroicons/vue/24/solid';
+import { UI_TEXTS } from "../constants/ui-texts";
 
 const orders = ref<Order[]>([]);
 const statuses = ref(['pending', 'accepted', 'preparing', 'ready', 'delivered']);

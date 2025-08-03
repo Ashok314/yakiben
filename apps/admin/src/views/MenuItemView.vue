@@ -1,9 +1,9 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Menu Item Management</h1>
+    <h1 class="text-2xl font-bold mb-4">{{ UI_TEXTS.menuManagement.title }}</h1>
     <form @submit.prevent="saveItem" class="space-y-4">
       <div>
-        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+        <label for="name" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.menuItem.form.nameLabel }}</label>
         <input 
           v-model="menuItem.name" 
           type="text" 
@@ -13,7 +13,7 @@
         />
       </div>
       <div>
-        <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+        <label for="price" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.menuItem.form.priceLabel }}</label>
         <input 
           v-model="menuItem.price" 
           type="number" 
@@ -23,7 +23,7 @@
         />
       </div>
       <div>
-        <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+        <label for="category" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.menuItem.form.categoryLabel }}</label>
         <input 
           v-model="menuItem.category" 
           type="text" 
@@ -33,7 +33,7 @@
         />
       </div>
       <div>
-        <label for="available" class="block text-sm font-medium text-gray-700">Available</label>
+        <label for="available" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.menuItem.form.availableLabel }}</label>
         <input 
           v-model="menuItem.available" 
           type="checkbox" 
@@ -46,7 +46,7 @@
           type="submit" 
           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Save
+          {{ UI_TEXTS.menuManagement.menuItem.form.saveButton }}
         </button>
       </div>
     </form>
@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { UI_TEXTS } from "../constants/ui-texts";
 
 interface MenuItem {
   name: string;
@@ -71,7 +72,7 @@ const menuItem = ref<MenuItem>({
 });
 
 const saveItem = () => {
-  alert(`Saving item: ${JSON.stringify(menuItem.value)}`);
+  alert(`${UI_TEXTS.menuManagement.menuItem.alerts.saveSuccess}: ${JSON.stringify(menuItem.value)}`);
 };
 </script>
 
