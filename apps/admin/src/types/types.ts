@@ -1,5 +1,13 @@
 export type UserRole = 'manager' | 'staff' | 'driver';
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password?: string; // Optional for security reasons
+  role: UserRole;
+}
+
 export interface Order {
   id: string;
   trackingId: string;
@@ -7,6 +15,12 @@ export interface Order {
     name: string;
     phone: string;
     email?: string;
+    address?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      instructions?: string;
+    };
   };
   items: OrderItem[];
   total: number;
@@ -28,6 +42,7 @@ export interface Order {
     role: string;
   };
   deliveredAt?: string;
+  deliveryTime?: string; // Optional delivery time for the order
 }
 
 export interface OrderItem {
