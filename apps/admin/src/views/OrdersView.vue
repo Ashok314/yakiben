@@ -15,9 +15,9 @@
       <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-x-auto">
         <div v-for="status in filteredStatuses" :key="status" :class="getStatusColor(status) + ' p-4 rounded-lg shadow'">
           <!-- Kanban Column Title -->
-          <h2 class="text-lg font-bold mb-2">{{ UI_TEXTS.orders.kanban.columnTitle[status] }}</h2>
+          <h2 class="text-lg font-bold mb-2">{{ status }}</h2>
 
-          <div v-for="order in filteredOrdersByStatus[status]" :key="order.id" class="bg-white p-4 rounded-md mb-2 shadow cursor-pointer" @click="selectOrder(order)">
+          <div v-for="order in filteredOrdersByStatus[status]" :key="order.id" class="bg-white p-4 rounded-md mb-2 shadow cursor-pointer relative" @click="selectOrder(order)">
             <!-- Top Section: Time Remaining and Buttons -->
             <div class="flex flex-wrap justify-between items-center mb-2">
               <!-- Time Remaining -->
@@ -51,6 +51,41 @@
             <p class="text-sm text-gray-600">{{ blurName(order.customer.name) }}</p>
             <p v-if="order.scheduledAt" class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.scheduledAt }}: {{ order.scheduledAt }}</p>
             <p class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.total }}: ${{ order.total.toFixed(2) }}</p>
+
+            <div v-if="DRIVER_STATUS.includes(order.status)" class="absolute bottom-2 right-2">
+              <!-- Assign Driver Button -->
+              <button 
+                v-if="!order.driver && !order.deliveredAt"
+                @click.stop="showAssignDriverModal(order)"
+                class="px-2 py-1 bg-blue-400 text-white text-sm rounded-md hover:bg-blue-500 flex items-center justify-center"
+              >
+                <DeliverIcon class="h-5 w-5 mr-2" />
+                Assign Driver
+              </button>
+
+              <!-- Unassign Driver Button -->
+              <button 
+                v-if="order.driver && !order.deliveredAt"
+                @click.stop="unassignDriver(order)"
+                class="px-2 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 flex items-center justify-center"
+              >
+                <DeliverIcon class="h-5 w-5 mr-2" />
+                Unassign Driver
+              </button>
+
+              <!-- Display Assigned Driver -->
+              <p v-if="order.driver && !order.deliveredAt" class="text-sm text-gray-600 mt-2">Assigned to: {{ order.driver.name }}</p>
+              <p v-else-if="order.deliveredAt" class="text-sm text-gray-600 mt-2">Delivered by: {{ order.driver.name }} at {{ new Date(order.deliveredAt).toLocaleString() }}</p>
+            </div>
+
+            <div v-if="status === STATUS_DELIVERED" class="absolute bottom-2 right-2">
+               <!-- FIXME: Unassign Driver Button  -->
+                
+              <!-- Display Delivered By and Delivered At -->
+              <p v-if="order.driver" class="text-sm text-gray-600">Delivered by: {{ order.driver.name }}</p>
+              <p v-if="order.deliveredAt" class="text-sm text-gray-500">Delivered at: {{ new Date(order.deliveredAt).toLocaleString() }}</p>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -144,6 +179,27 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal for Assigning Driver -->
+      <div v-if="assignDriverModalVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative">
+          <h2 class="text-lg font-bold mb-4">Assign Driver</h2>
+          <ul class="space-y-2">
+            <li v-for="user in availableUsers" :key="user.id" class="flex items-center justify-between">
+              <span>{{ user.name }} ({{ user.role }})</span>
+              <button 
+                @click="assignDriverToOrder(selectedOrder, user)"
+                class="px-2 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600"
+              >
+                Assign
+              </button>
+            </li>
+          </ul>
+          <button @click="closeAssignDriverModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+            <XMarkIcon class="h-5 w-5" />
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -152,23 +208,34 @@
 import { ref, computed, onMounted } from 'vue';
 import type { Order } from '../types/types';
 import { ordersApi } from '../mocks/orders';
-import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon } from '@heroicons/vue/24/solid';
+import { MOCK_USERS } from '../mocks/users';
+import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon, UserIcon as DeliverIcon } from '@heroicons/vue/24/solid';
 import { UI_TEXTS } from "../constants/ui-texts";
 
 const orders = ref<Order[]>([]);
-const statuses = ref(['pending', 'accepted', 'preparing', 'ready', 'delivered']);
+const users = ref(MOCK_USERS);
+const STATUS_FLOW = ['pending', 'accepted', 'preparing', 'ready', 'delivering', 'delivered'];
 const selectedOrder = ref<Order | null>(null);
 const hideDelivered = ref(false);
+const assignDriverModalVisible = ref(false);
+const availableUsers = ref(users.value.filter((user: { id: number; name: string; role: string }) => user.role === 'driver'));
+
+// Declare constants for status checks
+const STATUS_READY = 'ready';
+const STATUS_DELIVERED = 'delivered';
+const STATUS_DELIVERING = 'delivering';
+const HIDDEN_STATUSES = [STATUS_DELIVERED, STATUS_DELIVERING];
+const DRIVER_STATUS = [STATUS_READY, STATUS_DELIVERING];
 
 onMounted(async () => {
   orders.value = await ordersApi.getOrders();
 });
 
 const filteredOrdersByStatus = computed(() => {
-  return statuses.value.reduce((acc: Record<string, Order[]>, status: string) => {
+  return STATUS_FLOW.reduce((acc: Record<string, Order[]>, status: string) => {
     acc[status] = orders.value.filter((order: Order) => {
       const matchesStatus = order.status === status;
-      const isVisible = !(hideDelivered.value && order.status === 'delivered');
+      const isVisible = !(hideDelivered.value && HIDDEN_STATUSES.includes(order.status));
       return matchesStatus && isVisible;
     });
     return acc;
@@ -177,8 +244,8 @@ const filteredOrdersByStatus = computed(() => {
 
 const filteredStatuses = computed(() => {
   return hideDelivered.value
-    ? statuses.value.filter((status: string) => status !== 'delivered')
-    : statuses.value;
+    ? STATUS_FLOW.filter((status: string) => !HIDDEN_STATUSES.includes(status))
+    : STATUS_FLOW;
 });
 
 const blurName = (name: string) => {
@@ -187,22 +254,19 @@ const blurName = (name: string) => {
 };
 
 const canUpdateStatus = (order: Order) => {
-  const statusFlow = ['pending', 'accepted', 'preparing', 'ready', 'delivered'];
-  return statusFlow.indexOf(order.status) < statusFlow.length - 1;
+  return STATUS_FLOW.indexOf(order.status) < STATUS_FLOW.length - 1;
 };
 
 const updateOrderStatus = (order: Order, direction: 'next' | 'prev' = 'next') => {
-  const statusFlow = ['pending', 'accepted', 'preparing', 'ready', 'delivered'];
-  const currentIndex = statusFlow.indexOf(order.status);
-  if (direction === 'next' && currentIndex < statusFlow.length - 1) {
-    order.status = statusFlow[currentIndex + 1] as any;
+  const currentIndex = STATUS_FLOW.indexOf(order.status);
+  if (direction === 'next' && currentIndex < STATUS_FLOW.length - 1) {
+    order.status = STATUS_FLOW[currentIndex + 1] as any;
   } else if (direction === 'prev' && currentIndex > 0) {
-    order.status = statusFlow[currentIndex - 1] as any;
+    order.status = STATUS_FLOW[currentIndex - 1] as any;
   }
 };
 
 const selectOrder = (order: Order) => {
-  console.log('Order selected:', order);
   selectedOrder.value = order;
 };
 
@@ -220,6 +284,8 @@ const getStatusColor = (status: string) => {
       return 'bg-purple-100';
     case 'ready':
       return 'bg-green-100';
+    case 'delivering':
+      return 'bg-yellow-100';
     case 'delivered':
       return 'bg-gray-100';
     default:
@@ -271,14 +337,45 @@ const formatTimeRemaining = (createdAt: string) => {
 };
 
 const getNextStatus = (currentStatus: string) => {
-  const statusFlow = ['pending', 'accepted', 'preparing', 'ready', 'delivered'];
-  const currentIndex = statusFlow.indexOf(currentStatus);
-  return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
+  const currentIndex = STATUS_FLOW.indexOf(currentStatus);
+  return currentIndex < STATUS_FLOW.length - 1 ? STATUS_FLOW[currentIndex + 1] : null;
 };
 
 const getPrevStatus = (currentStatus: string) => {
-  const statusFlow = ['pending', 'accepted', 'preparing', 'ready', 'delivered'];
-  const currentIndex = statusFlow.indexOf(currentStatus);
-  return currentIndex > 0 ? statusFlow[currentIndex - 1] : null;
+  const currentIndex = STATUS_FLOW.indexOf(currentStatus);
+  return currentIndex > 0 ? STATUS_FLOW[currentIndex - 1] : null;
+};
+
+const showAssignDriverModal = (order: Order) => {
+  selectedOrder.value = order;
+  assignDriverModalVisible.value = true;
+  // Fetch available users for assignment (mocked here, replace with real API call)
+  availableUsers.value = users.value;
+};
+
+const closeAssignDriverModal = () => {
+  assignDriverModalVisible.value = false;
+  selectedOrder.value = null;
+};
+
+const assignDriverToOrder = async (order: Order, user: any) => {
+  try {
+    // Replace with actual API call
+    await ordersApi.assignDriver(order.id, user.id);
+    order.driver = user;
+    closeAssignDriverModal();
+  } catch (error) {
+    console.error('Failed to assign driver:', error);
+  }
+};
+
+const unassignDriver = async (order: Order) => {
+  try {
+    // Replace with actual API call
+    await ordersApi.unassignDriver(order.id);
+    order.driver = undefined;
+  } catch (error) {
+    console.error('Failed to unassign driver:', error);
+  }
 };
 </script>

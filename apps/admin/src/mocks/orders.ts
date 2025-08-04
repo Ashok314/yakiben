@@ -43,6 +43,8 @@ export const MOCK_ORDERS: Order[] = [
       { id: '5', name: 'Ramen', quantity: 3, price: 15.0 },
       { id: '6', name: 'Tempura', quantity: 2, price: 20.0 },
     ],
+    driver: { id: 1, name: 'Mike Brown', role: 'driver' },
+    deliveredAt: '2025-07-03T16:00:00Z',
   },
   {
     id: '4',
@@ -66,5 +68,13 @@ export const ordersApi = {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
     return MOCK_ORDERS;
+  },
+  async assignDriver(orderId: string, driverId: number): Promise<void> {
+    console.log(`Driver ${driverId} assigned to order ${orderId}`);
+    // Mock implementation
+  },
+  async unassignDriver(orderId: string): Promise<void> {
+    console.log(`Driver unassigned from order ${orderId}`);
+    // Mock implementation
   },
 };

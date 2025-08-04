@@ -10,7 +10,7 @@ export interface Order {
   };
   items: OrderItem[];
   total: number;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered';
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'delivered';
   createdAt: string;
   pickupTime?: string;
   address?: {
@@ -22,6 +22,12 @@ export interface Order {
   paymentMethod: 'cash' | 'card' | 'online';
   paymentStatus: 'pending' | 'paid';
   comments?: string; // Optional comments for the order
+  driver?: {
+    id: number;
+    name: string;
+    role: string;
+  };
+  deliveredAt?: string;
 }
 
 export interface OrderItem {
