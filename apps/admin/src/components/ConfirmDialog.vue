@@ -12,13 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import {  defineEmits } from 'vue';
 
-const props = defineProps({
-  isOpen: Boolean,
-  title: String,
-  message: String,
-});
 
 const emit = defineEmits(['cancel', 'confirm']);
 
@@ -30,7 +25,3 @@ const onConfirm = () => {
   emit('confirm');
 };
 </script>
-
-<style scoped>
-/* Add scoped styles here */
-</style>

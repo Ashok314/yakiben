@@ -29,18 +29,26 @@
         <hr class="border-gray-300 my-4" />
 
         <!-- Order Details Section -->
-        <h3 class="text-base font-semibold mb-2">Order Details</h3>
+        <h3 class="text-base font-semibold mb-2">Order</h3>
         <div class="p-4 bg-white shadow-lg rounded-md overflow-y-auto max-h-60">
           <ul class="list-disc pl-5 space-y-1 mb-4">
             <li v-for="item in currentDelivery.items" :key="item.id" class="text-sm">
               <span class="font-medium">{{ item.name }}</span> (x{{ item.quantity }}) - ${{ item.price.toFixed(2) }}
             </li>
           </ul>
-          <div class="space-y-1">
-            <p class="text-sm"><span class="font-medium">Total:</span> ${{ currentDelivery.total.toFixed(2) }}</p>
-            <p class="text-sm"><span class="font-medium">Payment Method:</span> {{ currentDelivery.paymentMethod }}</p>
-            <p class="text-sm"><span class="font-medium">Payment Status:</span> {{ currentDelivery.paymentStatus }}</p>
-          </div>
+        </div>
+        <hr class="border-gray-300 my-4" />
+
+        <!-- Details Section -->
+        <h3 class="text-base font-semibold mb-2">Order Details</h3>
+        <div class="space-y-1">
+          <p class="text-sm">
+            <span class="font-medium">Total:</span> 
+            <span class="text-green-500">${{ currentDelivery.total.toFixed(2) }}</span>
+            <a class="text-blue-500 hover:underline text-sm cursor-pointer px-2" v-if="currentDelivery.paymentMethod === 'card'" @click="handleCalculateChange">Calculate Change</a>
+          </p>
+          <p class="text-sm"><span class="font-medium">Payment Method:</span> <span class="text-blue-500">{{ currentDelivery.paymentMethod }}</span></p>
+          <p class="text-sm"><span class="font-medium">Payment Status:</span> <span class="text-red-500">{{ currentDelivery.paymentStatus }}</span></p>
         </div>
         <hr class="border-gray-300 my-4" />
 
@@ -48,7 +56,7 @@
         <h3 class="text-base font-semibold mb-2">Delivery Details</h3>
         <div class="space-y-1">
           <p class="text-sm"><span class="font-medium">Status:</span> {{ currentDelivery.status }}</p>
-          <p class="text-sm"><span class="font-medium">Delivery Time:</span> {{ formatTime(currentDelivery.deliveryTime) }}</p>
+          <p class="text-sm"><span class="font-medium">Delivery Time:</span> <span class="text-yellow-500">{{ formatTime(currentDelivery.deliveryTime) }} ({{ calculateCountdown(currentDelivery.deliveryTime) }})</span></p>
           <a :href="`https://maps.google.com/?q=${currentDelivery.customer.address?.street}, ${currentDelivery.customer.address?.city}`" target="_blank" class="text-blue-500 hover:underline text-sm">View on Map</a>
         </div>
         <hr class="border-gray-300 my-4" />
@@ -83,6 +91,10 @@
           <p class="text-sm"><span class="font-medium">Customer:</span> {{ order.customer.name }}</p>
           <p class="text-sm"><span class="font-medium">Address:</span> {{ order.customer.address?.street }}, {{ order.customer.address?.city }}</p>
           <p class="text-sm"><span class="font-medium">Comment:</span> {{ order.customer.address?.instructions || 'No comments provided' }}</p>
+          <p class="text-sm"><span class="font-medium">Delivery Time:</span> {{ formatTime(order.deliveryTime) }} 
+            (<span class="text-red-500" v-if="!order.deliveredAt">{{ calculateCountdown(order.deliveryTime) }}</span>
+          <span v-else class="text-sm text-green-500">Delivered at: {{ formatTime(order.deliveredAt) }}</span>)
+            </p>
         </div>
         <hr class="border-gray-300 my-2" />
         <details class="bg-gray-100 p-2 rounded-md">
@@ -95,7 +107,7 @@
           <p class="text-sm mt-2"><span class="font-medium">Total:</span> ${{ order.total.toFixed(2) }}</p>
         </details>
         <div class="flex justify-end mt-2">
-          <button @click="startDelivery(order)" class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Start Delivery</button>
+          <button v-if="order.status !== 'delivered'" @click="startDelivery(order)" class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Start Delivery</button>
         </div>
       </div>
     </div>
@@ -107,8 +119,24 @@
       :title="confirmDialogProps.title"
       :message="confirmDialogProps.message"
       @cancel="showConfirmDialog = false"
-      @confirm="handleConfirm"
+      @confirm="handleConfirm(currentDelivery)"
     />
+
+    <!-- Modal for Change Calculation -->
+    <template v-if="showChangeModal">
+      <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow-lg w-80">
+          <h3 class="text-lg font-semibold mb-4">Calculate Change</h3>
+          <label class="block text-sm font-medium mb-2">Given Amount:</label>
+          <input v-model="givenAmount" type="number" class="w-full border border-gray-300 rounded px-3 py-2 mb-4" placeholder="Enter amount" />
+          <p v-if="changeAmount !== null" class="text-sm text-green-500 mb-4">Change to return: ${{ changeAmount.toFixed(2) }}</p>
+          <div class="flex justify-end space-x-2">
+            <button @click="closeChangeModal" class="px-4 py-2 bg-gray-500 text-white rounded text-sm">Cancel</button>
+            <button @click="calculateChangeAmount" class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Calculate</button>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -186,11 +214,11 @@ const markAsDelivered = (order: DeliveryOrder) => {
       message: `Payment status is '${order.paymentStatus}'. Please confirm payment before marking as delivered.`,
     };
   } else {
-    confirmDialogProps.value = {
-      title: 'Delivery Confirmation',
-      message: `Order ${order.id} has been marked as delivered.`,
-    };
-    order.deliveredAt = new Date().toISOString();
+  confirmDialogProps.value = {
+    title: 'Delivery Confirmation',
+    message: `Order ${order.id} will be marked as delivered.`,
+  };
+    
   }
   showConfirmDialog.value = true;
 };
@@ -199,7 +227,11 @@ const startDelivery = (order: DeliveryOrder) => {
   alert(`Starting delivery for order ${order.id}.`);
 };
 
-const handleConfirm = () => {
+const handleConfirm = (order: DeliveryOrder) => {
+  if (order) {
+    order.status = 'delivered';
+    order.deliveredAt = new Date().toISOString();
+  }
   showConfirmDialog.value = false;
 };
 
@@ -219,5 +251,42 @@ const visibleDeliveries = computed(() => {
   );
 });
 
+const calculateCountdown = (deliveryTime: string | undefined): string => {
+  if (!deliveryTime) return 'N/A';
+  const now = new Date();
+  const delivery = new Date(deliveryTime);
+  const diff = Math.max(0, delivery.getTime() - now.getTime());
+  const minutes = Math.floor(diff / 60000);
+  return `${minutes} minutes remaining`;
+};
+
+const showChangeModal = ref(false);
+const givenAmount = ref<number | null>(null);
+const changeAmount = ref<number | null>(null);
+
+const handleCalculateChange = () => {
+  const delivery = currentDelivery.value;
+  if (delivery && delivery.total) {
+    showChangeModal.value = true;
+    givenAmount.value = null;
+    changeAmount.value = null;
+  }
+};
+
+const calculateChangeAmount = () => {
+  const delivery = currentDelivery.value;
+  if (delivery && givenAmount.value !== null) {
+    changeAmount.value = calculateChange(delivery.total, givenAmount.value);
+  }
+};
+
+const closeChangeModal = () => {
+  showChangeModal.value = false;
+};
+
 fetchOrders();
+function calculateChange(total: number, value: number): number | null {
+  if (value < total) return null;
+  return value - total;
+}
 </script>

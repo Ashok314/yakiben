@@ -36,11 +36,7 @@ export interface Order {
   paymentMethod: 'cash' | 'card' | 'online';
   paymentStatus: 'pending' | 'paid';
   comments?: string; // Optional comments for the order
-  driver?: {
-    id: number;
-    name: string;
-    role: string;
-  };
+  driver?: User;
   deliveredAt?: string;
   deliveryTime?: string; // Optional delivery time for the order
 }

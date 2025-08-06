@@ -260,9 +260,9 @@ const canUpdateStatus = (order: Order) => {
 const updateOrderStatus = (order: Order, direction: 'next' | 'prev' = 'next') => {
   const currentIndex = STATUS_FLOW.indexOf(order.status);
   if (direction === 'next' && currentIndex < STATUS_FLOW.length - 1) {
-    order.status = STATUS_FLOW[currentIndex + 1] as any;
+    order.status = STATUS_FLOW[currentIndex + 1] as Order['status'];
   } else if (direction === 'prev' && currentIndex > 0) {
-    order.status = STATUS_FLOW[currentIndex - 1] as any;
+    order.status = STATUS_FLOW[currentIndex - 1] as Order['status'];
   }
 };
 
@@ -358,7 +358,9 @@ const closeAssignDriverModal = () => {
   selectedOrder.value = null;
 };
 
-const assignDriverToOrder = async (order: Order, user: any) => {
+import type { User } from '../types/types';
+
+const assignDriverToOrder = async (order: Order, user: User) => {
   try {
     // Replace with actual API call
     await ordersApi.assignDriver(order.id, user.id);

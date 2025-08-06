@@ -138,7 +138,7 @@ export const ordersApi = {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return MOCK_ORDERS;
   },
-  async assignDriver(orderId: string, driverId: number): Promise<void> {
+  async assignDriver(orderId: string, driverId: string): Promise<void> {
     console.log(`Driver ${driverId} assigned to order ${orderId}`);
     // Mock implementation
   },
