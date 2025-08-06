@@ -133,11 +133,14 @@ export const UI_TEXTS = {
   },
   orders: {
     title: "Orders",
-    hideDeliveredLabel: "Hide Delivered Orders",
+    hideDeliveredLabel: "Hide Delivered",
+    hideNonTodayLabel: "Hide Non-Today",
+    hideDeliveringLabel: "Hide Delivering",
+    hideDeliveredAndDeliveringLabel: "Hide Delivered and Delivering", // Added hideDeliveredAndDeliveringLabel
+    filterLabel: "Filter by Date",
     kanban: {
-      columnTitle: "Status",
       orderDetails: {
-        trackingId: "Order #",
+        trackingId: "Tracking ID",
         customerName: "Customer Name",
         scheduledAt: "Scheduled At",
         total: "Total",
@@ -145,7 +148,7 @@ export const UI_TEXTS = {
       buttons: {
         prevStatus: "Previous Status",
         nextStatus: "Next Status",
-        print: "Print Order",
+        print: "Print",
       },
     },
     modal: {
@@ -156,26 +159,21 @@ export const UI_TEXTS = {
         phone: "Phone",
       },
       orderInfo: {
-        title: "Order Information",
         orderId: "Order ID",
         scheduledAt: "Scheduled At",
       },
       items: {
-        title: "Order Items",
+        title: "Items",
         headers: {
           index: "#",
           item: "Item",
           quantity: "Quantity",
-          customizations: "Customizations",
           price: "Price",
         },
         total: "Total",
       },
       comments: {
-        title: "Customer Comments",
-      },
-      buttons: {
-        close: "Close",
+        title: "Comments",
       },
     },
   },

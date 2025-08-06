@@ -1,4 +1,4 @@
-import type { Order } from '../types/types';
+import type { Order, UserRole } from '../types/types';
 
 // Mock data for orders
 export const MOCK_ORDERS: Order[] = [
@@ -73,7 +73,7 @@ export const MOCK_ORDERS: Order[] = [
       { id: '5', name: 'Ramen', quantity: 3, price: 15.0 },
       { id: '6', name: 'Tempura', quantity: 2, price: 20.0 },
     ],
-    driver: { id: 1, name: 'Mike Brown', role: 'driver' },
+    driver: { id: "1", name: 'Mike Brown', role: 'driver', email: 'mike.brown@example.com' },
     deliveredAt: '2025-07-03T16:00:00Z',
     deliveryTime: '2025-07-03T16:00:00Z',
   },
@@ -101,7 +101,7 @@ export const MOCK_ORDERS: Order[] = [
     ],
     deliveryTime: '2025-07-02T12:30:00Z',
     deliveredAt: '2025-07-02T14:00:00Z',
-    driver: { id: 1, name: 'Mike Brown', role: 'driver' },
+    driver: { id: "1", name: 'Mike Brown', role: 'driver', email: 'mike.brown@example.com' },
   },
   {
     id: '5',
@@ -125,7 +125,7 @@ export const MOCK_ORDERS: Order[] = [
       { id: '9', name: 'Sashimi', quantity: 2, price: 25.0 },
       { id: '10', name: 'Edamame', quantity: 1, price: 5.0 },
     ],
-    driver: { id: 2, name: 'Driver B', role: 'driver' },
+    driver: { id: "2", name: 'Driver B', role: 'driver', email: 'driver.b@example.com' },
     deliveredAt: '2025-07-05T11:00:00Z',
     deliveryTime: '2025-07-05T11:00:00Z',
   },
@@ -150,10 +150,10 @@ export const ordersApi = {
 
 // Mock data for the current user
 export const CURRENT_USER = {
-  id: 3,
+  id: '3',
   name: 'Driver User',
   email: 'driver@yakiben.com',
-  role: 'driver',
+  role: 'driver' as UserRole,
 };
 
 // Assign current user to orders
