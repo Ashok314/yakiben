@@ -1,12 +1,16 @@
 <template>
-  <div>
+  <div class="px-4">
     <!-- Tabs -->
-    <div class="flex justify-around mb-4">
+    <div class="tabs flex space-x-4 border-b border-gray-300 mb-6">
       <button
         v-for="tab in tabs"
         :key="tab"
         @click="activeTab = tab"
-        :class="['px-4 py-2 rounded', activeTab === tab ? 'bg-blue-500 text-white' : 'bg-gray-200']"
+        :class="{
+          'text-blue-500 border-blue-500': activeTab === tab,
+          'text-gray-500 hover:text-blue-500': activeTab !== tab,
+        }"
+        class="px-4 py-2 border-b-2 font-medium text-sm"
       >
         {{ tab }}
       </button>
@@ -14,137 +18,275 @@
 
     <!-- Current Delivery Tab -->
     <div v-if="activeTab === 'Current Delivery'">
-      <h2 class="text-lg font-semibold mb-4">Current Delivery</h2>
-      <div v-if="currentDelivery" class="p-4 bg-white shadow rounded-md">
-        <p><strong>Order ID:</strong> {{ currentDelivery.id }}</p>
-        <p><strong>Customer:</strong> {{ currentDelivery.customer }}</p>
-        <p><strong>Address:</strong> {{ currentDelivery.address }}</p>
-        <p><strong>Delivery Time:</strong> {{ formatTime(currentDelivery.deliveryTime) }}</p>
-        <p><strong>Order Details:</strong></p>
-        <ul class="list-disc pl-5">
-          <li v-for="item in currentDelivery.items" :key="item.id">
-            {{ item.name }} (x{{ item.quantity }}) - ${{ item.price.toFixed(2) }}
-          </li>
-        </ul>
-        <p><strong>Total:</strong> ${{ currentDelivery.total.toFixed(2) }}</p>
-        <p><strong>Payment Status:</strong> {{ currentDelivery.paymentStatus }}</p>
-        <div class="flex flex-col gap-4 mt-4">
-          <a :href="`https://maps.google.com/?q=${currentDelivery.address}`" target="_blank" class="text-blue-500 hover:underline">View on Map</a>
-          <button @click="contactCustomer(currentDelivery)" class="px-4 py-2 bg-green-500 text-white rounded">Contact Customer</button>
-          <button @click="markAsDelivered(currentDelivery)" class="px-4 py-2 bg-blue-500 text-white rounded">Mark as Delivered</button>
+      <div v-if="currentDelivery" class="p-4 bg-white shadow-lg rounded-md">
+        <!-- Customer Info Section -->
+        <h3 class="text-base font-semibold mb-2">Customer Info</h3>
+        <div class="space-y-1 mb-4">
+          <p class="text-sm"><span class="font-medium">Name:</span> {{ currentDelivery.customer.name }}</p>
+          <p class="text-sm"><span class="font-medium">Address:</span> {{ currentDelivery.customer.address?.street }}, {{ currentDelivery.customer.address?.city }}</p>
+          <p class="text-sm"><span class="font-medium">Comment:</span> {{ currentDelivery.customer.address?.instructions || 'No comments provided' }}</p>
+        </div>
+        <hr class="border-gray-300 my-4" />
+
+        <!-- Order Details Section -->
+        <h3 class="text-base font-semibold mb-2">Order</h3>
+        <div class="p-4 bg-white shadow-lg rounded-md overflow-y-auto max-h-60">
+          <ul class="list-disc pl-5 space-y-1 mb-4">
+            <li v-for="item in currentDelivery.items" :key="item.id" class="text-sm">
+              <span class="font-medium">{{ item.name }}</span> (x{{ item.quantity }}) - ${{ item.price.toFixed(2) }}
+            </li>
+          </ul>
+        </div>
+        <hr class="border-gray-300 my-4" />
+
+        <!-- Details Section -->
+        <h3 class="text-base font-semibold mb-2">Order Details</h3>
+        <div class="space-y-1">
+          <p class="text-sm">
+            <span class="font-medium">Total:</span> 
+            <span class="text-green-500">${{ currentDelivery.total.toFixed(2) }}</span>
+            <a class="text-blue-500 hover:underline text-sm cursor-pointer px-2" v-if="currentDelivery.paymentMethod === 'card'" @click="handleCalculateChange">Calculate Change</a>
+          </p>
+          <p class="text-sm"><span class="font-medium">Payment Method:</span> <span class="text-blue-500">{{ currentDelivery.paymentMethod }}</span></p>
+          <p class="text-sm"><span class="font-medium">Payment Status:</span> <span class="text-red-500">{{ currentDelivery.paymentStatus }}</span></p>
+        </div>
+        <hr class="border-gray-300 my-4" />
+
+        <!-- Delivery Details Section -->
+        <h3 class="text-base font-semibold mb-2">Delivery Details</h3>
+        <div class="space-y-1">
+          <p class="text-sm"><span class="font-medium">Status:</span> {{ currentDelivery.status }}</p>
+          <p class="text-sm"><span class="font-medium">Delivery Time:</span> <span class="text-yellow-500">{{ formatTime(currentDelivery.deliveryTime) }} ({{ calculateCountdown(currentDelivery.deliveryTime) }})</span></p>
+          <a :href="`https://maps.google.com/?q=${currentDelivery.customer.address?.street}, ${currentDelivery.customer.address?.city}`" target="_blank" class="text-blue-500 hover:underline text-sm">View on Map</a>
+        </div>
+        <hr class="border-gray-300 my-4" />
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-4">
+          <button @click="markAsDelivered(currentDelivery)" class="px-4 py-2 bg-green-500 text-white rounded text-sm">Mark as Delivered</button>
+          <button @click="contactCustomer(currentDelivery)" class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Contact Customer</button>
         </div>
       </div>
       <div v-else class="text-center text-gray-500">
-        <p>No current delivery assigned.</p>
+        <p class="text-sm">No current delivery assigned.</p>
       </div>
     </div>
 
     <!-- My Deliveries Tab -->
     <div v-if="activeTab === 'My Deliveries'">
-      <h2 class="text-lg font-semibold mb-4">My Deliveries</h2>
-      <div v-for="order in myDeliveries" :key="order.id" class="p-4 mb-4 bg-white shadow rounded-md">
-        <p><strong>Order ID:</strong> {{ order.id }}</p>
-        <p><strong>Customer:</strong> {{ order.customer }}</p>
-        <p><strong>Address:</strong> {{ order.address }}</p>
-        <p><strong>Status:</strong> {{ order.status }}</p>
+      <h2 class="text-lg font-bold mb-4 text-center">My Deliveries</h2>
+      <div class="flex justify-between items-center mb-4">
+        <label class="flex items-center space-x-2">
+          <input type="checkbox" v-model="hideDelivered" class="form-checkbox h-4 w-4 text-blue-500" />
+          <span class="text-sm">Hide Delivered</span>
+        </label>
+      </div>
+      <div v-for="order in visibleDeliveries" :key="order.id" class="p-4 mb-4 bg-white shadow-lg rounded-md">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-base font-semibold">Order ID: {{ order.id }}</h3>
+          <span class="text-sm text-gray-500">{{ order.status }}</span>
+        </div>
+        <hr class="border-gray-300 my-2" />
+        <div class="space-y-1">
+          <p class="text-sm"><span class="font-medium">Customer:</span> {{ order.customer.name }}</p>
+          <p class="text-sm"><span class="font-medium">Address:</span> {{ order.customer.address?.street }}, {{ order.customer.address?.city }}</p>
+          <p class="text-sm"><span class="font-medium">Comment:</span> {{ order.customer.address?.instructions || 'No comments provided' }}</p>
+          <p class="text-sm"><span class="font-medium">Delivery Time:</span> {{ formatTime(order.deliveryTime) }} 
+            (<span class="text-red-500" v-if="!order.deliveredAt">{{ calculateCountdown(order.deliveryTime) }}</span>
+          <span v-else class="text-sm text-green-500">Delivered at: {{ formatTime(order.deliveredAt) }}</span>)
+            </p>
+        </div>
+        <hr class="border-gray-300 my-2" />
+        <details class="bg-gray-100 p-2 rounded-md">
+          <summary class="cursor-pointer text-sm font-medium text-blue-500">Order Summary</summary>
+          <ul class="list-disc pl-5 space-y-1 mt-2">
+            <li v-for="item in order.items" :key="item.id" class="text-sm">
+              <span class="font-medium">{{ item.name }}</span> (x{{ item.quantity }}) - ${{ item.price.toFixed(2) }}
+            </li>
+          </ul>
+          <p class="text-sm mt-2"><span class="font-medium">Total:</span> ${{ order.total.toFixed(2) }}</p>
+        </details>
+        <div class="flex justify-end mt-2">
+          <button v-if="order.status !== 'delivered'" @click="startDelivery(order)" class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Start Delivery</button>
+        </div>
       </div>
     </div>
+
+    <!-- Confirm Dialog -->
+    <ConfirmDialog
+      v-if="showConfirmDialog"
+      :isOpen="showConfirmDialog"
+      :title="confirmDialogProps.title"
+      :message="confirmDialogProps.message"
+      @cancel="showConfirmDialog = false"
+      @confirm="handleConfirm(currentDelivery)"
+    />
+
+    <!-- Modal for Change Calculation -->
+    <template v-if="showChangeModal">
+      <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow-lg w-80">
+          <h3 class="text-lg font-semibold mb-4">Calculate Change</h3>
+          <label class="block text-sm font-medium mb-2">Given Amount:</label>
+          <input v-model="givenAmount" type="number" class="w-full border border-gray-300 rounded px-3 py-2 mb-4" placeholder="Enter amount" />
+          <p v-if="changeAmount !== null" class="text-sm text-green-500 mb-4">Change to return: ${{ changeAmount.toFixed(2) }}</p>
+          <div class="flex justify-end space-x-2">
+            <button @click="closeChangeModal" class="px-4 py-2 bg-gray-500 text-white rounded text-sm">Cancel</button>
+            <button @click="calculateChangeAmount" class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Calculate</button>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { ordersApi, CURRENT_USER } from '../mocks/orders';
+import ConfirmDialog from '../components/ConfirmDialog.vue';
 
 interface DeliveryOrder {
-  id: number;
-  customer: string;
-  address: string;
+  id: string;
+  trackingId: string;
+  customer: {
+    name: string;
+    phone: string;
+    address?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      instructions?: string;
+    };
+  };
   status: string;
-  deliveryTime: string;
-  assignedTo: string | null;
-  items: { id: number; name: string; quantity: number; price: number }[];
   total: number;
+  paymentMethod: string;
   paymentStatus: string;
+  createdAt: string;
+  items: { id: string; name: string; quantity: number; price: number }[];
+  driver?: { id: number; name: string; role: string };
+  deliveredAt?: string;
+  deliveryTime?: string;
 }
 
-const deliveryOrders = ref<DeliveryOrder[]>([
-  {
-    id: 1,
-    customer: 'John Doe',
-    address: '123 Main St',
-    status: 'Pending',
-    deliveryTime: '12:30 PM',
-    assignedTo: null,
-    items: [
-      { id: 1, name: 'Sushi Roll', quantity: 2, price: 12.99 },
-      { id: 2, name: 'Miso Soup', quantity: 1, price: 3.99 },
-    ],
-    total: 29.97,
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 2,
-    customer: 'Jane Smith',
-    address: '456 Elm St',
-    status: 'In Progress',
-    deliveryTime: '1:00 PM',
-    assignedTo: 'Driver A',
-    items: [
-      { id: 3, name: 'Ramen Bowl', quantity: 1, price: 9.99 },
-    ],
-    total: 9.99,
-    paymentStatus: 'Pending',
-  },
-  {
-    id: 3,
-    customer: 'Alice Johnson',
-    address: '789 Oak St',
-    status: 'Completed',
-    deliveryTime: '2:00 PM',
-    assignedTo: 'Driver A',
-    items: [
-      { id: 4, name: 'Tempura', quantity: 3, price: 8.99 },
-    ],
-    total: 26.97,
-    paymentStatus: 'Paid',
-  },
-]);
-
-const currentDriver = 'Driver A';
 const tabs = ['Current Delivery', 'My Deliveries'];
 const activeTab = ref('Current Delivery');
-const currentDelivery = ref<DeliveryOrder | null>(deliveryOrders.value.find(order => order.status === 'In Progress' && order.assignedTo === currentDriver) || null);
-const myDeliveries = ref(deliveryOrders.value.filter(order => order.assignedTo === currentDriver));
+const currentDriver = CURRENT_USER.name;
+const deliveryOrders = ref<DeliveryOrder[]>([]);
+const currentDelivery = computed(() =>
+  deliveryOrders.value.find(
+    (order) => order.status === 'delivering' && order.driver?.name === currentDriver
+  ) || null
+);
 
-const formatTime = (time: string) => time;
+const myDeliveries = computed(() =>
+  deliveryOrders.value.filter(
+    (order) => order.driver?.name === currentDriver
+  )
+);
+
+const fetchOrders = async () => {
+  deliveryOrders.value = await ordersApi.getOrders();
+};
+
+const formatTime = (time: string | undefined) => {
+  if (!time) return 'N/A'; // Fallback for undefined values
+  const date = new Date(time);
+  return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+};
 
 const contactCustomer = (order: DeliveryOrder) => {
-  alert(`Contacting customer: ${order.customer}`);
+  const phoneNumber = order.customer.phone;
+  if (phoneNumber) {
+    window.location.href = `tel:${phoneNumber}`;
+  } else {
+    alert('Phone number is not available for this customer.');
+  }
 };
+
+const showConfirmDialog = ref(false);
+const confirmDialogProps = ref({ title: '', message: '' });
 
 const markAsDelivered = (order: DeliveryOrder) => {
-  alert(`Order ${order.id} marked as delivered.`);
-  order.status = 'Completed';
-  currentDelivery.value = null;
+  if (order.paymentStatus !== 'paid') {
+    confirmDialogProps.value = {
+      title: 'Payment Reminder',
+      message: `Payment status is '${order.paymentStatus}'. Please confirm payment before marking as delivered.`,
+    };
+  } else {
+  confirmDialogProps.value = {
+    title: 'Delivery Confirmation',
+    message: `Order ${order.id} will be marked as delivered.`,
+  };
+    
+  }
+  showConfirmDialog.value = true;
 };
+
+const startDelivery = (order: DeliveryOrder) => {
+  alert(`Starting delivery for order ${order.id}.`);
+};
+
+const handleConfirm = (order: DeliveryOrder) => {
+  if (order) {
+    order.status = 'delivered';
+    order.deliveredAt = new Date().toISOString();
+  }
+  showConfirmDialog.value = false;
+};
+
+const hideDelivered = ref(true);
+
+const filteredDeliveries = computed(() => {
+  const today = '2025-07-02T12:30:00Z'.split('T')[0];
+  // const today = new Date().toISOString().split('T')[0];
+  return myDeliveries.value.filter(
+    (order) => order.deliveryTime?.startsWith(today)
+  );
+});
+
+const visibleDeliveries = computed(() => {
+  return filteredDeliveries.value.filter(
+    (order) => !hideDelivered.value || order.status !== 'delivered'
+  );
+});
+
+const calculateCountdown = (deliveryTime: string | undefined): string => {
+  if (!deliveryTime) return 'N/A';
+  const now = new Date();
+  const delivery = new Date(deliveryTime);
+  const diff = Math.max(0, delivery.getTime() - now.getTime());
+  const minutes = Math.floor(diff / 60000);
+  return `${minutes} minutes remaining`;
+};
+
+const showChangeModal = ref(false);
+const givenAmount = ref<number | null>(null);
+const changeAmount = ref<number | null>(null);
+
+const handleCalculateChange = () => {
+  const delivery = currentDelivery.value;
+  if (delivery && delivery.total) {
+    showChangeModal.value = true;
+    givenAmount.value = null;
+    changeAmount.value = null;
+  }
+};
+
+const calculateChangeAmount = () => {
+  const delivery = currentDelivery.value;
+  if (delivery && givenAmount.value !== null) {
+    changeAmount.value = calculateChange(delivery.total, givenAmount.value);
+  }
+};
+
+const closeChangeModal = () => {
+  showChangeModal.value = false;
+};
+
+fetchOrders();
+function calculateChange(total: number, value: number): number | null {
+  if (value < total) return null;
+  return value - total;
+}
 </script>
-
-<style scoped>
-/* Add mobile-friendly styles */
-button {
-  margin-right: 8px;
-}
-
-.flex {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.shadow {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.rounded-md {
-  border-radius: 0.375rem;
-}
-</style>

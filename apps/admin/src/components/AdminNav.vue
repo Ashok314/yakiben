@@ -21,12 +21,26 @@
           </li>
         </ul>
       </nav>
+
+      <!-- Mobile Collapsible Menu -->
+      <div v-if="isCollapsed" class="absolute top-0 left-0 w-full h-full bg-white z-50 md:hidden">
+        <nav>
+          <ul class="space-y-2">
+            <li v-for="item in filteredMenu" :key="item.name" class="px-4 py-2">
+              <router-link :to="item.path" class="flex items-center space-x-2 hover:bg-yellow-200 p-2 rounded">
+                <component :is="item.icon" class="w-6 h-6" />
+                <span>{{ item.name }}</span>
+              </router-link>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { HomeIcon, ClipboardDocumentListIcon, UserGroupIcon, Cog6ToothIcon, TruckIcon, UserIcon } from '@heroicons/vue/24/outline';
+import { HomeIcon, ClipboardDocumentListIcon, UserGroupIcon, Cog6ToothIcon, TruckIcon, UserIcon, ChartBarIcon } from '@heroicons/vue/24/outline';
 
 export default {
   props: {
@@ -47,6 +61,7 @@ export default {
         { name: 'Settings', path: '/settings', icon: Cog6ToothIcon, roles: ['manager'] },
         { name: 'Delivery', path: '/delivery', icon: TruckIcon, roles: ['driver', 'manager'] },
         { name: 'Account', path: '/account', icon: UserIcon, roles: ['staff', 'manager', 'driver'] },
+        { name: 'Order Summary', path: '/order-summary', icon: ChartBarIcon, roles: ['manager'] },
       ],
     };
   },
@@ -81,7 +96,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Add any component-specific styles here */
-</style>

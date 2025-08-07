@@ -32,7 +32,7 @@
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import type { UserRole } from '../types';
+import type { UserRole } from '../types/types';
 
 const authStore = useAuthStore();
 const route = useRoute();
