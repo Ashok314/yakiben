@@ -66,7 +66,7 @@ export const MOCK_ORDERS: Order[] = [
     },
     status: 'delivered',
     total: 120.5,
-    paymentMethod: 'online',
+    paymentMethod: 'paypay',
     paymentStatus: 'paid',
     createdAt: '2025-07-03T15:00:00Z',
     items: [
@@ -118,7 +118,7 @@ export const MOCK_ORDERS: Order[] = [
     },
     status: 'ready',
     total: 75.0,
-    paymentMethod: 'online',
+    paymentMethod: 'paypay',
     paymentStatus: 'paid',
     createdAt: '2025-07-05T10:00:00Z',
     items: [
@@ -145,6 +145,28 @@ export const ordersApi = {
   async unassignDriver(orderId: string): Promise<void> {
     console.log(`Driver unassigned from order ${orderId}`);
     // Mock implementation
+  },
+  async getOrderSummaries() {
+    const orders = await this.getOrders();
+    const summaries = orders.reduce((acc: Record<string, { totalOrders: number; totalRevenue: number; cash: number; card: number; paypay: number }>, order) => {
+      const date = new Date(order.createdAt).toISOString().split('T')[0];
+      if (!acc[date]) {
+        acc[date] = { totalOrders: 0, totalRevenue: 0, cash: 0, card: 0, paypay: 0 };
+      }
+      acc[date].totalOrders += 1;
+      acc[date].totalRevenue += order.total;
+      acc[date][order.paymentMethod] += order.total; // Increment based on payment method
+      return acc;
+    }, {});
+
+    return Object.entries(summaries).map(([date, { totalOrders, totalRevenue, cash, card, paypay }]: [string, { totalOrders: number; totalRevenue: number; cash: number; card: number; paypay: number }]) => ({
+      date,
+      totalOrders,
+      totalRevenue,
+      cash,
+      card,
+      paypay,
+    }));
   },
 };
 

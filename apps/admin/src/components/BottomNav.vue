@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { HomeIcon, ClipboardDocumentListIcon, UserGroupIcon, Cog6ToothIcon, TruckIcon, UserIcon } from '@heroicons/vue/24/outline';
+import { HomeIcon, ClipboardDocumentListIcon, Cog6ToothIcon, TruckIcon, UserIcon,ChartBarIcon } from '@heroicons/vue/24/outline';
 
 export default {
   props: {
@@ -27,10 +27,11 @@ export default {
       const menu = [
         { name: 'Orders', path: '/orders', icon: HomeIcon, roles: ['staff', 'manager', 'driver'] },
         { name: 'Menu Management', path: '/menu-management', icon: ClipboardDocumentListIcon, roles: ['manager'] },
-        { name: 'User Management', path: '/user-management', icon: UserGroupIcon, roles: ['manager'] },
+        // { name: 'User Management', path: '/user-management', icon: UserGroupIcon, roles: ['manager'] },
         { name: 'Settings', path: '/settings', icon: Cog6ToothIcon, roles: ['manager'] },
         { name: 'Delivery', path: '/delivery', icon: TruckIcon, roles: ['driver', 'manager'] },
         { name: 'Account', path: '/account', icon: UserIcon, roles: ['staff', 'manager', 'driver'] },
+        { name: 'Order Summary', path: '/order-summary', icon: ChartBarIcon, roles: ['manager'] },
       ];
       return menu.filter(item => item.roles.includes(this.userRole));
     },

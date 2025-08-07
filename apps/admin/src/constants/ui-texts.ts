@@ -194,4 +194,28 @@ export const UI_TEXTS = {
     confirmUpdateTitle: "Confirm Update",
     confirmUpdateMessage: "Are you sure you want to update your account information?",
   },
+  orderSummary: {
+    title: "Order Summary",
+    quickFilterLabel: "Quick Filter",
+    filterLabel: "Filter by Date Range",
+    groupByLabel: "Group By",
+    headers: {
+      date: "Date",
+      totalOrders: "Total Orders",
+      totalRevenue: "Total Revenue",
+    },
+    groupByOptions: {
+      daily: "Daily",
+      weekly: "Weekly",
+      monthly: "Monthly",
+    },
+    quickFilters: {
+      today: "Today",
+      yesterday: "Yesterday",
+      thisWeek: "This Week",
+      thisMonth: "This Month",
+      lastMonth: "Last Month",
+      all: "All",
+    },
+  },
 };

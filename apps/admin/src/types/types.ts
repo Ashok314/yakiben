@@ -33,7 +33,7 @@ export interface Order {
     postalCode: string;
     instructions?: string;
   };
-  paymentMethod: 'cash' | 'card' | 'online';
+  paymentMethod: 'cash' | 'card' | 'paypay';
   paymentStatus: 'pending' | 'paid';
   comments?: string; // Optional comments for the order
   driver?: User;
@@ -106,4 +106,13 @@ export interface Banner {
   url?: string; // Optional redirect URL
   startDate: string;
   endDate: string;
+}
+
+export interface OrderSummary {
+  date: string;
+  totalOrders: number;
+  totalRevenue: number;
+  cash: number;
+  card: number;
+  paypay: number;
 }

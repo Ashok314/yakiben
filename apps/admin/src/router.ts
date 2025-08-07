@@ -72,6 +72,17 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/order-summary',
+    component: BaseLayout,
+    children: [
+      {
+        path: '',
+        component: () => import('./views/OrderSummaryView.vue'),
+        meta: { requiresAuth: true, roles: ['manager'] },
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
@@ -89,7 +100,7 @@ router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, 
     next('/orders');
   } else if (to.meta.requiresAuth && !isLoggedIn) {
     next('/login');
-  } else if (to.meta.roles && !to.meta.roles.includes(authStore.user?.role)) {
+  } else if (to.meta.roles && Array.isArray(to.meta.roles) && !to.meta.roles.includes(authStore.user?.role)) {
     next('/');
   } else {
     next();
