@@ -79,7 +79,8 @@
 
     <!-- Performance and Analysis Tab -->
     <div v-if="activeTab === 'Performance and Analysis'">
-      <p>Performance and analysis content will go here.</p>
+      <h2 class="text-xl font-bold mb-4">Top-Selling Menu Items</h2>
+      <MenuPerformanceChart />
     </div>
   </div>
 </template>
@@ -89,6 +90,7 @@ import { ref, computed, onMounted } from 'vue';
 import { ordersApi } from '../mocks/orders';
 import { UI_TEXTS } from '../constants/ui-texts';
 import type { OrderSummary } from '../types/types';
+import MenuPerformanceChart from '../components/MenuPerformanceChart.vue';
 
 const tabs = ['Current Summary', 'Performance and Analysis'];
 const activeTab = ref('Current Summary');
@@ -163,23 +165,23 @@ const clearFilters = () => {
 };
 
 const totalOrders = computed(() => {
-  return filteredSummaries.value.reduce((sum, summary) => sum + summary.totalOrders, 0);
+  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.totalOrders, 0);
 });
 
 const totalRevenue = computed(() => {
-  return filteredSummaries.value.reduce((sum, summary) => sum + summary.totalRevenue, 0);
+  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.totalRevenue, 0);
 });
 
 const totalCash = computed(() => {
-  return filteredSummaries.value.reduce((sum, summary) => sum + summary.cash, 0);
+  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.cash, 0);
 });
 
 const totalCard = computed(() => {
-  return filteredSummaries.value.reduce((sum, summary) => sum + summary.card, 0);
+  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.card, 0);
 });
 
 const totalPayPay = computed(() => {
-  return filteredSummaries.value.reduce((sum, summary) => sum + summary.paypay, 0);
+  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.paypay, 0);
 });
 
 const groupedSummaries = computed(() => {
@@ -188,7 +190,7 @@ const groupedSummaries = computed(() => {
     return dataToGroup;
   } else if (selectedDateRange.value === 'weekly') {
     const grouped: Record<string, { date: string; totalOrders: number; totalRevenue: number; cash: number; card: number; paypay: number }> = {};
-    dataToGroup.forEach((summary) => {
+    dataToGroup.forEach((summary: OrderSummary) => {
       const week = new Date(summary.date);
       week.setDate(week.getDate() - week.getDay()); // Start of the week
       const weekKey = week.toISOString().split('T')[0];
@@ -204,7 +206,7 @@ const groupedSummaries = computed(() => {
     return Object.values(grouped);
   } else if (selectedDateRange.value === 'monthly') {
     const grouped: Record<string, { date: string; totalOrders: number; totalRevenue: number; cash: number; card: number; paypay: number }> = {};
-    dataToGroup.forEach((summary) => {
+    dataToGroup.forEach((summary: OrderSummary) => {
       const month = new Date(summary.date);
       const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
       if (!grouped[monthKey]) {
