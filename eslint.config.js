@@ -1,5 +1,8 @@
 module.exports = [
   {
+    ignores: ['.pnp.cjs', '.pnp.loader.mjs'],
+  },
+  {
     files: ['**/*.ts'],
     languageOptions: {
       parser: require('@typescript-eslint/parser'),

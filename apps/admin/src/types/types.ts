@@ -4,6 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string; // Optional for security reasons
   role: UserRole;
 }
 
@@ -14,21 +15,29 @@ export interface Order {
     name: string;
     phone: string;
     email?: string;
+    address?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      instructions?: string;
+    };
   };
   items: OrderItem[];
   total: number;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered';
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'delivered';
   createdAt: string;
-  pickupTime?: string;
+  deliveryTime: string;
   address?: {
     street: string;
     city: string;
     postalCode: string;
     instructions?: string;
   };
-  paymentMethod: 'cash' | 'card' | 'online';
+  paymentMethod: 'cash' | 'card' | 'paypay';
   paymentStatus: 'pending' | 'paid';
-  comments?: string; // Optional comments for the order
+  comments?: string;
+  driver?: User;
+  deliveredAt?: string;
 }
 
 export interface OrderItem {
@@ -51,8 +60,8 @@ export interface MenuItem {
   description: string;
   price: number;
   category: string;
-  image: string;
-  available: boolean;
+  imageUrl?: string;
+  outOfStock?: boolean;
   options?: MenuItemOption[];
 }
 
@@ -67,20 +76,42 @@ export interface MenuItemOption {
 
 export interface RestaurantSettings {
   name: string;
-  description: string;
-  logo: string;
-  address: string;
+  address: {
+    postal: string;
+    prefecture: string;
+    city: string;
+    line1: string;
+  };
   phone: string;
   email: string;
-  openingHours: {
-    day: string;
-    open: string;
-    close: string;
-  }[];
-  announcement?: string;
-  orderingEnabled: boolean;
-  minimumOrderAmount?: number;
-  deliveryFee?: number;
-  estimatedDeliveryTime?: number;
-  estimatedPickupTime?: number;
+  hours: {
+    open: number;
+    close: number;
+    orderDeadline: number;
+    minAdvanceTime: number;
+    maxAdvanceDays: number;
+    businessDays: number[];
+  };
+  support: {
+    phone: string;
+    hours: string;
+    email: string;
+  };
+}
+
+export interface Banner {
+  id: number;
+  text: string;
+  url?: string; // Optional redirect URL
+  startDate: string;
+  endDate: string;
+}
+
+export interface OrderSummary {
+  date: string;
+  totalOrders: number;
+  totalRevenue: number;
+  cash: number;
+  card: number;
+  paypay: number;
 }

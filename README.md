@@ -89,3 +89,10 @@ yakiben/
 
 For more details, see the code and workflow files in this repo.
 
+
+## License
+
+This project is released under a **strict custom license**.  
+**No use of the code is allowed** — including personal or internal business use — without explicit written permission.
+
+See [`LICENSE-RESTRICTED.txt`](./LICENSE-RESTRICTED.txt) for full details.

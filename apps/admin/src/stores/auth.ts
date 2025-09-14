@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { User, UserRole } from '../types'
+import type { User, UserRole } from '../types/types'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -48,10 +48,16 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user')
   }
 
+  const updateUser = (updatedUser: User) => {
+    user.value = { ...updatedUser };
+    localStorage.setItem('user', JSON.stringify(user.value));
+  };
+
   return {
     user,
     isAuthenticated,
     login,
-    logout
+    logout,
+    updateUser,
   }
 })
