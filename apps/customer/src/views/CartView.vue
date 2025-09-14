@@ -177,11 +177,11 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">受け取り時間<span class="text-red-500">*</span></label>
                 <input 
-                  v-model="orderForm.pickupTime"
+                  v-model="orderForm.delivertTime"
                   type="datetime-local"
                   required
-                  :min="minPickupTime"
-                  :max="maxPickupTime"
+                  :min="minDeliveryTime"
+                  :max="maxDeliveryTime"
                   class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary peer"
                 />
               </div>
@@ -281,7 +281,7 @@
                 <li v-if="validationErrors.companyContact">
                   電話番号は半角数字10桁または11桁で入力してください（例：0312345678）
                 </li>
-                <li v-if="validationErrors.pickupTime">
+                <li v-if="validationErrors.delivertTime">
                   受け取り時間は{{ RESTAURANT_INFO.hours.open }}:00〜{{ RESTAURANT_INFO.hours.orderDeadline }}:00の間で、
                   {{ RESTAURANT_INFO.hours.minAdvanceTime }}分以上前、
                   {{ RESTAURANT_INFO.hours.maxAdvanceDays }}営業日以内を選択してください
@@ -351,7 +351,7 @@ interface ValidationErrors {
   city: string;
   addressLine: string;
   companyContact: string;
-  pickupTime: string;
+  delivertTime: string;
 }
 
 const orderForm = ref({
@@ -362,7 +362,7 @@ const orderForm = ref({
   city: '',
   addressLine: '',
   companyContact: '',
-  pickupTime: '',
+  delivertTime: '',
   notes: '',
   paymentMethod: 'cash' as PaymentMethod,
   needReceipt: false
@@ -376,7 +376,7 @@ const validationErrors = ref<ValidationErrors>({
   city: '',
   addressLine: '',
   companyContact: '',
-  pickupTime: ''
+  delivertTime: ''
 });
 
 // Reactive validation
@@ -393,7 +393,7 @@ function validateForm() {
     city: '',
     addressLine: '',
     companyContact: '',
-    pickupTime: ''
+    delivertTime: ''
   };
 
   // Name validation (allow Japanese or English)
@@ -442,10 +442,10 @@ function validateForm() {
   }
 
   // Pickup time validation
-  if (!orderForm.value.pickupTime) {
-    validationErrors.value.pickupTime = '受け取り時間を選択してください';
-  } else if (!isPickupTimeValid.value) {
-    validationErrors.value.pickupTime = '有効な受け取り時間を選択してください（10:00-15:00）';
+  if (!orderForm.value.delivertTime) {
+    validationErrors.value.delivertTime = '受け取り時間を選択してください';
+  } else if (!isDeliveryTimeValid.value) {
+    validationErrors.value.delivertTime = '有効な受け取り時間を選択してください（10:00-15:00）';
   }
 }
 
@@ -465,19 +465,19 @@ onMounted(() => {
   }
 
   // Check for preserved pickup time from reorder
-  const savedPickupTime = localStorage.getItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
-  if (savedPickupTime) {
-    const pickupTime = new Date(savedPickupTime);
+  const savedDeliveryTime = localStorage.getItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
+  if (savedDeliveryTime) {
+    const delivertTime = new Date(savedDeliveryTime);
     // Final validation before using the preserved time
-    const min = new Date(minPickupTime.value);
-    const max = new Date(maxPickupTime.value);
+    const min = new Date(minDeliveryTime.value);
+    const max = new Date(maxDeliveryTime.value);
     
-    if (pickupTime >= min && 
-        pickupTime <= max && 
-        RESTAURANT_INFO.hours.businessDays.includes(pickupTime.getDay()) &&
-        pickupTime.getHours() >= RESTAURANT_INFO.hours.open &&
-        pickupTime.getHours() < RESTAURANT_INFO.hours.orderDeadline) {
-      orderForm.value.pickupTime = pickupTime.toISOString().slice(0, 16);
+    if (delivertTime >= min && 
+        delivertTime <= max && 
+        RESTAURANT_INFO.hours.businessDays.includes(delivertTime.getDay()) &&
+        delivertTime.getHours() >= RESTAURANT_INFO.hours.open &&
+        delivertTime.getHours() < RESTAURANT_INFO.hours.orderDeadline) {
+      orderForm.value.delivertTime = delivertTime.toISOString().slice(0, 16);
     }
     // Remove the saved pickup time
     localStorage.removeItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
@@ -501,7 +501,7 @@ function saveCustomerInfo() {
   validateForm();
 }
 
-const minPickupTime = computed(() => {
+const minDeliveryTime = computed(() => {
   const now = new Date();
   now.setMinutes(now.getMinutes() + RESTAURANT_INFO.hours.minAdvanceTime);
   
@@ -528,7 +528,7 @@ const minPickupTime = computed(() => {
   return now.toISOString().slice(0, 16);
 });
 
-const maxPickupTime = computed(() => {
+const maxDeliveryTime = computed(() => {
   const max = new Date();
   // Find the last valid business day within maxAdvanceDays
   let daysChecked = 0;
@@ -548,11 +548,11 @@ const maxPickupTime = computed(() => {
   return max.toISOString().slice(0, 16);
 });
 
-const isPickupTimeValid = computed(() => {
-  if (!orderForm.value.pickupTime) return false;
-  const pickupDate = new Date(orderForm.value.pickupTime);
-  const min = new Date(minPickupTime.value);
-  const max = new Date(maxPickupTime.value);
+const isDeliveryTimeValid = computed(() => {
+  if (!orderForm.value.delivertTime) return false;
+  const pickupDate = new Date(orderForm.value.delivertTime);
+  const min = new Date(minDeliveryTime.value);
+  const max = new Date(maxDeliveryTime.value);
   
   // Check if pickup day is a business day
   if (!RESTAURANT_INFO.hours.businessDays.includes(pickupDate.getDay())) {
@@ -581,7 +581,7 @@ const isFormValid = computed(() => {
     orderForm.value.city &&
     orderForm.value.addressLine &&
     orderForm.value.companyContact &&
-    orderForm.value.pickupTime &&
+    orderForm.value.delivertTime &&
     orderForm.value.paymentMethod &&
     cartItems.value.length > 0;
 
@@ -605,7 +605,7 @@ async function submitOrder() {
       customerName: `${orderForm.value.lastName} ${orderForm.value.firstName}`,
       companyAddress: fullAddress,
       companyContact: orderForm.value.companyContact,
-      pickupTime: new Date(orderForm.value.pickupTime),
+      delivertTime: new Date(orderForm.value.delivertTime),
       notes: orderForm.value.notes,
       status: 'pending' as OrderStatus,
       paymentMethod: orderForm.value.paymentMethod,

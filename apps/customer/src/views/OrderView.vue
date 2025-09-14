@@ -162,8 +162,8 @@
               <div>{{ order.companyContact }}</div>
             </div>
             <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.pickupTime }}</div>
-              <div>{{ formatDate(order.pickupTime) }}</div>
+              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.delivertTime }}</div>
+              <div>{{ formatDate(order.delivertTime) }}</div>
             </div>
             <div v-if="order.notes">
               <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.notes }}</div>
@@ -243,8 +243,8 @@
               <p class="font-medium">{{ formatDateForPrint(order.createdAt) }}</p>
             </div>
             <div class="text-right">
-              <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.pickupTime }}</p>
-              <p class="font-medium">{{ formatDateForPrint(order.pickupTime) }}</p>
+              <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.delivertTime }}</p>
+              <p class="font-medium">{{ formatDateForPrint(order.delivertTime) }}</p>
             </div>
           </div>
         </div>

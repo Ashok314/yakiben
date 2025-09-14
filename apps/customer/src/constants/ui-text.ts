@@ -95,7 +95,7 @@ export const UI_TEXT = {
       nameFormat: '有効な名前を入力してください',
       postalCode: '正しい郵便番号を入力してください（例：100-0005）',
       phone: '有効な電話番号を入力してください（10桁または11桁）',
-      pickupTime: {
+      delivertTime: {
         required: '受け取り時間を選択してください',
         invalid: '有効な受け取り時間を選択してください',
         range: '受け取り時間は営業時間内で指定してください',
@@ -124,7 +124,7 @@ export const UI_TEXT = {
       companyName: '会社名',
       address: '会社住所',
       phone: '電話番号',
-      pickupTime: '受け取り時間',
+      delivertTime: '受け取り時間',
       notes: '備考',
       paymentInfo: 'お支払い情報',
       paymentMethod: 'お支払い方法',
