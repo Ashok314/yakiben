@@ -1,5 +1,35 @@
-# Vue 3 + TypeScript + Vite
+# Customer App
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Overview
+The Customer App is part of the Yakiben project, designed for customers to browse menus, place orders, and track their purchases. It is currently implemented with mock APIs and is ready for future database integration.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Features
+- Mobile-first menu browsing
+- Comprehensive cart with item customizations
+- Order tracking with user-friendly IDs
+- Mock API for testing and development
+
+## Development Setup
+1. Install dependencies:
+   ```bash
+   yarn install
+   ```
+2. Navigate to the customer workspace:
+   ```bash
+   cd apps/customer
+   ```
+3. Start the development server:
+   ```bash
+   yarn dev
+   ```
+
+## Future Plans
+- Integrate with Supabase for backend persistence
+- Add advanced printing support for orders and receipts
+- Implement LINE Mini App integration
+
+## Tech Stack
+- Vue 3
+- Vite
+- TypeScript
+- Tailwind CSS

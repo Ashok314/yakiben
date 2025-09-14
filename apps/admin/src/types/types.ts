@@ -38,6 +38,7 @@ export interface Order {
   comments?: string;
   driver?: User;
   deliveredAt?: string;
+  paymentProviderId?: string; // Optional payment provider reference
 }
 
 export interface OrderItem {

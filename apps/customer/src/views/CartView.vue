@@ -177,7 +177,7 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">受け取り時間<span class="text-red-500">*</span></label>
                 <input 
-                  v-model="orderForm.delivertTime"
+                  v-model="orderForm.deliveryTime"
                   type="datetime-local"
                   required
                   :min="minDeliveryTime"
@@ -281,7 +281,7 @@
                 <li v-if="validationErrors.companyContact">
                   電話番号は半角数字10桁または11桁で入力してください（例：0312345678）
                 </li>
-                <li v-if="validationErrors.delivertTime">
+                <li v-if="validationErrors.deliveryTime">
                   受け取り時間は{{ RESTAURANT_INFO.hours.open }}:00〜{{ RESTAURANT_INFO.hours.orderDeadline }}:00の間で、
                   {{ RESTAURANT_INFO.hours.minAdvanceTime }}分以上前、
                   {{ RESTAURANT_INFO.hours.maxAdvanceDays }}営業日以内を選択してください
@@ -351,7 +351,7 @@ interface ValidationErrors {
   city: string;
   addressLine: string;
   companyContact: string;
-  delivertTime: string;
+  deliveryTime: string;
 }
 
 const orderForm = ref({
@@ -362,7 +362,7 @@ const orderForm = ref({
   city: '',
   addressLine: '',
   companyContact: '',
-  delivertTime: '',
+  deliveryTime: '',
   notes: '',
   paymentMethod: 'cash' as PaymentMethod,
   needReceipt: false
@@ -376,7 +376,7 @@ const validationErrors = ref<ValidationErrors>({
   city: '',
   addressLine: '',
   companyContact: '',
-  delivertTime: ''
+  deliveryTime: ''
 });
 
 // Reactive validation
@@ -393,7 +393,7 @@ function validateForm() {
     city: '',
     addressLine: '',
     companyContact: '',
-    delivertTime: ''
+    deliveryTime: ''
   };
 
   // Name validation (allow Japanese or English)
@@ -442,10 +442,10 @@ function validateForm() {
   }
 
   // Pickup time validation
-  if (!orderForm.value.delivertTime) {
-    validationErrors.value.delivertTime = '受け取り時間を選択してください';
+  if (!orderForm.value.deliveryTime) {
+    validationErrors.value.deliveryTime = '受け取り時間を選択してください';
   } else if (!isDeliveryTimeValid.value) {
-    validationErrors.value.delivertTime = '有効な受け取り時間を選択してください（10:00-15:00）';
+    validationErrors.value.deliveryTime = '有効な受け取り時間を選択してください（10:00-15:00）';
   }
 }
 
@@ -467,17 +467,17 @@ onMounted(() => {
   // Check for preserved pickup time from reorder
   const savedDeliveryTime = localStorage.getItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
   if (savedDeliveryTime) {
-    const delivertTime = new Date(savedDeliveryTime);
+    const deliveryTime = new Date(savedDeliveryTime);
     // Final validation before using the preserved time
     const min = new Date(minDeliveryTime.value);
     const max = new Date(maxDeliveryTime.value);
     
-    if (delivertTime >= min && 
-        delivertTime <= max && 
-        RESTAURANT_INFO.hours.businessDays.includes(delivertTime.getDay()) &&
-        delivertTime.getHours() >= RESTAURANT_INFO.hours.open &&
-        delivertTime.getHours() < RESTAURANT_INFO.hours.orderDeadline) {
-      orderForm.value.delivertTime = delivertTime.toISOString().slice(0, 16);
+    if (deliveryTime >= min && 
+        deliveryTime <= max && 
+        RESTAURANT_INFO.hours.businessDays.includes(deliveryTime.getDay()) &&
+        deliveryTime.getHours() >= RESTAURANT_INFO.hours.open &&
+        deliveryTime.getHours() < RESTAURANT_INFO.hours.orderDeadline) {
+      orderForm.value.deliveryTime = deliveryTime.toISOString().slice(0, 16);
     }
     // Remove the saved pickup time
     localStorage.removeItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
@@ -549,8 +549,8 @@ const maxDeliveryTime = computed(() => {
 });
 
 const isDeliveryTimeValid = computed(() => {
-  if (!orderForm.value.delivertTime) return false;
-  const pickupDate = new Date(orderForm.value.delivertTime);
+  if (!orderForm.value.deliveryTime) return false;
+  const pickupDate = new Date(orderForm.value.deliveryTime);
   const min = new Date(minDeliveryTime.value);
   const max = new Date(maxDeliveryTime.value);
   
@@ -581,7 +581,7 @@ const isFormValid = computed(() => {
     orderForm.value.city &&
     orderForm.value.addressLine &&
     orderForm.value.companyContact &&
-    orderForm.value.delivertTime &&
+    orderForm.value.deliveryTime &&
     orderForm.value.paymentMethod &&
     cartItems.value.length > 0;
 
@@ -605,7 +605,7 @@ async function submitOrder() {
       customerName: `${orderForm.value.lastName} ${orderForm.value.firstName}`,
       companyAddress: fullAddress,
       companyContact: orderForm.value.companyContact,
-      delivertTime: new Date(orderForm.value.delivertTime),
+      deliveryTime: new Date(orderForm.value.deliveryTime),
       notes: orderForm.value.notes,
       status: 'pending' as OrderStatus,
       paymentMethod: orderForm.value.paymentMethod,

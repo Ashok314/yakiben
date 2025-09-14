@@ -34,7 +34,7 @@ const MOCK_ORDERS: Order[] = [
     status: 'pending' as OrderStatus,
     paymentMethod: 'cash' as PaymentMethod,
     paymentStatus: 'completed' as PaymentStatus,
-    delivertTime: new Date('2025-07-02T12:30:00'),
+    deliveryTime: new Date('2025-07-02T12:30:00'),
     notes: 'できるだけ早めに準備をお願いします。',
     createdAt: new Date('2025-07-02T10:00:00'),
     updatedAt: new Date('2025-07-02T10:00:00')
@@ -70,7 +70,7 @@ const MOCK_ORDERS: Order[] = [
     status: 'completed' as OrderStatus,
     paymentMethod: 'paypay' as PaymentMethod,
     paymentStatus: 'completed' as PaymentStatus,
-    delivertTime: new Date('2025-07-02T13:00:00'),
+    deliveryTime: new Date('2025-07-02T13:00:00'),
     notes: '',
     createdAt: new Date('2025-07-02T09:30:00'),
     updatedAt: new Date('2025-07-02T09:30:00')
