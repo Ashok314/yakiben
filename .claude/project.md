@@ -132,7 +132,7 @@ interface Order {
   customerName: string;
   company: string;
   customerContact: string;
-  pickupTime: Date;
+  delivertTime: Date;
   notes?: string;
   status: OrderStatus;
   paymentMethod?: PaymentMethod;

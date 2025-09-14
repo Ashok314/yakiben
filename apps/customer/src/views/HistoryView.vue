@@ -37,7 +37,7 @@
                   {{ order.customerName }}
                 </div>
                 <div class="text-sm text-gray-500">
-                  {{ formatDate(order.pickupTime) }}
+                  {{ formatDate(order.delivertTime) }}
                 </div>
                 <div class="text-sm text-gray-500 mt-1">
                   {{ order.items.length }}品

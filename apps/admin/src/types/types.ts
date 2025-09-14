@@ -26,7 +26,7 @@ export interface Order {
   total: number;
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'delivered';
   createdAt: string;
-  pickupTime?: string;
+  deliveryTime: string;
   address?: {
     street: string;
     city: string;
@@ -35,10 +35,9 @@ export interface Order {
   };
   paymentMethod: 'cash' | 'card' | 'paypay';
   paymentStatus: 'pending' | 'paid';
-  comments?: string; // Optional comments for the order
+  comments?: string;
   driver?: User;
   deliveredAt?: string;
-  deliveryTime?: string; // Optional delivery time for the order
 }
 
 export interface OrderItem {

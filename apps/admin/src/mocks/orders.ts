@@ -19,13 +19,14 @@ export const MOCK_ORDERS: Order[] = [
     total: 45.99,
     paymentMethod: 'card',
     paymentStatus: 'paid',
-    createdAt: '2025-07-01T10:00:00Z',
+    createdAt: '2025-09-14T10:00:00Z',
     items: [
       { id: '1', name: 'Chicken Teriyaki', quantity: 2, price: 12.99 },
       { id: '2', name: 'Miso Soup', quantity: 1, price: 4.99 },
     ],
-    deliveryTime: '2025-07-01T12:00:00Z',
+    deliveryTime: '2025-09-14T12:00:00Z',
     deliveredAt: '2025-07-02T12:30:00Z',
+    comments: 'Please be quick!',
   },
   {
     id: '2',
@@ -46,10 +47,11 @@ export const MOCK_ORDERS: Order[] = [
     paymentStatus: 'pending',
     createdAt: '2025-07-02T12:00:00Z',
     items: [
-      { id: '3', name: 'Sushi Platter', quantity: 1, price: 50.0 },
+      { id: '3', name: 'Chicken Teriyaki', quantity: 1, price: 50.0 },
       { id: '4', name: 'Green Tea', quantity: 2, price: 5.0 },
     ],
-    deliveryTime: '2025-07-02T14:00:00Z',
+    deliveryTime: '2025-09-14T14:00:00Z',
+    comments: 'Please be quick!',
   },
   {
     id: '3',
