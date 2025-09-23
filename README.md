@@ -67,6 +67,68 @@ Modern Japanese lunch box pre-order system built with Vue 3 and TypeScript.
 ### Environment Variables
 - Place `.env` files in each app for secrets (see `.env.example` in each app).
 
+## Local Supabase Setup
+
+To use the local Supabase instance for development:
+
+1. **Install Supabase CLI**:
+   ```bash
+   brew install supabase/tap/supabase
+   ```
+
+2. **Initialize Supabase**:
+   ```bash
+   supabase init
+   ```
+
+3. **Start Supabase**:
+   ```bash
+   supabase start
+   ```
+
+4. **Access Supabase**:
+   - API: `http://localhost:54321`
+   - Studio: `http://localhost:54323`
+
+5. **Update Environment Variables**:
+   - Add the local Supabase URL and anon key to the shared `supabase.ts` file:
+     ```typescript
+     const supabaseUrl = 'http://localhost:54321';
+     const supabaseAnonKey = 'YOUR_LOCAL_SUPABASE_ANON_KEY';
+     ```
+
+6. **Testing**:
+   - Keep the mock APIs until Supabase is fully implemented and tested.
+
+## Deploying Supabase
+
+To deploy the Supabase schema and configuration to your remote project, follow these steps:
+
+1. **Link to your Supabase project**:
+   ```bash
+   supabase link
+   ```
+   This command will prompt you to authenticate and select your Supabase project.
+
+2. **Push the local migrations to the remote database**:
+   ```bash
+   supabase db push
+   ```
+   This will apply all local migrations to the remote Supabase database.
+
+3. **Verify the deployment**:
+   - Check the Supabase dashboard to ensure the schema and data are correctly applied.
+   - Test the API endpoints to confirm functionality.
+
+4. **Optional: Seed the database**:
+   If you have a `seed.sql` file, you can populate the database with initial data:
+   ```bash
+   supabase db seed
+   ```
+
+5. **Monitor and Debug**:
+   Use the Supabase dashboard logs and metrics to monitor the deployment and debug any issues.
+
 ## Project Structure
 
 ```
