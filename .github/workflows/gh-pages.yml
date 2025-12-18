@@ -24,8 +24,10 @@ jobs:
 
       # 1. Backend Deployment (Apps Script)
       - name: Prepare Clasp
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
         run: |
-          echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
+          echo "$CLASPRC_JSON" > /home/runner/.clasprc.json
           echo '{"scriptId":"${{ secrets.SCRIPT_ID }}","rootDir":"./dist"}' > apps/api/.clasp.json
 
       - name: Build and Deploy API

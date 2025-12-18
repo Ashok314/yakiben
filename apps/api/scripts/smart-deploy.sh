@@ -6,6 +6,9 @@ MAX_DEPLOYMENTS=45
 
 echo "Starting smart deployment for Apps Script..."
 
+# Move to the API directory where .clasp.json is located
+cd apps/api
+
 # 1. Push code
 npx @google/clasp push --force
 
