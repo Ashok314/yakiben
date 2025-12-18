@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Test API Endpoints",
+			"type": "shell",
+			"command": "curl -L \"https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=health\" && curl -L \"https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=protectedEndpoint\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		}
+	]
+}

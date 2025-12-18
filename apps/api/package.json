@@ -1,0 +1,22 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "Yakiben backend using Google Apps Script",
+  "private": true,
+  "scripts": {
+    "login": "clasp login",
+    "build": "tsc && cp ./appsscript.json ./dist/",
+    "dev": "tsc --watch",
+    "push": "yarn build && clasp push",
+    "deploy": "yarn build && clasp push && clasp deploy --description \"Deploy $(date +'%Y-%m-%d %H:%M')\"",
+    "deploy:version": "clasp deploy --description",
+    "open": "clasp open",
+    "logs": "clasp logs",
+    "deployments": "clasp deployments",
+    "undeploy": "clasp undeploy",
+    "health": "clasp run health"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

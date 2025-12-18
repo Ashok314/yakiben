@@ -80,8 +80,10 @@
             </div>
             <div class="text-right">
               <span :class="{
-                'text-yellow-600': order.status === 'pending',
                 'text-green-600': order.status === 'completed',
+                'text-blue-600': order.status === 'delivering' || order.status === 'ready',
+                'text-orange-500': order.status === 'preparing',
+                'text-yellow-600': order.status === 'pending' || order.status === 'confirmed',
                 'text-red-600': order.status === 'cancelled'
               }" class="font-medium">
                 {{ statusText[order.status] }}
@@ -97,16 +99,20 @@
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 rounded-full"
                     :class="{
-                      'bg-yellow-500 animate-pulse': order.status === 'pending',
                       'bg-green-500': order.status === 'completed',
+                      'bg-blue-500 animate-pulse': order.status === 'delivering' || order.status === 'ready',
+                      'bg-orange-500 animate-pulse': order.status === 'preparing',
+                      'bg-yellow-500 animate-pulse': order.status === 'pending' || order.status === 'confirmed',
                       'bg-red-500': order.status === 'cancelled'
                     }"></span>
               <span class="text-sm font-medium" :class="{
-                'text-yellow-800': order.status === 'pending',
                 'text-green-800': order.status === 'completed',
+                'text-blue-800': order.status === 'delivering' || order.status === 'ready',
+                'text-orange-800': order.status === 'preparing',
+                'text-yellow-800': order.status === 'pending' || order.status === 'confirmed',
                 'text-red-800': order.status === 'cancelled'
               }">
-                {{ order.status === 'pending' ? '準備中' : order.status === 'completed' ? 'お渡し完了' : 'キャンセル済み' }}
+                {{ statusText[order.status] }}
               </span>
             </div>
           </div>
@@ -162,8 +168,8 @@
               <div>{{ order.companyContact }}</div>
             </div>
             <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.delivertTime }}</div>
-              <div>{{ formatDate(order.delivertTime) }}</div>
+              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.deliveryTime }}</div>
+              <div>{{ formatDate(order.deliveryTime) }}</div>
             </div>
             <div v-if="order.notes">
               <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.notes }}</div>
@@ -243,8 +249,8 @@
               <p class="font-medium">{{ formatDateForPrint(order.createdAt) }}</p>
             </div>
             <div class="text-right">
-              <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.delivertTime }}</p>
-              <p class="font-medium">{{ formatDateForPrint(order.delivertTime) }}</p>
+              <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.deliveryTime }}</p>
+              <p class="font-medium">{{ formatDateForPrint(order.deliveryTime) }}</p>
             </div>
           </div>
         </div>

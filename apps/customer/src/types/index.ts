@@ -34,7 +34,7 @@ export interface Order {
   customerName: string;
   companyAddress: string;
   companyContact: string;
-  delivertTime: Date;
+  deliveryTime: Date;
   notes?: string;
   status: OrderStatus;
   paymentMethod?: PaymentMethod;
