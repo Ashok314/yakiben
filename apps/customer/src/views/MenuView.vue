@@ -131,18 +131,21 @@
             </svg>
           </button>
         </div>
-        <div class="space-y-4">
+        <div v-if="restaurantInfo" class="space-y-4">
           <div>
             <h4 class="font-medium mb-1">住所</h4>
-            <p class="text-gray-600">〒100-0005 東京都千代田区丸の内1-1-1</p>
+            <p class="text-gray-600">
+              〒{{ restaurantInfo.address.postal }} 
+              {{ restaurantInfo.address.prefecture }}{{ restaurantInfo.address.city }}{{ restaurantInfo.address.line1 }}
+            </p>
           </div>
           <div>
             <h4 class="font-medium mb-1">営業時間</h4>
-            <p class="text-gray-600">平日 10:00-15:00</p>
+            <p class="text-gray-600">平日 {{ restaurantInfo.hours.open }}:00-{{ restaurantInfo.hours.close }}:00</p>
           </div>
           <div>
             <h4 class="font-medium mb-1">電話番号</h4>
-            <p class="text-gray-600">03-1234-5678</p>
+            <p class="text-gray-600">{{ restaurantInfo.phone }}</p>
           </div>
           <div>
             <h4 class="font-medium mb-2">アクセス</h4>
@@ -158,6 +161,9 @@
             </div>
           </div>
         </div>
+        <div v-else class="text-center py-12 text-gray-400">
+           読み込み中...
+        </div>
       </div>
     </div>
   </div>
@@ -168,13 +174,17 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { categories as categoryList, getMenuItemsByCategory, fetchMenu, isLoading } from '../data/menu';
 import MenuCard from '../components/MenuCard.vue';
 import { useCart } from '../stores/cart';
-import type { MenuItem } from '../types'; // Import type
+import type { MenuItem } from '../types'; 
+import { useRestaurantStore } from '../stores/restaurant';
+
+const { info: restaurantInfo } = useRestaurantStore();
 
 onMounted(() => {
   fetchMenu();
+  checkAnnouncement();
 });
 
-// Since categories are loaded async, we need to watch them to set initial selectedCategory
+// Categories are loaded async, so we watch them to set initial selectedCategory
 const categories = categoryList;
 const selectedCategory = ref('');
 
@@ -184,7 +194,6 @@ watch(categories, (newCats) => {
   }
 }, { immediate: true });
 
-// Computed for items to be reactive
 const currentItems = computed(() => {
     if (!selectedCategory.value) return [];
     return getMenuItemsByCategory(selectedCategory.value).value;
@@ -192,23 +201,14 @@ const currentItems = computed(() => {
 
 const { cartItemCount, cartTotal } = useCart();
 
-const ANNOUNCEMENT_ID = 'banner-2025-07-limit'; // Unique ID for current banner
+const ANNOUNCEMENT_ID = 'banner-2025-07-limit'; 
 
 function checkAnnouncement() {
   const dismissed = localStorage.getItem(`yakiben-banner-dismissed-${ANNOUNCEMENT_ID}`);
-  if (!dismissed) {
-    showAnnouncement.value = true;
-  } else {
-    showAnnouncement.value = false;
-  }
+  showAnnouncement.value = !dismissed;
 }
 
-onMounted(() => {
-  fetchMenu();
-  checkAnnouncement();
-});
-
-const showAnnouncement = ref(false); // Default to false, set true if check passes
+const showAnnouncement = ref(false); 
 const showInfo = ref(false);
 
 function closeAnnouncement() {

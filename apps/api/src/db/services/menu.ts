@@ -1,4 +1,24 @@
 /**
+ * Format image URL (handles Google Drive links)
+ */
+function formatImageUrl(url: string): string {
+  if (!url) return '/assets/menu/placeholder.jpeg';
+
+  // If it's already a direct web link or relative path, keep it
+  if (!url.includes('drive.google.com')) {
+    return url;
+  }
+
+  // Extract File ID from Google Drive link
+  const driveIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (driveIdMatch && driveIdMatch[1]) {
+    return `https://drive.google.com/uc?export=view&id=${driveIdMatch[1]}`;
+  }
+
+  return url;
+}
+
+/**
  * Get menu items (PUBLIC)
  */
 function handleGetMenu(filters?: { category?: string }): ApiResponse<MenuItem[]> {
@@ -13,7 +33,7 @@ function handleGetMenu(filters?: { category?: string }): ApiResponse<MenuItem[]>
       ...item,
       customizations: item.customizations_json || [],
       price: Number(item.price),
-      image: item.image_url || '/assets/menu/placeholder.jpeg'
+      image: formatImageUrl(item.image_url)
     }));
 
     // Filter by category if provided

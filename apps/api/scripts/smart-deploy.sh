@@ -10,6 +10,7 @@ echo "Starting smart deployment for Apps Script..."
 cd apps/api
 
 # 1. Push code
+echo "Deploying to script ID from .clasp.json..."
 npx @google/clasp push --force
 
 # 2. Find existing production deployment

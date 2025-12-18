@@ -149,10 +149,9 @@ export const ordersApi = {
     return orders.find(o => o.trackingId === trackingId) || null;
   },
 
-  // Update an order (Mock only previously, real API protected)
+  // Update an order (staff/manager role usually required)
   async updateOrder(updatedOrder: Order): Promise<Order> {
     // Customer app usually doesn't update orders directly except maybe cancelling
-    // For now throwing error or no-op as it requires Manager role
     console.warn('updateOrder not implemented for customer app');
     return updatedOrder;
   },

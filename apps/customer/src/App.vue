@@ -3,13 +3,15 @@ import HeaderStatus from './components/HeaderStatus.vue';
 import UserMenu from './components/UserMenu.vue';
 import { ref, onMounted } from 'vue';
 import { callAPI } from './services/api';
+import { useRestaurantStore } from './stores/restaurant';
 
+const { fetchInfo } = useRestaurantStore();
 const publicHealthStatus = ref('');
 
 onMounted(async () => {
+  fetchInfo();
   try {
     const data = await callAPI('health');
-    console.log('Public health:', data);
     publicHealthStatus.value = `Backend: ${data.data?.message || 'Connected'}`;
   } catch (error) {
     console.error('Public health error:', error);

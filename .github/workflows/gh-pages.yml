@@ -2,7 +2,7 @@ name: Deploy App
 
 on:
   push:
-    branches: [develop, fix-local-setup]
+    branches: [develop]
   workflow_dispatch:
 
 jobs:
@@ -34,19 +34,11 @@ jobs:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
           SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
         run: |
-          # 1. Setup Clasp (Strict home pathing)
+          # 1. Setup Clasp (Clean & Secure)
           mkdir -p ~/.config/clasp
           printf "%s" "$CLASPRC_JSON" > ~/.clasprc.json
           printf "%s" "$CLASPRC_JSON" > ~/.config/clasp/claspjson
           echo "{\"scriptId\":\"$SCRIPT_ID\",\"rootDir\":\"./dist\"}" > apps/api/.clasp.json
-          
-          # Debug: Verify files exist
-          echo "--- DEBUG INFO ---"
-          ls -la ~/.clasprc.json && echo "Found ~/.clasprc.json"
-          ls -la ~/.config/clasp/claspjson && echo "Found ~/.config/clasp/claspjson"
-          echo "Project ID being used: $(cat apps/api/.clasp.json | grep -oE '\"scriptId\":\"[^\"]+\"')"
-          npx @google/clasp -v
-          echo "--- END DEBUG ---"
           
           # 2. Deploy
           yarn workspace api build

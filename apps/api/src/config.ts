@@ -15,12 +15,12 @@ const CONFIG = {
     'health',
     'getMenu',
     'getCustomizations',
-    'getRestaurantInfo'
+    'getRestaurantInfo',
+    'createOrder'
   ],
 
   // Protected endpoints (auth required)
   PROTECTED_ENDPOINTS: [
-    'createOrder',
     'getOrders',
     'updateOrder',
     'updateMenuItem',
