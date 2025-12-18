@@ -8,6 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -23,18 +28,23 @@ jobs:
         run: yarn install
 
       # 1. Backend Deployment (Apps Script)
-      - name: Prepare Clasp
-        env:
-          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
-        run: |
-          echo "$CLASPRC_JSON" > /home/runner/.clasprc.json
-          echo '{"scriptId":"${{ secrets.SCRIPT_ID }}","rootDir":"./dist"}' > apps/api/.clasp.json
-
       - name: Build and Deploy API
         id: deploy_api
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
         run: |
+          # 1. Setup Clasp (In-memory/Local only)
+          echo "$CLASPRC_JSON" > ~/.clasprc.json
+          echo "{\"scriptId\":\"$SCRIPT_ID\",\"rootDir\":\"./dist\"}" > apps/api/.clasp.json
+          
+          # 2. Deploy
           yarn workspace api build
           ./apps/api/scripts/smart-deploy.sh
+          
+          # 3. Security: Wipe credentials immediately
+          rm -f ~/.clasprc.json
+          rm -f apps/api/.clasp.json
 
       # 2. Frontend Build (using the ID discovered by the script)
       - name: Build Apps
