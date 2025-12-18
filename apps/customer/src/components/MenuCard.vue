@@ -2,7 +2,7 @@
   <div class="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative">
     <div class="relative h-32 group-hover:h-40 transition-all duration-300">
       <img 
-        :src="`/yakiben/customer${item.image}`" 
+        :src="item.image.startsWith('http') ? item.image : `/yakiben/customer${item.image}`" 
         :alt="item.name"
         class="w-full h-full object-cover transition-transform duration-500"
       />

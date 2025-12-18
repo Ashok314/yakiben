@@ -17,7 +17,14 @@
     </header>
 
     <main class="container mx-auto px-4 py-6">
-      <div v-if="!orders.length" class="text-center py-12">
+      <div v-if="isLoading" class="flex justify-center py-12">
+        <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+
+      <div v-else-if="!orders.length" class="text-center py-12">
         <p class="text-gray-600 mb-4">注文履歴がありません</p>
         <router-link 
           to="/"
@@ -37,7 +44,7 @@
                   {{ order.customerName }}
                 </div>
                 <div class="text-sm text-gray-500">
-                  {{ formatDate(order.delivertTime) }}
+                  {{ formatDate(order.deliveryTime) }}
                 </div>
                 <div class="text-sm text-gray-500 mt-1">
                   {{ order.items.length }}品
@@ -50,7 +57,9 @@
                 <div class="text-sm">
                   <span :class="{
                     'text-green-600': order.status === 'completed',
-                    'text-yellow-600': order.status === 'pending',
+                    'text-blue-600': order.status === 'delivering' || order.status === 'ready',
+                    'text-orange-500': order.status === 'preparing',
+                    'text-yellow-600': order.status === 'pending' || order.status === 'confirmed',
                     'text-red-600': order.status === 'cancelled'
                   }">
                     {{ statusText[order.status] }}
@@ -88,13 +97,26 @@ import type { Order } from '../types';
 const orders = ref<Order[]>([]);
 
 const statusText = {
-  pending: '準備中',
+  pending: '注文確認中',
+  confirmed: '受信済み',
+  preparing: '調理中',
+  ready: '準備完了',
+  delivering: '配達中',
   completed: '完了',
   cancelled: 'キャンセル'
 } as const;
 
+const isLoading = ref(true);
+
 onMounted(async () => {
-  orders.value = await ordersApi.getOrders();
+  try {
+    // Initial load can be from API which handles merging, 
+    // but we can also reactively update if needed.
+    // getOrders already does the heavy lifting of merging local + API.
+    orders.value = await ordersApi.getOrders();
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 const sortedOrders = computed(() => {
