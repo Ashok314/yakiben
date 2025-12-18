@@ -34,9 +34,19 @@ jobs:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
           SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
         run: |
-          # 1. Setup Clasp (In-memory/Local only)
-          echo "$CLASPRC_JSON" > ~/.clasprc.json
+          # 1. Setup Clasp (Strict home pathing)
+          mkdir -p ~/.config/clasp
+          printf "%s" "$CLASPRC_JSON" > ~/.clasprc.json
+          printf "%s" "$CLASPRC_JSON" > ~/.config/clasp/claspjson
           echo "{\"scriptId\":\"$SCRIPT_ID\",\"rootDir\":\"./dist\"}" > apps/api/.clasp.json
+          
+          # Debug: Verify files exist
+          echo "--- DEBUG INFO ---"
+          ls -la ~/.clasprc.json && echo "Found ~/.clasprc.json"
+          ls -la ~/.config/clasp/claspjson && echo "Found ~/.config/clasp/claspjson"
+          echo "Project ID being used: $(cat apps/api/.clasp.json | grep -oE '\"scriptId\":\"[^\"]+\"')"
+          npx @google/clasp -v
+          echo "--- END DEBUG ---"
           
           # 2. Deploy
           yarn workspace api build
@@ -44,6 +54,7 @@ jobs:
           
           # 3. Security: Wipe credentials immediately
           rm -f ~/.clasprc.json
+          rm -f ~/.config/clasp/claspjson
           rm -f apps/api/.clasp.json
 
       # 2. Frontend Build (using the ID discovered by the script)
