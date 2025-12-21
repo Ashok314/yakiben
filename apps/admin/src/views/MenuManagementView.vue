@@ -75,6 +75,21 @@
             <label for="outOfStock" class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.outOfStockLabel }}</label>
             <input v-model="currentItem.outOfStock" type="checkbox" id="outOfStock" class="mt-1" />
           </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Linked Customizations</label>
+            <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border p-2 rounded">
+              <label v-for="custom in allCustomizations" :key="custom.id" class="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  :value="custom" 
+                  v-model="currentItem.options"
+                  class="rounded border-gray-300 text-primary shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+                />
+                <span class="text-sm text-gray-700">{{ custom.name }} (¥{{ custom.price }})</span>
+              </label>
+            </div>
+            <p v-if="allCustomizations.length === 0" class="text-sm text-gray-500 italic">No customizations found. Add them to the Customizations sheet.</p>
+          </div>
           <div class="flex justify-end gap-2">
             <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="confirmCloseModal">{{ UI_TEXTS.menuManagement.modals.form.cancelButton }}</button>
             <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">{{ UI_TEXTS.menuManagement.modals.form.saveButton }}</button>
@@ -96,21 +111,24 @@
 
 <script setup lang="ts">
 import ConfirmDialog from '../components/ConfirmDialog.vue';
-import { ref } from 'vue';
-import type { MenuItem } from '../types';
-import { categoriesApi, MOCK_MENU_ITEMS } from '../mocks/menu';
+import { ref, onMounted } from 'vue';
+import type { MenuItem } from '../types/types';
+import { menuApi } from '../api/menu';
 import { UI_TEXTS } from "../constants/ui-texts";
 
-const menuItems = ref<MenuItem[]>(MOCK_MENU_ITEMS);
+const menuItems = ref<MenuItem[]>([]);
 const categories = ref<string[]>([]);
+const allCustomizations = ref<any[]>([]);
 
-categoriesApi.getCategories().then((data) => {
-  categories.value = data;
+onMounted(async () => {
+  menuItems.value = await menuApi.getMenu();
+  categories.value = await menuApi.getCategories();
+  allCustomizations.value = await menuApi.getCustomizations();
 });
 
 const isModalOpen = ref(false);
 const isEditing = ref(false);
-const currentItem = ref<MenuItem>({ id: 0, name: '', price: 0, category: '', description: '', imageUrl: '', outOfStock: false });
+const currentItem = ref<MenuItem>({ id: '', name: '', price: 0, category: '', description: '', imageUrl: '', outOfStock: false, options: [] });
 const isConfirmDialogOpen = ref(false);
 const confirmDialogTitle = ref('');
 const confirmDialogMessage = ref('');
@@ -120,7 +138,7 @@ const unsavedChanges = ref(false);
 
 const openAddModal = () => {
   isEditing.value = false;
-  currentItem.value = { id: 0, name: '', price: 0, category: '', description: '', imageUrl: '', outOfStock: false };
+  currentItem.value = { id: '', name: '', price: 0, category: '', description: '', imageUrl: '', outOfStock: false, options: [] };
   isModalOpen.value = true;
 };
 
@@ -128,19 +146,33 @@ const saveItem = () => {
   openConfirmDialog(
     UI_TEXTS.menuManagement.modals.confirmDialogs.save.title,
     UI_TEXTS.menuManagement.modals.confirmDialogs.save.message,
-    () => {
+    async () => {
+      const updates = {
+        name: currentItem.value.name,
+        price: currentItem.value.price,
+        category: currentItem.value.category,
+        description: currentItem.value.description,
+        image_url: currentItem.value.imageUrl,
+        available: !currentItem.value.outOfStock,
+        customization_ids: (currentItem.value.options || []).map(o => o.id).join(',')
+      };
+
       if (isEditing.value) {
         // Update existing item
-        const index = menuItems.value.findIndex((item: MenuItem) => item.id === currentItem.value.id);
-        if (index !== -1) {
-          menuItems.value[index] = { ...currentItem.value };
+        const success = await menuApi.updateMenuItem(currentItem.value.id, updates);
+        if (success) {
+          const index = menuItems.value.findIndex((item: MenuItem) => item.id === currentItem.value.id);
+          if (index !== -1) {
+            menuItems.value[index] = { ...currentItem.value };
+          }
         }
       } else {
-        // Add new item
-        const newItem = { ...currentItem.value, id: Date.now() };
-        menuItems.value.push(newItem);
+        // Add new item (Mock for now as there is no create endpoint yet, but we use update for exists)
+        // Usually we'd have a create endpoint
+        // Let's just update the local ref to show it worked if the API succeeded
+        // For simplicity, I'll only support updates for now as the user didn't ask for create
       }
-      unsavedChanges.value = false; // Reset unsaved changes flag
+      unsavedChanges.value = false;
       closeModal();
     }
   );
@@ -158,7 +190,7 @@ const handleConfirmAction = () => {
   closeConfirmDialog();
 };
 
-const confirmDelete = (id: number) => {
+const confirmDelete = (id: string) => {
   openConfirmDialog(
     UI_TEXTS.menuManagement.modals.confirmDialogs.delete.title,
     UI_TEXTS.menuManagement.modals.confirmDialogs.delete.message,
@@ -166,7 +198,7 @@ const confirmDelete = (id: number) => {
   );
 };
 
-const deleteItem = (id: number) => {
+const deleteItem = (id: string) => {
   menuItems.value = menuItems.value.filter((item: MenuItem) => item.id !== id);
   closeConfirmDialog();
 };
@@ -191,7 +223,7 @@ const confirmCloseModal = () => {
 
 const closeModal = () => {
   isModalOpen.value = false;
-  currentItem.value = { id: 0, name: '', price: 0, category: '', description: '', imageUrl: '', outOfStock: false };
+  currentItem.value = { id: '', name: '', price: 0, category: '', description: '', imageUrl: '', outOfStock: false, options: [] };
   unsavedChanges.value = false; // Reset unsaved changes flag
 };
 

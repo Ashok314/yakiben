@@ -7,6 +7,7 @@ interface User {
   email?: string;
   role: 'guest' | 'customer' | 'staff' | 'manager' | 'driver';
   isLoggedIn: boolean;
+  isStaff: boolean;
 }
 
 /**

@@ -16,7 +16,7 @@ function api(action: string, data?: any): ApiResponse {
         return handleHealth();
 
       case 'login':
-        return handleLogin(data.credential);
+        return handleLogin(data);
 
       case 'getMenu':
         return handleGetMenu(data);
@@ -44,6 +44,9 @@ function api(action: string, data?: any): ApiResponse {
         return handleUpdateSettings(data.key, data.value);
 
       // Authenticated endpoints
+      case 'getUsers':
+        return handleGetUsers();
+
       case 'authenticated:health':
         return handleAuthenticatedHealth();
 

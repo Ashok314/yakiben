@@ -256,9 +256,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { Order } from '../types/types';
-import { ordersApi } from '../mocks/orders';
-import { MOCK_USERS } from '../mocks/users';
+import type { Order, User } from '../types/types';
+import { ordersApi } from '../api/orders';
+import { usersApi } from '../api/users';
 import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon, UserIcon as DeliverIcon } from '@heroicons/vue/24/solid';
 import { UI_TEXTS } from "../constants/ui-texts";
 
@@ -266,12 +266,12 @@ const tabs = ['All Items', 'Single Orders'];
 const activeTab = ref('All Items');
 
 const orders = ref<Order[]>([]);
-const users = ref(MOCK_USERS);
+const users = ref<User[]>([]);
 const STATUS_FLOW = ['pending', 'accepted', 'preparing', 'ready', 'delivering', 'delivered'];
 const selectedOrder = ref<Order | null>(null);
 const hideDeliveredAndDelivering = ref(true); // Checkbox is checked by default
 const assignDriverModalVisible = ref(false);
-const availableUsers = ref(users.value.filter((user: { id: number; name: string; role: string }) => user.role === 'driver'));
+const availableUsers = computed(() => users.value.filter(user => user.role === 'driver'));
 
 // Declare constants for status checks
 const STATUS_READY = 'ready';
@@ -282,6 +282,7 @@ const DRIVER_STATUS = [STATUS_READY, STATUS_DELIVERING];
 
 onMounted(async () => {
   orders.value = await ordersApi.getOrders();
+  users.value = await usersApi.getUsers();
 });
 
 const selectedDateFilter = ref('today');
@@ -316,12 +317,21 @@ const canUpdateStatus = (order: Order) => {
   return STATUS_FLOW.indexOf(order.status) < STATUS_FLOW.length - 1;
 };
 
-const updateOrderStatus = (order: Order, direction: 'next' | 'prev' = 'next') => {
+const updateOrderStatus = async (order: Order, direction: 'next' | 'prev' = 'next') => {
   const currentIndex = STATUS_FLOW.indexOf(order.status);
+  let newStatus = order.status;
+  
   if (direction === 'next' && currentIndex < STATUS_FLOW.length - 1) {
-    order.status = STATUS_FLOW[currentIndex + 1] as Order['status'];
+    newStatus = STATUS_FLOW[currentIndex + 1] as Order['status'];
   } else if (direction === 'prev' && currentIndex > 0) {
-    order.status = STATUS_FLOW[currentIndex - 1] as Order['status'];
+    newStatus = STATUS_FLOW[currentIndex - 1] as Order['status'];
+  }
+
+  if (newStatus !== order.status) {
+    const success = await ordersApi.updateOrderStatus(order.id, newStatus);
+    if (success) {
+      order.status = newStatus;
+    }
   }
 };
 

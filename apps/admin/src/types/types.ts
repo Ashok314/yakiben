@@ -54,6 +54,13 @@ export interface OrderItemOption {
   price?: number;
 }
 
+export interface Customization {
+  id: string;
+  name: string;
+  price: number;
+  available: boolean;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -62,16 +69,7 @@ export interface MenuItem {
   category: string;
   imageUrl?: string;
   outOfStock?: boolean;
-  options?: MenuItemOption[];
-}
-
-export interface MenuItemOption {
-  name: string;
-  required: boolean;
-  choices: {
-    name: string;
-    price?: number;
-  }[];
+  options?: Customization[];
 }
 
 export interface RestaurantSettings {

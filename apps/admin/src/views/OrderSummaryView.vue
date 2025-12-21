@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { ordersApi } from '../mocks/orders';
+import { ordersApi } from '../api/orders';
 import { UI_TEXTS } from '../constants/ui-texts';
 import type { OrderSummary } from '../types/types';
 import MenuPerformanceChart from '../components/MenuPerformanceChart.vue';

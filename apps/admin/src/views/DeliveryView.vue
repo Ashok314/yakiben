@@ -141,8 +141,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { ordersApi, CURRENT_USER } from '../mocks/orders';
+import { ref, computed, onMounted } from 'vue';
+import { ordersApi } from '../api/orders';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
 
 interface DeliveryOrder {
@@ -171,17 +171,25 @@ interface DeliveryOrder {
 
 const tabs = ['Current Delivery', 'My Deliveries'];
 const activeTab = ref('Current Delivery');
-const currentDriver = CURRENT_USER.name;
+
+import { useAuthStore } from '../stores/auth';
+
+const auth = useAuthStore();
+const currentDriver = computed(() => auth.user?.name || '');
 const deliveryOrders = ref<DeliveryOrder[]>([]);
 const currentDelivery = computed(() =>
   deliveryOrders.value.find(
-    (order) => order.status === 'delivering' && order.driver?.name === currentDriver
+    (order) => order.status === 'delivering' && order.driver?.name === currentDriver.value
   ) || null
 );
 
+onMounted(() => {
+  fetchOrders();
+});
+
 const myDeliveries = computed(() =>
   deliveryOrders.value.filter(
-    (order) => order.driver?.name === currentDriver
+    (order) => order.driver?.name === currentDriver.value
   )
 );
 
@@ -223,14 +231,21 @@ const markAsDelivered = (order: DeliveryOrder) => {
   showConfirmDialog.value = true;
 };
 
-const startDelivery = (order: DeliveryOrder) => {
-  alert(`Starting delivery for order ${order.id}.`);
+const startDelivery = async (order: DeliveryOrder) => {
+  const success = await ordersApi.updateOrderStatus(order.id, 'delivering');
+  if (success) {
+    order.status = 'delivering';
+    alert(`Starting delivery for order ${order.id}.`);
+  }
 };
 
-const handleConfirm = (order: DeliveryOrder) => {
+const handleConfirm = async (order: DeliveryOrder) => {
   if (order) {
-    order.status = 'delivered';
-    order.deliveredAt = new Date().toISOString();
+    const success = await ordersApi.updateOrderStatus(order.id, 'delivered');
+    if (success) {
+      order.status = 'delivered';
+      order.deliveredAt = new Date().toISOString();
+    }
   }
   showConfirmDialog.value = false;
 };
