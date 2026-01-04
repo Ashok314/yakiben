@@ -35,17 +35,17 @@ function api(action: string, data?: any): ApiResponse {
         return handleGetOrders(data);
 
       case 'updateOrder':
-        return handleUpdateOrder(data.orderId, data.updates);
+        return handleUpdateOrder(data.orderId, data.updates, data.authToken);
 
       case 'updateMenuItem':
-        return handleUpdateMenuItem(data.itemId, data.updates);
+        return handleUpdateMenuItem(data.itemId, data.updates, data.authToken);
 
       case 'updateSettings':
-        return handleUpdateSettings(data.key, data.value);
+        return handleUpdateSettings(data.key, data.value, data.authToken);
 
       // Authenticated endpoints
       case 'getUsers':
-        return handleGetUsers();
+        return handleGetUsers(data);
 
       case 'authenticated:health':
         return handleAuthenticatedHealth();

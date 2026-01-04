@@ -76,10 +76,8 @@ function handleGetOrders(filters?: { status?: string; trackingId?: string; authT
 
     // Parse JSON fields and flatten customer data
     orders = orders.map((order: any) => {
-      const customer = order.customer_json || {};
       return {
-        ...order,
-        customer,
+        ...order
       };
     });
 
@@ -92,9 +90,9 @@ function handleGetOrders(filters?: { status?: string; trackingId?: string; authT
 /**
  * Update order (PROTECTED - staff/manager only)
  */
-function handleUpdateOrder(orderId: string, updates: any): ApiResponse {
+function handleUpdateOrder(orderId: string, updates: Record<string, unknown>, authToken: string): ApiResponse {
   try {
-    requireRole(['staff', 'manager', 'driver']);
+    requireRole(['staff', 'manager', 'driver'], authToken); // Validate authToken
 
     updates.updated_at = new Date().toISOString();
 

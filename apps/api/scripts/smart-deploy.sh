@@ -31,7 +31,7 @@ if echo "$DEPLOY_OUTPUT" | grep -q "may only have up to"; then
     
     if [ "$TOTAL" -gt 2 ]; then
         # Keep only the last 2, delete the rest
-        TO_DELETE=$(echo "$ALL_IDS" | head -n -2)
+        TO_DELETE=$(echo "$ALL_IDS" | head -n $(($TOTAL - 2)))
         
         for ID in $TO_DELETE; do
             echo "Deleting deployment: $ID"

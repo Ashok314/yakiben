@@ -94,9 +94,9 @@ function handleGetCustomizations(): ApiResponse<Customization[]> {
 /**
  * Update menu item (PROTECTED - manager only)
  */
-function handleUpdateMenuItem(itemId: string, updates: any): ApiResponse {
+function handleUpdateMenuItem(itemId: string, updates: Record<string, unknown>, authToken: string): ApiResponse {
   try {
-    requireRole(['manager']);
+    requireRole(['manager'], authToken); // Validate authToken
 
     updates.updated_at = new Date().toISOString();
 

@@ -28,6 +28,7 @@
         <thead>
           <tr>
             <th class="border-b border-gray-300 py-2">Item</th>
+            <th class="border-b border-gray-300 py-2">Customizations</th>
             <th class="border-b border-gray-300 py-2">Quantity</th>
             <th class="border-b border-gray-300 py-2">Comments</th>
           </tr>
@@ -35,6 +36,13 @@
         <tbody>
           <tr v-for="(item, index) in groupedItems" :key="index">
             <td class="py-2">{{ item.name }}</td>
+            <td class="py-2">
+              <ul>
+                <li v-for="(customization, i) in item.customizations" :key="i">
+                  {{ customization.name }}
+                </li>
+              </ul>
+            </td>
             <td class="py-2">{{ item.quantity }}</td>
             <td class="py-2">
               <span v-for="(comment, idx) in item.comments" :key="idx">
@@ -212,9 +220,14 @@
                 <tbody>
                   <tr v-for="(item, index) in selectedOrder.items" :key="item.id">
                     <td class="py-2">{{ index + 1 }}</td>
-                    <td class="py-2">{{ item.name }}</td>
+                    <td class="py-2">
+                      {{ item.name }}
+                      <div v-if="item.customizations && item.customizations.length" class="text-sm text-gray-500">
+                        Customizations: {{ item.customizations.join(', ') }}
+                      </div>
+                    </td>
                     <td class="py-2">x{{ item.quantity }}</td>
-                    <td class="py-2">${{ item.price.toFixed(2) }}</td>
+                    <td class="py-2">${{ item.price ? item.price.toFixed(2) : '0.00' }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -267,7 +280,7 @@ const activeTab = ref('All Items');
 
 const orders = ref<Order[]>([]);
 const users = ref<User[]>([]);
-const STATUS_FLOW = ['pending', 'accepted', 'preparing', 'ready', 'delivering', 'delivered'];
+const STATUS_FLOW = ['pending', 'accepted', 'preparing', 'ready', 'delivering', 'completed'];
 const selectedOrder = ref<Order | null>(null);
 const hideDeliveredAndDelivering = ref(true); // Checkbox is checked by default
 const assignDriverModalVisible = ref(false);
@@ -275,7 +288,7 @@ const availableUsers = computed(() => users.value.filter(user => user.role === '
 
 // Declare constants for status checks
 const STATUS_READY = 'ready';
-const STATUS_DELIVERED = 'delivered';
+const STATUS_DELIVERED = 'completed';
 const STATUS_DELIVERING = 'delivering';
 const HIDDEN_STATUSES = [STATUS_DELIVERED, STATUS_DELIVERING];
 const DRIVER_STATUS = [STATUS_READY, STATUS_DELIVERING];
@@ -363,17 +376,26 @@ const getStatusColor = (status: string) => {
 };
 
 const printOrder = (order: Order) => {
+  if (!order || !order.items) {
+    console.error('Order or items are undefined');
+    return;
+  }
+
   const printContent = `
     <div>
       <h1>Order Details</h1>
       <p><strong>Order ID:</strong> ${order.trackingId}</p>
-      <p><strong>Customer:</strong> ${order.customer.name}</p>
-      <p><strong>Phone:</strong> ${order.customer.phone}</p>
+      <p><strong>Customer:</strong> ${order.customer?.name || 'Unknown'}</p>
+      <p><strong>Phone:</strong> ${order.customer?.phone || 'N/A'}</p>
       <p><strong>Status:</strong> ${order.status}</p>
-      <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+      <p><strong>Total:</strong> $${order.total?.toFixed(2) || '0.00'}</p>
       <h2>Items</h2>
       <ul>
-        ${order.items.map((item, index) => `<li>${index + 1}. ${item.quantity}x ${item.name} - $${item.price.toFixed(2)}</li>`).join('')}
+        ${order.items.map((item, index) => {
+          const itemName = item.item?.name || 'Unknown Item';
+          const itemPrice = item.item?.price?.toFixed(2) || '0.00';
+          return `<li>${index + 1}. ${item.quantity}x ${itemName} - $${itemPrice}</li>`;
+        }).join('')}
       </ul>
       ${order.comments ? `<h2>Comments</h2><p>${order.comments}</p>` : ''}
     </div>
@@ -490,20 +512,28 @@ const isManagerOrDriver = true; // Replace with actual logic to determine if the
 
 const groupedItems = computed(() => {
   const today = new Date().toDateString();
-  const itemMap: Record<string, { name: string; quantity: number; comments: { text: string; orderNumber: string }[] }> = {};
+  const itemMap: Record<string, { name: string; customizations: string[]; quantity: number; comments: { text: string; orderNumber: string }[] }> = {};
+
   orders.value
     .filter((order: Order) => order.deliveryTime && new Date(order.deliveryTime).toDateString() === today)
     .forEach((order: Order) => {
-      order.items.forEach((item: { name: string; quantity: number }) => {
-        if (!itemMap[item.name]) {
-          itemMap[item.name] = { name: item.name, quantity: 0, comments: [] };
-        }
-        itemMap[item.name].quantity += item.quantity;
-        if (order.comments) {
-          itemMap[item.name].comments.push({ text: order.comments, orderNumber: order.trackingId });
+      order.items.forEach((item: { item: { name: string; customizations?: string[] }; quantity: number }) => {
+        const itemName = item.item?.name;
+        const itemCustomizations = item.item?.customizations || [];
+        const itemKey = `${itemName} - ${itemCustomizations.join(', ')}`;
+
+        if (itemName) {
+          if (!itemMap[itemKey]) {
+            itemMap[itemKey] = { name: itemName, customizations: itemCustomizations, quantity: 0, comments: [] };
+          }
+          itemMap[itemKey].quantity += item.quantity;
+          if (order.comments) {
+            itemMap[itemKey].comments.push({ text: order.comments, orderNumber: order.trackingId });
+          }
         }
       });
     });
+
   return Object.values(itemMap);
 });
 </script>

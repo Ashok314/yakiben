@@ -101,10 +101,19 @@ function requiresAuth(action: string): boolean {
  * Now accepts optional authToken from request payload
  */
 function requireAuth(authToken?: string): User {
+  if (!authToken) {
+    throw new Error(JSON.stringify({
+      message: 'Authentication required: Missing authToken',
+    }));
+  }
+
   const user = getCurrentUser(authToken);
 
   if (!user) {
-    throw new Error('Authentication required');
+    throw new Error(JSON.stringify({
+      message: 'Authentication required: Invalid or expired authToken',
+      authToken,
+    }));
   }
 
   return user;
@@ -120,8 +129,20 @@ function requireRole(allowedRoles: string[], authToken?: string): User {
   const users = getSheetData(CONFIG.SHEETS.USERS);
   const dbUser = users.find(u => u.id === user.id);
 
-  if (!dbUser || !allowedRoles.includes(dbUser.role)) {
-    throw new Error('Access denied: Insufficient permissions');
+  if (!dbUser) {
+    throw new Error(JSON.stringify({
+      message: 'Access denied: User not found',
+      userId: user.id,
+      allowedRoles,
+    }));
+  }
+
+  if (!allowedRoles.includes(dbUser.role)) {
+    throw new Error(JSON.stringify({
+      message: `Access denied: Role '${dbUser.role}' not permitted`,
+      userRole: dbUser.role,
+      allowedRoles,
+    }));
   }
 
   return dbUser;
@@ -130,10 +151,10 @@ function requireRole(allowedRoles: string[], authToken?: string): User {
 /**
  * Get all users (PROTECTED - manager only)
  */
-function handleGetUsers(): ApiResponse {
+function handleGetUsers(data: { authToken?: string }): ApiResponse {
   try {
     // Ensure only managers can access this endpoint
-    const manager = requireRole(['manager']);
+    requireRole(['manager'], data?.authToken);
 
     // Fetch users with admin roles from the USERS sheet
     const users = getSheetData(CONFIG.SHEETS.USERS);
@@ -150,6 +171,9 @@ function handleGetUsers(): ApiResponse {
       })),
     };
   } catch (error) {
-    return { success: false, error: String(error) };
+    return {
+      success: false,
+      error: `Error in handleGetUsers: ${error}`,
+    };
   }
 }
