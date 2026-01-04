@@ -80,8 +80,10 @@
             </div>
             <div class="text-right">
               <span :class="{
-                'text-yellow-600': order.status === 'pending',
                 'text-green-600': order.status === 'completed',
+                'text-blue-600': order.status === 'delivering' || order.status === 'ready',
+                'text-orange-500': order.status === 'preparing',
+                'text-yellow-600': order.status === 'pending' || order.status === 'confirmed',
                 'text-red-600': order.status === 'cancelled'
               }" class="font-medium">
                 {{ statusText[order.status] }}
@@ -97,16 +99,20 @@
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 rounded-full"
                     :class="{
-                      'bg-yellow-500 animate-pulse': order.status === 'pending',
                       'bg-green-500': order.status === 'completed',
+                      'bg-blue-500 animate-pulse': order.status === 'delivering' || order.status === 'ready',
+                      'bg-orange-500 animate-pulse': order.status === 'preparing',
+                      'bg-yellow-500 animate-pulse': order.status === 'pending' || order.status === 'confirmed',
                       'bg-red-500': order.status === 'cancelled'
                     }"></span>
               <span class="text-sm font-medium" :class="{
-                'text-yellow-800': order.status === 'pending',
                 'text-green-800': order.status === 'completed',
+                'text-blue-800': order.status === 'delivering' || order.status === 'ready',
+                'text-orange-800': order.status === 'preparing',
+                'text-yellow-800': order.status === 'pending' || order.status === 'confirmed',
                 'text-red-800': order.status === 'cancelled'
               }">
-                {{ order.status === 'pending' ? '準備中' : order.status === 'completed' ? 'お渡し完了' : 'キャンセル済み' }}
+                {{ statusText[order.status] }}
               </span>
             </div>
           </div>
@@ -162,8 +168,8 @@
               <div>{{ order.companyContact }}</div>
             </div>
             <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.delivertTime }}</div>
-              <div>{{ formatDate(order.delivertTime) }}</div>
+              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.deliveryTime }}</div>
+              <div>{{ formatDate(order.deliveryTime) }}</div>
             </div>
             <div v-if="order.notes">
               <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.notes }}</div>
@@ -214,10 +220,10 @@
 
       <!-- Print Layout -->
       <div v-if="order" class="hidden print:block p-8">
-        <div class="text-center mb-8 border-b pb-4">
-          <h1 class="text-2xl font-bold mb-2">{{ RESTAURANT_INFO.name }}</h1>
-          <p class="text-sm">〒{{ RESTAURANT_INFO.address.postal }} {{ RESTAURANT_INFO.address.prefecture }}{{ RESTAURANT_INFO.address.city }}{{ RESTAURANT_INFO.address.line1 }}</p>
-          <p class="text-sm">Tel: {{ RESTAURANT_INFO.phone }}</p>
+        <div v-if="restaurantInfo" class="text-center mb-8 border-b pb-4">
+          <h1 class="text-2xl font-bold mb-2">{{ restaurantInfo.name }}</h1>
+          <p class="text-sm">〒{{ restaurantInfo.address.postal }} {{ restaurantInfo.address.prefecture }}{{ restaurantInfo.address.city }}{{ restaurantInfo.address.line1 }}</p>
+          <p class="text-sm">Tel: {{ restaurantInfo.phone }}</p>
         </div>
 
         <div class="mb-8">
@@ -243,8 +249,8 @@
               <p class="font-medium">{{ formatDateForPrint(order.createdAt) }}</p>
             </div>
             <div class="text-right">
-              <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.delivertTime }}</p>
-              <p class="font-medium">{{ formatDateForPrint(order.delivertTime) }}</p>
+              <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.deliveryTime }}</p>
+              <p class="font-medium">{{ formatDateForPrint(order.deliveryTime) }}</p>
             </div>
           </div>
         </div>
@@ -292,7 +298,9 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { STORAGE_KEYS } from '../constants';
-import { RESTAURANT_INFO } from '../config/restaurant';
+import { useRestaurantStore } from '../stores/restaurant';
+
+const { info: restaurantInfo } = useRestaurantStore();
 import { UI_TEXT } from '../constants/ui-text';
 import type { Order } from '../types';
 import { useCart } from '../stores/cart';
@@ -322,29 +330,24 @@ function formatDate(date: string | Date) {
 }
 
 async function loadOrder() {
-  console.log('Loading order...');
   isLoading.value = true;
   try {
     const trackingId = route.params.trackingId;
-    console.log('TrackingID from route:', trackingId);
 
     if (!trackingId) {
-      console.log('No tracking ID provided');
       order.value = null;
       return;
     }
     
     // Check for current order first
     const currentOrderId = localStorage.getItem(STORAGE_KEYS.CURRENT_ORDER);
-    console.log('Current order ID from storage:', currentOrderId);
     if (currentOrderId === trackingId) {
       // Clear it so we don't use it again
       localStorage.removeItem(STORAGE_KEYS.CURRENT_ORDER);
     }
 
-    // Load order from mock API
+    // Load order from API
     const result = await ordersApi.getOrderByTrackingId(trackingId);
-    console.log('API returned order:', result);
     order.value = result;
   } catch (error) {
     console.error('Failed to load order:', error);
@@ -356,13 +359,11 @@ async function loadOrder() {
 
 // Initialize and handle route changes
 onMounted(() => {
-  console.log('Component mounted, initial params:', route.params);
   loadOrder();
 });
 
 // Watch for route changes after initial mount
 watch(() => route.params.trackingId, (newId) => {
-  console.log('Route param changed to:', newId);
   loadOrder();
 });
 
@@ -420,7 +421,6 @@ function printOrder() {
 }
 
 function printReceipt() {
-  // TODO: Implement receipt-specific print layout
   window.print();
 }
 

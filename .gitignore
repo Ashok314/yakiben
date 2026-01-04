@@ -15,3 +15,7 @@ node_modules
 
 #!.yarn/cache
 .pnp.*
+
+# temprorary copilot/ agent instruction 
+.plan
+.knowledge

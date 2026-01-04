@@ -177,7 +177,7 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">受け取り時間<span class="text-red-500">*</span></label>
                 <input 
-                  v-model="orderForm.delivertTime"
+                  v-model="orderForm.deliveryTime"
                   type="datetime-local"
                   required
                   :min="minDeliveryTime"
@@ -281,10 +281,13 @@
                 <li v-if="validationErrors.companyContact">
                   電話番号は半角数字10桁または11桁で入力してください（例：0312345678）
                 </li>
-                <li v-if="validationErrors.delivertTime">
-                  受け取り時間は{{ RESTAURANT_INFO.hours.open }}:00〜{{ RESTAURANT_INFO.hours.orderDeadline }}:00の間で、
-                  {{ RESTAURANT_INFO.hours.minAdvanceTime }}分以上前、
-                  {{ RESTAURANT_INFO.hours.maxAdvanceDays }}営業日以内を選択してください
+                <li v-if="validationErrors.deliveryTime && restaurantInfo">
+                  受け取り時間は{{ restaurantInfo.hours.open }}:00〜{{ restaurantInfo.hours.orderDeadline }}:00の間で、
+                  {{ restaurantInfo.hours.minAdvanceTime }}分以上前、
+                  {{ restaurantInfo.hours.maxAdvanceDays }}営業日以内を選択してください
+                </li>
+                <li v-else-if="validationErrors.deliveryTime">
+                  有効な受け取り時間を選択してください
                 </li>
               </ul>
             </div>
@@ -306,21 +309,24 @@
             </svg>
           </button>
         </div>
-        <div class="space-y-4">
+        <div v-if="restaurantInfo" class="space-y-4">
           <div>
             <h4 class="font-medium mb-2">ご注文について</h4>
             <ul class="space-y-2 text-sm">
-              <li>ご注文は{{ RESTAURANT_INFO.hours.minAdvanceTime }}分前までにお願いいたします</li>
-              <li>受け取り時間は{{ RESTAURANT_INFO.hours.open }}:00〜{{ RESTAURANT_INFO.hours.orderDeadline }}:00の間でご指定ください</li>
-              <li>{{ RESTAURANT_INFO.hours.maxAdvanceDays }}営業日先までご予約可能です</li>
+              <li>ご注文は{{ restaurantInfo.hours.minAdvanceTime }}分前までにお願いいたします</li>
+              <li>受け取り時間は{{ restaurantInfo.hours.open }}:00〜{{ restaurantInfo.hours.orderDeadline }}:00の間でご指定ください</li>
+              <li>{{ restaurantInfo.hours.maxAdvanceDays }}営業日先までご予約可能です</li>
               <li>土日祝日は営業しておりません</li>
             </ul>
           </div>
           <div class="bg-gray-50 rounded-lg p-4 space-y-2">
-            <p>電話番号：<a href="tel:{{ RESTAURANT_INFO.support.phone }}" class="text-primary">{{ RESTAURANT_INFO.support.phone }}</a></p>
-            <p>受付時間：{{ RESTAURANT_INFO.support.hours }}</p>
-            <p>メール：<a href="mailto:{{ RESTAURANT_INFO.support.email }}" class="text-primary">{{ RESTAURANT_INFO.support.email }}</a></p>
+            <p>電話番号：<a :href="`tel:${restaurantInfo.support.phone}`" class="text-primary">{{ restaurantInfo.support.phone }}</a></p>
+            <p>受付時間：{{ restaurantInfo.support.hours }}</p>
+            <p>メール：<a :href="`mailto:${restaurantInfo.support.email}`" class="text-primary">{{ restaurantInfo.support.email }}</a></p>
           </div>
+        </div>
+        <div v-else class="text-center py-12 text-gray-400">
+          読み込み中...
         </div>
       </div>
     </div>
@@ -335,11 +341,12 @@ import { generateTrackingId } from '../data/menu';
 import { STORAGE_KEYS } from '../constants';
 import { ordersApi } from '../data/api/orders';
 import { useCart } from '../stores/cart';
-import { RESTAURANT_INFO } from '../config/restaurant';
+import { useRestaurantStore } from '../stores/restaurant';
 import type { Order, OrderStatus, PaymentStatus, PaymentMethod } from '../types';
 
 const router = useRouter();
 const { cartItems, cartTotal, clearCart } = useCart();
+const { info: restaurantInfo } = useRestaurantStore();
 const showHelp = ref(false);
 const isSubmitting = ref(false); // Add loading state
 
@@ -351,7 +358,7 @@ interface ValidationErrors {
   city: string;
   addressLine: string;
   companyContact: string;
-  delivertTime: string;
+  deliveryTime: string;
 }
 
 const orderForm = ref({
@@ -362,7 +369,7 @@ const orderForm = ref({
   city: '',
   addressLine: '',
   companyContact: '',
-  delivertTime: '',
+  deliveryTime: '',
   notes: '',
   paymentMethod: 'cash' as PaymentMethod,
   needReceipt: false
@@ -376,7 +383,7 @@ const validationErrors = ref<ValidationErrors>({
   city: '',
   addressLine: '',
   companyContact: '',
-  delivertTime: ''
+  deliveryTime: ''
 });
 
 // Reactive validation
@@ -393,7 +400,7 @@ function validateForm() {
     city: '',
     addressLine: '',
     companyContact: '',
-    delivertTime: ''
+    deliveryTime: ''
   };
 
   // Name validation (allow Japanese or English)
@@ -442,10 +449,12 @@ function validateForm() {
   }
 
   // Pickup time validation
-  if (!orderForm.value.delivertTime) {
-    validationErrors.value.delivertTime = '受け取り時間を選択してください';
+  if (!orderForm.value.deliveryTime) {
+    validationErrors.value.deliveryTime = '受け取り時間を選択してください';
   } else if (!isDeliveryTimeValid.value) {
-    validationErrors.value.delivertTime = '有効な受け取り時間を選択してください（10:00-15:00）';
+    const openTime = restaurantInfo.value?.hours.open || 10;
+    const deadline = restaurantInfo.value?.hours.orderDeadline || 15;
+    validationErrors.value.deliveryTime = `有効な受け取り時間を選択してください（${openTime}:00-${deadline}:00）`;
   }
 }
 
@@ -467,17 +476,17 @@ onMounted(() => {
   // Check for preserved pickup time from reorder
   const savedDeliveryTime = localStorage.getItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
   if (savedDeliveryTime) {
-    const delivertTime = new Date(savedDeliveryTime);
+    const deliveryTime = new Date(savedDeliveryTime);
     // Final validation before using the preserved time
     const min = new Date(minDeliveryTime.value);
     const max = new Date(maxDeliveryTime.value);
     
-    if (delivertTime >= min && 
-        delivertTime <= max && 
-        RESTAURANT_INFO.hours.businessDays.includes(delivertTime.getDay()) &&
-        delivertTime.getHours() >= RESTAURANT_INFO.hours.open &&
-        delivertTime.getHours() < RESTAURANT_INFO.hours.orderDeadline) {
-      orderForm.value.delivertTime = delivertTime.toISOString().slice(0, 16);
+    if (deliveryTime >= min && 
+        deliveryTime <= max && 
+        (restaurantInfo.value?.hours.businessDays || []).includes(deliveryTime.getDay()) &&
+        deliveryTime.getHours() >= (restaurantInfo.value?.hours.open || 0) &&
+        deliveryTime.getHours() < (restaurantInfo.value?.hours.orderDeadline || 24)) {
+      orderForm.value.deliveryTime = deliveryTime.toISOString().slice(0, 16);
     }
     // Remove the saved pickup time
     localStorage.removeItem(STORAGE_KEYS.REORDER_PICKUP_TIME);
@@ -503,15 +512,15 @@ function saveCustomerInfo() {
 
 const minDeliveryTime = computed(() => {
   const now = new Date();
-  now.setMinutes(now.getMinutes() + RESTAURANT_INFO.hours.minAdvanceTime);
+  now.setMinutes(now.getMinutes() + (restaurantInfo.value?.hours.minAdvanceTime || 30));
   
   // If after closing time, set to next business day at 12:00
-  if (now.getHours() >= RESTAURANT_INFO.hours.close) {
+  if (now.getHours() >= (restaurantInfo.value?.hours.close || 21)) {
     do {
       now.setDate(now.getDate() + 1);
-    } while (!RESTAURANT_INFO.hours.businessDays.includes(now.getDay()));
+    } while (!(restaurantInfo.value?.hours.businessDays || []).includes(now.getDay()));
     now.setHours(12, 0, 0, 0);
-  } else if (now.getHours() < RESTAURANT_INFO.hours.open) {
+  } else if (now.getHours() < (restaurantInfo.value?.hours.open || 10)) {
     // If before opening time, set to today's 12:00
     now.setHours(12, 0, 0, 0);
   } else if (now.getHours() < 12) {
@@ -520,7 +529,7 @@ const minDeliveryTime = computed(() => {
   }
   
   // If current day is not a business day, find next business day
-  while (!RESTAURANT_INFO.hours.businessDays.includes(now.getDay())) {
+  while (!(restaurantInfo.value?.hours.businessDays || []).includes(now.getDay())) {
     now.setDate(now.getDate() + 1);
     now.setHours(12, 0, 0, 0);
   }
@@ -534,34 +543,34 @@ const maxDeliveryTime = computed(() => {
   let daysChecked = 0;
   let validDaysFound = 0;
   
-  while (validDaysFound < RESTAURANT_INFO.hours.maxAdvanceDays && daysChecked < 14) {
-    if (RESTAURANT_INFO.hours.businessDays.includes(max.getDay())) {
+  while (validDaysFound < (restaurantInfo.value?.hours.maxAdvanceDays || 30) && daysChecked < 14) {
+    if ((restaurantInfo.value?.hours.businessDays || []).includes(max.getDay())) {
       validDaysFound++;
     }
-    if (validDaysFound < RESTAURANT_INFO.hours.maxAdvanceDays) {
+    if (validDaysFound < (restaurantInfo.value?.hours.maxAdvanceDays || 30)) {
       max.setDate(max.getDate() + 1);
     }
     daysChecked++;
   }
   
-  max.setHours(RESTAURANT_INFO.hours.orderDeadline, 0, 0, 0);
+  max.setHours(restaurantInfo.value?.hours.orderDeadline || 20, 0, 0, 0);
   return max.toISOString().slice(0, 16);
 });
 
 const isDeliveryTimeValid = computed(() => {
-  if (!orderForm.value.delivertTime) return false;
-  const pickupDate = new Date(orderForm.value.delivertTime);
+  if (!orderForm.value.deliveryTime) return false;
+  const pickupDate = new Date(orderForm.value.deliveryTime);
   const min = new Date(minDeliveryTime.value);
   const max = new Date(maxDeliveryTime.value);
   
   // Check if pickup day is a business day
-  if (!RESTAURANT_INFO.hours.businessDays.includes(pickupDate.getDay())) {
+  if (!(restaurantInfo.value?.hours.businessDays || []).includes(pickupDate.getDay())) {
     return false;
   }
   
   // Check if pickup time is between open and close
   const hours = pickupDate.getHours();
-  if (hours < RESTAURANT_INFO.hours.open || hours >= RESTAURANT_INFO.hours.orderDeadline) {
+  if (hours < (restaurantInfo.value?.hours.open || 0) || hours >= (restaurantInfo.value?.hours.orderDeadline || 24)) {
     return false;
   }
   
@@ -581,7 +590,7 @@ const isFormValid = computed(() => {
     orderForm.value.city &&
     orderForm.value.addressLine &&
     orderForm.value.companyContact &&
-    orderForm.value.delivertTime &&
+    orderForm.value.deliveryTime &&
     orderForm.value.paymentMethod &&
     cartItems.value.length > 0;
 
@@ -605,7 +614,7 @@ async function submitOrder() {
       customerName: `${orderForm.value.lastName} ${orderForm.value.firstName}`,
       companyAddress: fullAddress,
       companyContact: orderForm.value.companyContact,
-      delivertTime: new Date(orderForm.value.delivertTime),
+      deliveryTime: new Date(orderForm.value.deliveryTime),
       notes: orderForm.value.notes,
       status: 'pending' as OrderStatus,
       paymentMethod: orderForm.value.paymentMethod,
@@ -615,26 +624,22 @@ async function submitOrder() {
       updatedAt: new Date()
     };
 
-    // Save order using mock API
-    await ordersApi.createOrder(order);
-
-    // Mock PayPay payment if selected
-    if (order.paymentMethod === 'paypay') {
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate payment processing
-      order.paymentStatus = 'completed';
-      await ordersApi.updateOrder(order);
-    }
+    // Save order
+    const result = await ordersApi.createOrder(order);
 
     // Clear cart
     clearCart();
 
-    // Save the current order ID to ensure it's available immediately after redirect
-    localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, order.trackingId);
+    // Use the tracking ID returned by the server (in case it was re-generated or normalized)
+    const finalTrackingId = result.trackingId || order.trackingId;
+
+    // Save the current order ID to ensure it's available immediately
+    localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, finalTrackingId);
     
-    // Redirect to order detail using named route
+    // Redirect to order detail using the server's tracking ID
     await router.push({
       name: 'order',
-      params: { trackingId: order.trackingId }
+      params: { trackingId: finalTrackingId }
     });
   } catch (error) {
     console.error('Order submission failed:', error);

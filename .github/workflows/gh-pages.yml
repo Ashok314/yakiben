@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy App
 
 on:
   push:
@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,28 +21,43 @@ jobs:
         with:
           node-version: 20
 
-      - name: Set up Yarn 4 (Berry)
+      - name: Set up Yarn
         run: corepack enable && corepack prepare yarn@4.9.1 --activate
 
       - name: Install dependencies
         run: yarn install
 
-      - name: Build customer app
-        run: yarn workspace customer build
+      # 1. Backend Deployment (Apps Script)
+      - name: Build and Deploy API
+        id: deploy_api
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          SCRIPT_ID: ${{ secrets.SCRIPT_ID }}
+        run: |
+          # 1. Setup Clasp (Clean & Secure)
+          mkdir -p ~/.config/clasp
+          printf "%s" "$CLASPRC_JSON" > ~/.clasprc.json
+          printf "%s" "$CLASPRC_JSON" > ~/.config/clasp/claspjson
+          echo "{\"scriptId\":\"$SCRIPT_ID\",\"rootDir\":\"./dist\"}" > apps/api/.clasp.json
+          
+          # 2. Deploy
+          yarn workspace api build
+          ./apps/api/scripts/smart-deploy.sh
+          
+          # 3. Security: Wipe credentials immediately
+          rm -f ~/.clasprc.json
+          rm -f ~/.config/clasp/claspjson
+          rm -f apps/api/.clasp.json
 
-      - name: Build admin app
-        run: yarn workspace admin build
+      # 2. Frontend Build (using the ID discovered by the script)
+      - name: Build Apps
+        env:
+          VITE_API_URL: ${{ steps.deploy_api.outputs.api_url }}
+        run: |
+          yarn workspace customer build
+          yarn workspace admin build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          keep_files: true
-          destination_dir: ./
-          enable_jekyll: false
-
-      - name: Copy dist folders to root for GitHub Pages
+      - name: Prepare GitHub Pages
         run: |
           rm -rf customer admin
           mv apps/customer/dist customer
@@ -48,3 +68,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
+          keep_files: true
+          destination_dir: ./
+          enable_jekyll: false
