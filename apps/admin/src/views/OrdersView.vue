@@ -3,13 +3,9 @@
     <!-- Tabs -->
     <div class="mb-4">
       <div class="flex border-b border-gray-300">
-        <button
-          v-for="tab in tabs"
-          :key="tab"
-          @click="activeTab = tab"
+        <button v-for="tab in tabs" :key="tab" @click="activeTab = tab"
           :class="['px-4 py-2', activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500']"
-          class="focus:outline-none"
-        >
+          class="focus:outline-none">
           {{ tab }}
         </button>
       </div>
@@ -19,7 +15,8 @@
     <div v-if="activeTab === 'All Items'">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Items for the Day - {{ new Date().toLocaleDateString() }}</h2>
-        <button @click="printGroupedItems" class="px-2 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
+        <button @click="printGroupedItems"
+          class="px-2 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
           <PrinterIcon class="h-5 w-5 mr-2" />
           Print
         </button>
@@ -39,7 +36,7 @@
             <td class="py-2">
               <ul>
                 <li v-for="(customization, i) in item.customizations" :key="i">
-                  {{ customization.name }}
+                  {{ customization }}
                 </li>
               </ul>
             </td>
@@ -78,11 +75,13 @@
       <div class="flex flex-col md:flex-row gap-4 pb-16">
         <!-- Kanban Board -->
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-x-auto">
-          <div v-for="status in filteredStatuses" :key="status" :class="getStatusColor(status) + ' p-4 rounded-lg shadow'">
+          <div v-for="status in filteredStatuses" :key="status"
+            :class="getStatusColor(status) + ' p-4 rounded-lg shadow'">
             <!-- Kanban Column Title -->
             <h2 class="text-lg font-bold mb-2">{{ status }}</h2>
 
-            <div v-for="order in filteredOrdersByStatus[status]" :key="order.id" class="bg-white p-4 rounded-md mb-2 shadow cursor-pointer relative" @click="selectOrder(order)">
+            <div v-for="order in filteredOrdersByStatus[status]" :key="order.id"
+              class="bg-white p-4 rounded-md mb-2 shadow cursor-pointer relative" @click="selectOrder(order)">
               <!-- Top Section: Time Remaining and Buttons -->
               <div class="flex flex-wrap justify-between items-center mb-2">
                 <!-- Time Remaining -->
@@ -92,21 +91,16 @@
 
                 <!-- Buttons -->
                 <div class="flex gap-2 flex-wrap">
-                  <button 
-                    v-if="order.status !== 'pending'"
-                    @click.stop="updateOrderStatus(order, 'prev')"
-                    :class="getStatusColor(getPrevStatus(order.status)) + ' px-2 py-1 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'"
-                  >
+                  <button v-if="order.status !== 'pending'" @click.stop="updateOrderStatus(order, 'prev')"
+                    :class="getStatusColor(getPrevStatus(order.status)) + ' px-2 py-1 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'">
                     <ArrowLeftIcon class="h-5 w-5" />
                   </button>
-                  <button 
-                    v-if="canUpdateStatus(order)"
-                    @click.stop="updateOrderStatus(order)"
-                    :class="getStatusColor(getNextStatus(order.status)) + ' px-2 py-1 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'"
-                  >
+                  <button v-if="canUpdateStatus(order)" @click.stop="updateOrderStatus(order)"
+                    :class="getStatusColor(getNextStatus(order.status)) + ' px-2 py-1 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'">
                     <ArrowRightIcon class="h-5 w-5" />
                   </button>
-                  <button @click.stop="printOrder(order)" class="px-2 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
+                  <button @click.stop="printOrder(order)"
+                    class="px-2 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
                     <PrinterIcon class="h-5 w-5" />
                   </button>
                 </div>
@@ -115,47 +109,47 @@
               <div class="space-y-2">
                 <p class="font-bold">{{ UI_TEXTS.orders.kanban.orderDetails.trackingId }} {{ order.trackingId }}</p>
                 <p class="text-sm text-gray-600">{{ blurName(order.customer.name) }}</p>
-                <p v-if="order.deliveryTime" class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.scheduledAt }}: {{ order.deliveryTime }}</p>
-                <p class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.total }}: ${{ order.total.toFixed(2) }}</p>
+                <p v-if="order.deliveryTime" class="text-sm text-gray-500">{{
+                  UI_TEXTS.orders.kanban.orderDetails.scheduledAt }}: {{ order.deliveryTime }}</p>
+                <p class="text-sm text-gray-500">{{ UI_TEXTS.orders.kanban.orderDetails.total }}: ${{
+                  order.total.toFixed(2) }}</p>
               </div>
 
               <div v-if="DRIVER_STATUS.includes(order.status)" class="mt-4">
                 <!-- Assign Driver Button -->
-                <button 
-                  v-if="!order.driver && !order.deliveredAt"
-                  @click.stop="showAssignDriverModal(order)"
-                  class="px-2 py-1 bg-blue-400 text-white text-sm rounded-md hover:bg-blue-500 flex items-center justify-center md:w-auto w-full"
-                >
+                <button v-if="!order.driver && !order.deliveredAt" @click.stop="showAssignDriverModal(order)"
+                  class="px-2 py-1 bg-blue-400 text-white text-sm rounded-md hover:bg-blue-500 flex items-center justify-center md:w-auto w-full">
                   <DeliverIcon class="h-5 w-5 mr-2" />
                   Assign Driver
                 </button>
 
                 <!-- Unassign Driver Button -->
-                <button 
-                  v-if="order.driver && !order.deliveredAt"
-                  @click.stop="unassignDriver(order)"
-                  class="px-2 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 flex items-center justify-center md:w-auto w-full"
-                >
+                <button v-if="order.driver && !order.deliveredAt" @click.stop="unassignDriver(order)"
+                  class="px-2 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 flex items-center justify-center md:w-auto w-full">
                   <DeliverIcon class="h-5 w-5 mr-2" />
                   Unassign Driver
                 </button>
 
                 <!-- Display Assigned Driver -->
-                <p v-if="order.driver && !order.deliveredAt" class="text-sm text-gray-600 mt-2">Assigned to: {{ order.driver.name }}</p>
-                <p v-else-if="order.deliveredAt" class="text-sm text-gray-600 mt-2">Delivered by: {{ order.driver?.name }} at {{ new Date(order.deliveredAt).toLocaleString() }}</p>
+                <p v-if="order.driver && !order.deliveredAt" class="text-sm text-gray-600 mt-2">Assigned to: {{
+                  order.driver.name }}</p>
+                <p v-else-if="order.deliveredAt" class="text-sm text-gray-600 mt-2">Delivered by: {{ order.driver?.name
+                  }} at {{ new Date(order.deliveredAt).toLocaleString() }}</p>
               </div>
 
               <div v-if="status === STATUS_DELIVERED" class="mt-4">
                 <!-- Display Delivered By and Delivered At -->
                 <p v-if="order.driver" class="text-sm text-gray-600">Delivered by: {{ order.driver.name }}</p>
-                <p v-if="order.deliveredAt" class="text-sm text-gray-500">Delivered at: {{ new Date(order.deliveredAt).toLocaleString() }}</p>
+                <p v-if="order.deliveredAt" class="text-sm text-gray-500">Delivered at: {{ new
+                  Date(order.deliveredAt).toLocaleString() }}</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Full-Screen Modal for Order Details -->
-        <div v-if="selectedOrder" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closeOrderDetail">
+        <div v-if="selectedOrder" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          @click.self="closeOrderDetail">
           <div class="bg-white w-full max-w-3xl max-h-full overflow-y-auto p-6 rounded-lg shadow-lg relative">
             <!-- Top Section: Status and Time Remaining -->
             <div class="flex justify-between items-center mb-4">
@@ -171,24 +165,20 @@
 
               <!-- Buttons -->
               <div class="flex gap-4 items-center">
-                <button 
-                  v-if="selectedOrder.status !== 'pending'"
-                  @click="updateOrderStatus(selectedOrder, 'prev')"
-                  :class="getStatusColor(getPrevStatus(selectedOrder.status)) + ' px-4 py-2 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'"
-                >
+                <button v-if="selectedOrder.status !== 'pending'" @click="updateOrderStatus(selectedOrder, 'prev')"
+                  :class="getStatusColor(getPrevStatus(selectedOrder.status)) + ' px-4 py-2 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'">
                   <ArrowLeftIcon class="h-5 w-5" />
                 </button>
-                <button 
-                  v-if="canUpdateStatus(selectedOrder)"
-                  @click="updateOrderStatus(selectedOrder)"
-                  :class="getStatusColor(getNextStatus(selectedOrder.status)) + ' px-4 py-2 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'"
-                >
+                <button v-if="canUpdateStatus(selectedOrder)" @click="updateOrderStatus(selectedOrder)"
+                  :class="getStatusColor(getNextStatus(selectedOrder.status)) + ' px-4 py-2 text-black text-sm rounded-md hover:bg-opacity-80 flex items-center justify-center'">
                   <ArrowRightIcon class="h-5 w-5" />
                 </button>
-                <button @click="printOrder(selectedOrder)" class="px-2 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
+                <button @click="printOrder(selectedOrder)"
+                  class="px-2 py-1 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
                   <PrinterIcon class="h-5 w-5" />
                 </button>
-                <button @click="closeOrderDetail" class="px-2 py-1 bg-red-500 text-white text-sm rounded-full hover:bg-red-600 flex items-center justify-center">
+                <button @click="closeOrderDetail"
+                  class="px-2 py-1 bg-red-500 text-white text-sm rounded-full hover:bg-red-600 flex items-center justify-center">
                   <XMarkIcon class="h-4 w-4" />
                 </button>
               </div>
@@ -199,10 +189,14 @@
             <!-- Customer and Order Info -->
             <div class="mb-4 border-b border-gray-300 pb-4">
               <h3 class="text-md font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.title }}</h3>
-              <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.name }}:</span> {{ isManagerOrDriver ? selectedOrder.customer.name : blurName(selectedOrder.customer.name) }}</p>
-              <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.phone }}:</span> {{ isManagerOrDriver ? selectedOrder.customer.phone : '***-***-****' }}</p>
-              <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.orderInfo.orderId }}:</span> {{ selectedOrder.trackingId }}</p>
-              <p v-if="selectedOrder.deliveryTime"><span class="font-semibold">{{ UI_TEXTS.orders.modal.orderInfo.scheduledAt }}:</span> {{ selectedOrder.deliveryTime }}</p>
+              <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.name }}:</span> {{ isManagerOrDriver
+                ? selectedOrder.customer.name : blurName(selectedOrder.customer.name) }}</p>
+              <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.customerInfo.phone }}:</span> {{ isManagerOrDriver
+                ? selectedOrder.customer.phone : '***-***-****' }}</p>
+              <p><span class="font-semibold">{{ UI_TEXTS.orders.modal.orderInfo.orderId }}:</span> {{
+                selectedOrder.trackingId }}</p>
+              <p v-if="selectedOrder.deliveryTime"><span class="font-semibold">{{
+                UI_TEXTS.orders.modal.orderInfo.scheduledAt }}:</span> {{ selectedOrder.deliveryTime }}</p>
             </div>
 
             <!-- Items -->
@@ -222,8 +216,8 @@
                     <td class="py-2">{{ index + 1 }}</td>
                     <td class="py-2">
                       {{ item.name }}
-                      <div v-if="item.customizations && item.customizations.length" class="text-sm text-gray-500">
-                        Customizations: {{ item.customizations.join(', ') }}
+                      <div v-if="item.options && item.options.length" class="text-sm text-gray-500">
+                        Options: {{item.options.map(o => o.name).join(', ')}}
                       </div>
                     </td>
                     <td class="py-2">x{{ item.quantity }}</td>
@@ -231,7 +225,8 @@
                   </tr>
                 </tbody>
               </table>
-              <p class="text-right font-bold mt-4">{{ UI_TEXTS.orders.modal.items.total }}: ${{ selectedOrder.total.toFixed(2) }}</p>
+              <p class="text-right font-bold mt-4">{{ UI_TEXTS.orders.modal.items.total }}: ${{
+                selectedOrder.total.toFixed(2) }}</p>
             </div>
 
             <!-- Comments -->
@@ -243,16 +238,15 @@
         </div>
 
         <!-- Modal for Assigning Driver -->
-        <div v-if="assignDriverModalVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div v-if="assignDriverModalVisible"
+          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative">
             <h2 class="text-lg font-bold mb-4">Assign Driver</h2>
             <ul class="space-y-2">
               <li v-for="user in availableUsers" :key="user.id" class="flex items-center justify-between">
                 <span>{{ user.name }} ({{ user.role }})</span>
-                <button 
-                  @click="assignDriverToOrder(selectedOrder, user)"
-                  class="px-2 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600"
-                >
+                <button @click="assignDriverToOrder(selectedOrder, user)"
+                  class="px-2 py-1 bg-green-500 text-white text-sm rounded-md hover:bg-green-600">
                   Assign
                 </button>
               </li>
@@ -269,7 +263,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import type { Order, User } from '../types/types';
+import type { Order, User, OrderItem } from '../types/types';
 import { ordersApi } from '../api/orders';
 import { usersApi } from '../api/users';
 import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon, UserIcon as DeliverIcon } from '@heroicons/vue/24/solid';
@@ -306,9 +300,10 @@ const filteredOrdersByStatus = computed(() => {
     acc[status] = orders.value.filter((order: Order) => {
       const matchesStatus = order.status === status;
       const isVisible = !(hideDeliveredAndDelivering.value && (order.status === STATUS_DELIVERED || order.status === STATUS_DELIVERING));
-      const isToday = selectedDateFilter.value === 'today' && new Date(order.deliveryTime).toDateString() === new Date().toDateString();
-      const isTomorrow = selectedDateFilter.value === 'tomorrow' && new Date(order.deliveryTime).toDateString() === new Date(Date.now() + 86400000).toDateString();
-      const isSpecificDate = selectedDateFilter.value === 'specific' && new Date(order.deliveryTime).toDateString() === new Date(specificDate.value).toDateString();
+      const deliveryDateString = order.deliveryTime ? new Date(order.deliveryTime).toDateString() : '';
+      const isToday = selectedDateFilter.value === 'today' && deliveryDateString === new Date().toDateString();
+      const isTomorrow = selectedDateFilter.value === 'tomorrow' && deliveryDateString === new Date(Date.now() + 86400000).toDateString();
+      const isSpecificDate = selectedDateFilter.value === 'specific' && deliveryDateString === new Date(specificDate.value).toDateString();
       return matchesStatus && isVisible && (isToday || isTomorrow || isSpecificDate);
     });
     return acc;
@@ -322,8 +317,11 @@ const filteredStatuses = computed(() => {
 });
 
 const blurName = (name: string) => {
-  const [firstName, ...rest] = name.split(' ');
-  return `${firstName[0]}*** ${rest.join(' ')}`;
+  if (!name) return '***';
+  const parts = name.split(' ');
+  const firstName = parts[0] || '';
+  const rest = parts.slice(1);
+  return `${firstName[0] || ''}*** ${rest.join(' ')}`;
 };
 
 const canUpdateStatus = (order: Order) => {
@@ -333,7 +331,7 @@ const canUpdateStatus = (order: Order) => {
 const updateOrderStatus = async (order: Order, direction: 'next' | 'prev' = 'next') => {
   const currentIndex = STATUS_FLOW.indexOf(order.status);
   let newStatus = order.status;
-  
+
   if (direction === 'next' && currentIndex < STATUS_FLOW.length - 1) {
     newStatus = STATUS_FLOW[currentIndex + 1] as Order['status'];
   } else if (direction === 'prev' && currentIndex > 0) {
@@ -392,10 +390,11 @@ const printOrder = (order: Order) => {
       <h2>Items</h2>
       <ul>
         ${order.items.map((item, index) => {
-          const itemName = item.item?.name || 'Unknown Item';
-          const itemPrice = item.item?.price?.toFixed(2) || '0.00';
-          return `<li>${index + 1}. ${item.quantity}x ${itemName} - $${itemPrice}</li>`;
-        }).join('')}
+    const itemName = item.name || 'Unknown Item';
+    const itemPrice = item.price?.toFixed(2) || '0.00';
+    const customizations = item.options?.map(o => o.name).join(', ') || '';
+    return `<li>${index + 1}. ${item.quantity}x ${itemName} ${customizations ? `(${customizations})` : ''} - $${itemPrice}</li>`;
+  }).join('')}
       </ul>
       ${order.comments ? `<h2>Comments</h2><p>${order.comments}</p>` : ''}
     </div>
@@ -454,10 +453,12 @@ const calculateTimeRemaining = (createdAt: string) => {
 };
 
 const formatTimeRemaining = (createdAt: string) => {
+  if (!createdAt) return '--:--';
   const now = new Date();
   const createdTime = new Date(createdAt);
-  const diffInMs = createdTime.getTime() - now.getTime();
-  const diffInMinutes = Math.abs(Math.ceil(diffInMs / (1000 * 60)));
+  if (isNaN(createdTime.getTime())) return '--:--';
+  const diffInMs = Math.abs(createdTime.getTime() - now.getTime());
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
   const hours = Math.floor(diffInMinutes / 60);
   const minutes = diffInMinutes % 60;
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
@@ -476,16 +477,12 @@ const getPrevStatus = (currentStatus: string) => {
 const showAssignDriverModal = (order: Order) => {
   selectedOrder.value = order;
   assignDriverModalVisible.value = true;
-  // Fetch available users for assignment (mocked here, replace with real API call)
-  availableUsers.value = users.value;
 };
 
 const closeAssignDriverModal = () => {
   assignDriverModalVisible.value = false;
   selectedOrder.value = null;
 };
-
-import type { User } from '../types/types';
 
 const assignDriverToOrder = async (order: Order | null, user: User) => {
   if (!order) return; // Added null check for selectedOrder
@@ -515,16 +512,21 @@ const groupedItems = computed(() => {
   const itemMap: Record<string, { name: string; customizations: string[]; quantity: number; comments: { text: string; orderNumber: string }[] }> = {};
 
   orders.value
-    .filter((order: Order) => order.deliveryTime && new Date(order.deliveryTime).toDateString() === today)
+    .filter((order: Order) => {
+      if (!order.deliveryTime) return false;
+      const deliveryDate = new Date(order.deliveryTime);
+      if (isNaN(deliveryDate.getTime())) return false;
+      return deliveryDate.toDateString() === today;
+    })
     .forEach((order: Order) => {
-      order.items.forEach((item: { item: { name: string; customizations?: string[] }; quantity: number }) => {
-        const itemName = item.item?.name;
-        const itemCustomizations = item.item?.customizations || [];
-        const itemKey = `${itemName} - ${itemCustomizations.join(', ')}`;
+      order.items.forEach((item: OrderItem) => {
+        const itemName = item.name;
+        const itemOptions = item.options?.map((o: any) => o.name) || [];
+        const itemKey = `${itemName} - ${itemOptions.join(', ')}`;
 
         if (itemName) {
           if (!itemMap[itemKey]) {
-            itemMap[itemKey] = { name: itemName, customizations: itemCustomizations, quantity: 0, comments: [] };
+            itemMap[itemKey] = { name: itemName, customizations: itemOptions, quantity: 0, comments: [] };
           }
           itemMap[itemKey].quantity += item.quantity;
           if (order.comments) {

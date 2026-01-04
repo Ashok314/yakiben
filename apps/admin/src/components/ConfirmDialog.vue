@@ -12,8 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import {  defineEmits } from 'vue';
-
+const props = defineProps<{
+  isOpen: boolean;
+  title: string;
+  message: string;
+}>();
 
 const emit = defineEmits(['cancel', 'confirm']);
 

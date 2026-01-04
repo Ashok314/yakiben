@@ -7,8 +7,8 @@ export const menuApi = {
         if (res.success && res.data) {
             return res.data.map(item => ({
                 id: item.id,
-                name: item.name,
-                description: item.description,
+                name: item.name || 'Unknown',
+                description: item.description || '',
                 price: Number(item.price),
                 category: item.category,
                 imageUrl: item.image,

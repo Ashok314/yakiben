@@ -8,7 +8,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["node", "vue-router"],
-    "resolveJsonModule": true
+    "types": ["node", "vue-router", "google.accounts"],
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   }
 }

@@ -6,7 +6,7 @@
           <h1 class="text-4xl font-bold text-gray-800 mb-2">Yakiben Admin</h1>
           <p class="text-gray-600">Sign in with your authorized Google account</p>
         </div>
-        
+
         <div v-if="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p class="text-red-700 text-sm">{{ error }}</p>
         </div>
@@ -16,7 +16,7 @@
         <div class="mt-8 p-4 bg-blue-50 rounded-lg">
           <p class="text-sm text-blue-800 font-medium mb-2">ℹ️ Admin Access Required</p>
           <p class="text-xs text-blue-700">
-            Only authorized staff accounts can access this admin panel. 
+            Only authorized staff accounts can access this admin panel.
             Please sign in with your registered Google account.
           </p>
         </div>
@@ -34,7 +34,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const error = ref('');
 
-const GOOGLE_CLIENT_ID="228058456776-74ia8mkrg3jsqmgvmpgkfru3h6khv09v.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "228058456776-74ia8mkrg3jsqmgvmpgkfru3h6khv09v.apps.googleusercontent.com";
 
 onMounted(() => {
   if (!GOOGLE_CLIENT_ID) {
@@ -65,10 +65,14 @@ function initializeGoogleSignIn() {
     },
   });
 
-  google.accounts.id.renderButton(
-    document.getElementById('google-signin-button'),
-    { theme: 'outline', size: 'large' }
-  );
+  const button = document.getElementById('google-signin-button');
+  if (button) {
+    google.accounts.id.renderButton(button, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+    });
+  }
 }
 </script>
 
