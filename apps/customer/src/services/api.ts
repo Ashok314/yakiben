@@ -1,6 +1,4 @@
-// import { useAuthStore } from '../stores/auth'; // Removed circular dependency
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbwe8KLexn483LNVGM9orL0GQtK3eqh3N_KsHxTX62xb81Hghe3mGuyBJBo_W2_YDaeS/exec';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 interface ApiResponse<T = any> {
     success: boolean;
