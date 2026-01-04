@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbwe8KLexn483LNVGM9orL0GQtK3eqh3N_KsHxTX62xb81Hghe3mGuyBJBo_W2_YDaeS/exec';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbwsNcaQZ75QLBKhRGj67IsMGElrqWjwrO5IUsmP5PYnDu1lFU7ePUMyF0oOXjv8pcoA/exec';
 
 interface ApiResponse<T = any> {
     success: boolean;
