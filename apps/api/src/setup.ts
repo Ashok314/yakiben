@@ -6,7 +6,7 @@ function setupDatabase() {
     const sheets = [
         {
             name: 'Users',
-            headers: ['id', 'name', 'email', 'picture', 'created_at']
+            headers: ['id', 'name', 'email', 'picture', 'role', 'created_at']
         },
         {
             name: 'Sessions',
@@ -14,7 +14,7 @@ function setupDatabase() {
         },
         {
             name: 'Menu',
-            headers: ['id', 'name', 'description', 'price', 'category', 'image_url', 'available', 'customizations_json']
+            headers: ['id', 'name', 'description', 'price', 'category', 'image_url', 'available', 'customization_ids']
         },
         {
             name: 'Orders',
@@ -39,30 +39,42 @@ function setupDatabase() {
         },
         {
             name: 'Customizations',
-            headers: ['id', 'name', 'options_json']
+            headers: ['id', 'name', 'price', 'available']
         }
     ];
 
-    let ss: GoogleAppsScript.Spreadsheet.Spreadsheet | null = null;
-    try {
-        ss = SpreadsheetApp.getActiveSpreadsheet();
-    } catch (e) {
-        // Likely standalone script
-    }
-
     const logs: string[] = [];
     let createdCount = 0;
+    let ss: GoogleAppsScript.Spreadsheet.Spreadsheet | null = null;
+
+    // Try getting by ID first (preferred)
+    if (CONFIG.SHEET_ID) {
+        try {
+            ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+            logs.push('Using spreadsheet from CONFIG.SHEET_ID: ' + ss.getId());
+        } catch (e) {
+            logs.push('Failed to open spreadsheet by CONFIG.SHEET_ID: ' + String(e));
+        }
+    }
+
+    // Fallback to active spreadsheet (if bound)
+    if (!ss) {
+        try {
+            ss = SpreadsheetApp.getActiveSpreadsheet();
+            if (ss) logs.push('Using active spreadsheet: ' + ss.getId());
+        } catch (e) {
+            // Not a bound script
+        }
+    }
 
     if (!ss) {
-        logs.push('Standalone script detected. Creating new database spreadsheet...');
+        logs.push('No existing spreadsheet found. Creating new database spreadsheet...');
         ss = SpreadsheetApp.create('Yakiben Database');
         logs.push('************************************************');
         logs.push('CREATED NEW SPREADSHEET');
         logs.push('ID: ' + ss.getId());
         logs.push('PLEASE COPY THIS ID INTO apps/api/src/config.ts');
         logs.push('************************************************');
-    } else {
-        logs.push('Using active spreadsheet: ' + ss.getId());
     }
 
     // Type guard
@@ -79,12 +91,23 @@ function setupDatabase() {
             logs.push(`Created sheet: ${config.name}`);
             createdCount++;
         } else {
-            logs.push(`Sheet already exists: ${config.name}`);
+            // Respect existing columns: check if all required headers exist
+            const existingHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+            const missingHeaders = config.headers.filter(h => existingHeaders.indexOf(h) === -1);
+
+            if (missingHeaders.length > 0) {
+                const startCol = sheet.getLastColumn() + 1;
+                sheet.getRange(1, startCol, 1, missingHeaders.length).setValues([missingHeaders]);
+                logs.push(`Updated sheet "${config.name}" with missing headers: ${missingHeaders.join(', ')}`);
+            } else {
+                logs.push(`Sheet already exists and is up to date: ${config.name}`);
+            }
         }
     });
 
-    const msg = `Setup complete. Created ${createdCount} new sheets. DB_ID: ${spreadsheet.getId()}`;
+    const msg = `Setup complete. Synced ${sheets.length} sheets. DB_ID: ${spreadsheet.getId()}`;
     logs.push(msg);
+
     console.log(logs.join('\n'));
     return msg;
 }

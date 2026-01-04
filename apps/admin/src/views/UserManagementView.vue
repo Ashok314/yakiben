@@ -69,21 +69,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
-import type { User } from '../types';
-import { MOCK_USERS } from '../mocks/users';
+import type { User } from '../types/types';
+import { usersApi } from '../api/users';
 import { UI_TEXTS } from "../constants/ui-texts";
 
-const users = ref<User[]>(MOCK_USERS);
+const users = ref<User[]>([]);
 const isEditModalOpen = ref(false);
 const isDeleteDialogOpen = ref(false);
-const currentUser = ref<User>({ id: 0, name: '', email: '', role: 'staff' });
-const deleteUserId = ref<number | null>(null);
+const currentUser = ref<User>({ id: '', name: '', email: '', role: 'staff' });
+const deleteUserId = ref<string | null>(null);
+
+onMounted(async () => {
+  users.value = await usersApi.getUsers();
+});
 
 const openAddModal = () => {
   // FIXME  remove id when adding a new user: handle in backend
-  currentUser.value = { id: Date.now(), name: '', email: '', role: 'staff' }; // Generate unique ID for new user
+  currentUser.value = { id: String(Date.now()), name: '', email: '', role: 'staff' }; // Generate unique ID for new user
   isEditModalOpen.value = true;
 };
 
@@ -94,10 +98,10 @@ const openEditModal = (user: User) => {
 
 const closeEditModal = () => {
   isEditModalOpen.value = false;
-  currentUser.value = { id: 0, name: '', email: '', role: 'staff' };
+  currentUser.value = { id: '', name: '', email: '', role: 'staff' };
 };
 
-const openDeleteDialog = (id: number) => {
+const openDeleteDialog = (id: string) => {
   deleteUserId.value = id;
   isDeleteDialogOpen.value = true;
 };

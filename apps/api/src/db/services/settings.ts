@@ -43,13 +43,13 @@ function handleGetRestaurantInfo(): ApiResponse<RestaurantInfo> {
 /**
  * Update settings (PROTECTED - manager only)
  */
-function handleUpdateSettings(key: string, value: any): ApiResponse {
+function handleUpdateSettings(key: string, value: any, authToken: string): ApiResponse {
   try {
-    requireRole(['manager']);
-    
+    requireRole(['manager'], authToken); // Validate authToken
+
     const settings = getSheetData(CONFIG.SHEETS.SETTINGS);
     let found = false;
-    
+
     // Find and update setting
     for (let i = 0; i < settings.length; i++) {
       if (settings[i].key === key) {
@@ -61,7 +61,7 @@ function handleUpdateSettings(key: string, value: any): ApiResponse {
         break;
       }
     }
-    
+
     if (!found) {
       // Insert new setting
       insertRecord(CONFIG.SHEETS.SETTINGS, {
@@ -71,7 +71,7 @@ function handleUpdateSettings(key: string, value: any): ApiResponse {
         updated_at: new Date().toISOString()
       });
     }
-    
+
     return { success: true, data: { message: 'Settings updated' } };
   } catch (error) {
     return { success: false, error: String(error) };

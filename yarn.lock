@@ -2024,6 +2024,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/google.accounts@npm:^0.0.18":
+  version: 0.0.18
+  resolution: "@types/google.accounts@npm:0.0.18"
+  checksum: 10c0/c8769e1061e6809ad6fcd613f8c08b22a428bab7b3385002151fba6fea4444aaee30aee3d033bb5c75ea5dccbd3af5e38d04811f8737a77c2997566dabc21a49
+  languageName: node
+  linkType: hard
+
 "@types/http-cache-semantics@npm:*":
   version: 4.0.4
   resolution: "@types/http-cache-semantics@npm:4.0.4"
@@ -8684,6 +8691,7 @@ __metadata:
     "@tailwindcss/forms": "npm:^0.5.10"
     "@types/axios": "npm:^0.14.4"
     "@types/google-apps-script": "npm:latest"
+    "@types/google.accounts": "npm:^0.0.18"
     "@typescript-eslint/eslint-plugin": "npm:^8.35.0"
     "@typescript-eslint/parser": "npm:^8.35.0"
     "@vitejs/plugin-vue": "npm:^6.0.0"

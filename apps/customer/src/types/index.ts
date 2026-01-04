@@ -23,23 +23,29 @@ export interface CartItem {
   subtotal: number;
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled';
-export type PaymentStatus = 'pending' | 'paid' | 'failed';
-export type PaymentMethod = 'cash' | 'paypay' | 'line_pay';
+export type OrderStatus = 'pending' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+export type PaymentStatus = 'pending' | 'completed';
+export type PaymentMethod = 'cash' | 'card' | 'paypay';
 
 export interface Order {
   id: string;
   trackingId: string;
   items: CartItem[];
-  customerName: string;
-  companyAddress: string;
-  companyContact: string;
-  deliveryTime: Date;
-  notes?: string;
+  customer: {
+    name: string;
+    phone: string;
+    address: {
+      street: string;
+      city: string;
+      postalCode: string;
+      instructions?: string;
+    };
+  };
+  deliveryTime?: string;
   status: OrderStatus;
-  paymentMethod?: PaymentMethod;
+  paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   total: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }

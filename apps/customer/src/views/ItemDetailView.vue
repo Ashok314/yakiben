@@ -31,7 +31,7 @@
       <!-- Item Image -->
       <div class="aspect-video rounded-xl overflow-hidden mb-6">
         <img 
-          :src="`/yakiben/customer${item.image}`" 
+          :src="item.image.startsWith('http') ? item.image : `/yakiben/customer${item.image}`" 
           :alt="item.name"
           class="w-full h-full object-cover"
         />
@@ -142,10 +142,13 @@
         </div>
         <div class="space-y-4">
           <p>{{ UI_TEXT.menu.help.message }}</p>
-          <div class="bg-gray-50 rounded-lg p-4 space-y-2">
-            <p>電話番号：<a :href="`tel:${RESTAURANT_INFO.support.phone}`" class="text-primary">{{ RESTAURANT_INFO.support.phone }}</a></p>
-            <p>受付時間：{{ RESTAURANT_INFO.support.hours }}</p>
-            <p>メール：<a :href="`mailto:${RESTAURANT_INFO.support.email}`" class="text-primary">{{ RESTAURANT_INFO.support.email }}</a></p>
+          <div v-if="restaurantInfo" class="bg-gray-50 rounded-lg p-4 space-y-2">
+            <p>電話番号：<a :href="`tel:${restaurantInfo.support.phone}`" class="text-primary">{{ restaurantInfo.support.phone }}</a></p>
+            <p>受付時間：{{ restaurantInfo.support.hours }}</p>
+            <p>メール：<a :href="`mailto:${restaurantInfo.support.email}`" class="text-primary">{{ restaurantInfo.support.email }}</a></p>
+          </div>
+          <div v-else class="text-center py-4 text-gray-400">
+            {{ UI_TEXT.common.loading }}
           </div>
         </div>
       </div>
@@ -156,24 +159,31 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { menuItems } from '../data/menu';
+import { menuItems, fetchMenu } from '../data/menu';
 import { useCart } from '../stores/cart';
 import type { MenuItem } from '../types';
-import { RESTAURANT_INFO } from '../config/restaurant';
+import { useRestaurantStore } from '../stores/restaurant';
 import { UI_TEXT } from '../constants/ui-text';
 
 const route = useRoute();
 const router = useRouter();
 const { addToCart, cartTotal } = useCart();
+const { info: restaurantInfo } = useRestaurantStore();
 
 const item = ref<MenuItem | undefined>();
 const quantity = ref(1);
 const selectedCustomizations = ref<string[]>([]);
 const showHelp = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
   const id = route.params.id as string;
-  item.value = menuItems.find(i => i.id === id);
+  
+  // If menu is not loaded, fetch it first
+  if (menuItems.value.length === 0) {
+    await fetchMenu();
+  }
+  
+  item.value = menuItems.value.find(i => String(i.id) === id);
   
   if (!item.value) {
     router.push('/');

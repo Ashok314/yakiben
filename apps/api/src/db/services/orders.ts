@@ -69,41 +69,17 @@ function handleGetOrders(filters?: { status?: string; trackingId?: string; authT
 
     let orders = getSheetData(CONFIG.SHEETS.ORDERS);
 
-    // Filter by user ID immediately
-    orders = orders.filter((o: any) => o.user_id === user.id);
+    // Filter by user ID for customers
+    if (user.role === 'customer') {
+      orders = orders.filter((o: any) => o.user_id === user.id);
+    }
 
     // Parse JSON fields and flatten customer data
     orders = orders.map((order: any) => {
-      const customer = order.customer_json || {};
       return {
-        id: order.id,
-        trackingId: order.tracking_id,
-        // Map fields from customer_json or use top-level fallback
-        customerName: customer.customerName || order.customer_json || 'Guest',
-        companyAddress: customer.companyAddress || '',
-        companyContact: customer.companyContact || '',
-        notes: customer.notes || '',
-        items: order.items_json,
-        total: Number(order.total),
-        status: order.status,
-        paymentMethod: order.payment_method,
-        paymentStatus: order.payment_status,
-        deliveryTime: order.delivery_time,
-        createdAt: order.created_at,
-        updatedAt: order.updated_at
+        ...order
       };
     });
-
-    // Apply filters
-    if (filters) {
-      if (filters.status) {
-        orders = orders.filter((o: Order) => o.status === filters.status);
-      }
-
-      if (filters.trackingId) {
-        orders = orders.filter((o: Order) => o.trackingId === filters.trackingId);
-      }
-    }
 
     return { success: true, data: orders };
   } catch (error) {
@@ -114,9 +90,9 @@ function handleGetOrders(filters?: { status?: string; trackingId?: string; authT
 /**
  * Update order (PROTECTED - staff/manager only)
  */
-function handleUpdateOrder(orderId: string, updates: any): ApiResponse {
+function handleUpdateOrder(orderId: string, updates: Record<string, unknown>, authToken: string): ApiResponse {
   try {
-    requireRole(['staff', 'manager', 'driver']);
+    requireRole(['staff', 'manager', 'driver'], authToken); // Validate authToken
 
     updates.updated_at = new Date().toISOString();
 

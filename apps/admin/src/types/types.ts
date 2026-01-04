@@ -14,8 +14,7 @@ export interface Order {
   customer: {
     name: string;
     phone: string;
-    email?: string;
-    address?: {
+    address: {
       street: string;
       city: string;
       postalCode: string;
@@ -24,17 +23,12 @@ export interface Order {
   };
   items: OrderItem[];
   total: number;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'delivered';
-  createdAt: string;
-  deliveryTime: string;
-  address?: {
-    street: string;
-    city: string;
-    postalCode: string;
-    instructions?: string;
-  };
+  status: 'pending' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
   paymentMethod: 'cash' | 'card' | 'paypay';
-  paymentStatus: 'pending' | 'paid';
+  paymentStatus: 'pending' | 'completed';
+  deliveryTime?: string;
+  createdAt: string;
+  updatedAt: string;
   comments?: string;
   driver?: User;
   deliveredAt?: string;
@@ -54,6 +48,13 @@ export interface OrderItemOption {
   price?: number;
 }
 
+export interface Customization {
+  id: string;
+  name: string;
+  price: number;
+  available: boolean;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -62,16 +63,7 @@ export interface MenuItem {
   category: string;
   imageUrl?: string;
   outOfStock?: boolean;
-  options?: MenuItemOption[];
-}
-
-export interface MenuItemOption {
-  name: string;
-  required: boolean;
-  choices: {
-    name: string;
-    price?: number;
-  }[];
+  options?: Customization[];
 }
 
 export interface RestaurantSettings {

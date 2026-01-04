@@ -23,67 +23,67 @@ function getCurrentUser(authToken?: string): User | null {
 
   const users = getSheetData(CONFIG.SHEETS.USERS);
   const user = users.find(u => u.id === validSession.user_id);
-
   return user ? { ...user, isLoggedIn: true } : null;
 }
 
 /**
  * Handle Google Login
  */
-function handleLogin(credential: string): ApiResponse {
+function handleLogin(data: { credential?: string }): ApiResponse {
   try {
-    // Validate Google ID Token
-    // https://developers.google.com/identity/sign-in/web/backend-auth
-    const response = UrlFetchApp.fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
-    const payload = JSON.parse(response.getContentText());
+    if (data.credential) {
+      // Google Login
+      const response = UrlFetchApp.fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${data.credential}`);
+      const payload = JSON.parse(response.getContentText());
 
-    if (payload.error_description) {
-      throw new Error(payload.error_description);
-    }
-
-    const { email, name, picture, sub: googleId } = payload;
-
-    // Find or Create User
-    const users = getSheetData(CONFIG.SHEETS.USERS);
-    let user = users.find(u => u.email === email);
-    let userId;
-
-    if (!user) {
-      // Create new user
-      userId = Utilities.getUuid();
-      const newUser = {
-        id: userId,
-        name: name,
-        email: email,
-        picture: picture,
-        created_at: new Date().toISOString()
-      };
-      insertRecord(CONFIG.SHEETS.USERS, newUser);
-      user = newUser;
-    } else {
-      userId = user.id;
-    }
-
-    // Create Session
-    const token = Utilities.getUuid();
-    // Expires in 30 days
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30);
-
-    insertRecord(CONFIG.SHEETS.SESSIONS, {
-      token: token,
-      user_id: userId,
-      expires_at: expiresAt.toISOString()
-    });
-
-    return {
-      success: true,
-      data: {
-        token,
-        user: { name: user.name, email: user.email, picture: user.picture }
+      if (payload.error_description) {
+        throw new Error(payload.error_description);
       }
-    };
 
+      const { email, name, picture } = payload;
+      const users = getSheetData(CONFIG.SHEETS.USERS);
+      let user = users.find(u => u.email === email);
+
+      if (!user) {
+        // Create new user
+        const userId = Utilities.getUuid();
+        user = {
+          id: userId,
+          name,
+          email,
+          picture,
+          role: 'customer',
+          created_at: new Date().toISOString(),
+        };
+        insertRecord(CONFIG.SHEETS.USERS, user);
+      }
+
+      const token = Utilities.getUuid();
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+
+      insertRecord(CONFIG.SHEETS.SESSIONS, {
+        token,
+        user_id: user.id,
+        expires_at: expiresAt.toISOString(),
+      });
+
+      return {
+        success: true,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            picture: user.picture,
+            role: user.role,
+          },
+        },
+      };
+    } else {
+      throw new Error('Invalid login request');
+    }
   } catch (error) {
     return { success: false, error: `Login failed: ${error}` };
   }
@@ -101,10 +101,19 @@ function requiresAuth(action: string): boolean {
  * Now accepts optional authToken from request payload
  */
 function requireAuth(authToken?: string): User {
+  if (!authToken) {
+    throw new Error(JSON.stringify({
+      message: 'Authentication required: Missing authToken',
+    }));
+  }
+
   const user = getCurrentUser(authToken);
 
   if (!user) {
-    throw new Error('Authentication required');
+    throw new Error(JSON.stringify({
+      message: 'Authentication required: Invalid or expired authToken',
+      authToken,
+    }));
   }
 
   return user;
@@ -116,9 +125,55 @@ function requireAuth(authToken?: string): User {
 function requireRole(allowedRoles: string[], authToken?: string): User {
   const user = requireAuth(authToken);
 
-  if (allowedRoles.indexOf(user.role) === -1) {
-    throw new Error('Insufficient permissions');
+  // Fetch the user from the USERS sheet to ensure role validation is based on the database
+  const users = getSheetData(CONFIG.SHEETS.USERS);
+  const dbUser = users.find(u => u.id === user.id);
+
+  if (!dbUser) {
+    throw new Error(JSON.stringify({
+      message: 'Access denied: User not found',
+      userId: user.id,
+      allowedRoles,
+    }));
   }
 
-  return user;
+  if (!allowedRoles.includes(dbUser.role)) {
+    throw new Error(JSON.stringify({
+      message: `Access denied: Role '${dbUser.role}' not permitted`,
+      userRole: dbUser.role,
+      allowedRoles,
+    }));
+  }
+
+  return dbUser;
+}
+
+/**
+ * Get all users (PROTECTED - manager only)
+ */
+function handleGetUsers(data: { authToken?: string }): ApiResponse {
+  try {
+    // Ensure only managers can access this endpoint
+    requireRole(['manager'], data?.authToken);
+
+    // Fetch users with admin roles from the USERS sheet
+    const users = getSheetData(CONFIG.SHEETS.USERS);
+    const adminUsers = users.filter(u => ['manager', 'staff', 'driver'].includes(u.role));
+
+    return {
+      success: true,
+      data: adminUsers.map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        picture: u.picture,
+      })),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Error in handleGetUsers: ${error}`,
+    };
+  }
 }

@@ -110,9 +110,6 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
-    // Initial load can be from API which handles merging, 
-    // but we can also reactively update if needed.
-    // getOrders already does the heavy lifting of merging local + API.
     orders.value = await ordersApi.getOrders();
   } finally {
     isLoading.value = false;

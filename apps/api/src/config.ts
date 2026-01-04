@@ -7,20 +7,23 @@ const CONFIG = {
     USERS: 'Users',
     SETTINGS: 'Settings',
     CUSTOMIZATIONS: 'Customizations',
+    STAFF: 'Staff',
     SESSIONS: 'Sessions'
   },
 
   // Public endpoints (no auth required)
   PUBLIC_ENDPOINTS: [
+    'ping',
     'health',
     'getMenu',
     'getCustomizations',
-    'getRestaurantInfo'
+    'getRestaurantInfo',
+    'createOrder',
+    'adminLogin'
   ],
 
   // Protected endpoints (auth required)
   PROTECTED_ENDPOINTS: [
-    'createOrder',
     'getOrders',
     'updateOrder',
     'updateMenuItem',

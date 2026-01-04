@@ -1,13 +1,13 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from './stores/auth';
 import OrdersView from './views/OrdersView.vue';
 import BaseLayout from './layouts/BaseLayout.vue';
 import MenuManagementView from './views/MenuManagementView.vue';
 
 const routes: RouteRecordRaw[] = [
-  { path: '/', component: () => import('./views/LoginView.vue') },
-  { 
-    path: '/orders', 
+  { path: '/', redirect: '/orders' },
+  {
+    path: '/orders',
     component: BaseLayout,
     children: [
       {
@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
       },
     ]
   },
-  { 
+  {
     path: '/menu-management',
     component: BaseLayout,
     children: [
@@ -28,7 +28,7 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  { 
+  {
     path: '/user-management',
     component: BaseLayout,
     children: [
@@ -39,8 +39,8 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  { 
-    path: '/delivery', 
+  {
+    path: '/delivery',
     component: BaseLayout,
     children: [
       {
@@ -83,6 +83,10 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/login',
+    component: () => import('./views/LoginView.vue'),
+  },
 ];
 
 const router = createRouter({
@@ -90,7 +94,7 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+router.beforeEach((to, _from, next) => {
 
   const authStore = useAuthStore();
 
