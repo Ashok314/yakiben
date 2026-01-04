@@ -19,7 +19,7 @@ const CONFIG = {
     'getCustomizations',
     'getRestaurantInfo',
     'createOrder',
-    'adminLogin'
+    'login'
   ],
 
   // Protected endpoints (auth required)
