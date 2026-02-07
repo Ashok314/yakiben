@@ -149,10 +149,10 @@
 </template>
 
 <script>
-import { restaurantSettings, sensitiveSettings } from "../mocks/settings";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import ConfirmDialog from "../components/ConfirmDialog.vue";
 import { UI_TEXTS } from "../constants/ui-texts";
+import { settingsApi } from "../api/settings";
 
 export default {
   components: {
@@ -172,27 +172,24 @@ export default {
         maxAdvanceDays: 0,
         businessDays: [],
       },
+      support: {}
     });
-    const sensitiveSettingsRef = ref(sensitiveSettings);
+    const sensitiveSettingsRef = ref({ orderingEnabled: true });
     const showConfirmDialog = ref(false);
     const showSettingsConfirmDialog = ref(false);
     const showOrderingConfirmDialog = ref(false);
     const editMode = ref({ info: false, settings: false });
 
-    // FIXME: Replace mock data with actual API call
-    restaurantSettingsRef.value = {
-      name: restaurantSettings.name,
-      address: { line1: restaurantSettings.address },
-      phone: restaurantSettings.phone,
-      email: restaurantSettings.email,
-      hours: {
-        open: restaurantSettings.hours.open,
-        close: restaurantSettings.hours.close,
-        minAdvanceTime: restaurantSettings.hours.minAdvanceTime,
-        maxAdvanceDays: restaurantSettings.hours.maxAdvanceDays,
-        businessDays: restaurantSettings.hours.businessDays,
-      },
-    };
+    onMounted(async () => {
+      const info = await settingsApi.getRestaurantInfo();
+      if (info) {
+        restaurantSettingsRef.value = {
+          ...info,
+          address: { line1: info.address?.line1 || '' },
+          hours: { ...info.hours }
+        };
+      }
+    });
 
     const toggleEdit = (section) => {
       editMode.value[section] = !editMode.value[section];
@@ -212,8 +209,11 @@ export default {
 
     const handleOrderingConfirm = async () => {
       try {
-        // FIXME: Replace with actual API call to update ordering status
-        sensitiveSettingsRef.value.orderingEnabled = !sensitiveSettingsRef.value.orderingEnabled;
+        const newValue = !sensitiveSettingsRef.value.orderingEnabled;
+        const success = await settingsApi.updateSettings('ordering_enabled', newValue);
+        if (success) {
+           sensitiveSettingsRef.value.orderingEnabled = newValue;
+        }
       } catch (error) {
         console.error("Failed to change ordering status:", error);
       } finally {
@@ -229,10 +229,17 @@ export default {
 
     const saveRestaurantInfo = async () => {
       try {
-        // FIXME: Replace with actual API call to save restaurant info
-        const index = restaurantSettingsRef.value;
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("Restaurant info saved successfully:", index);
+        const info = restaurantSettingsRef.value;
+        // The API expects individual updates or a bulk update?
+        // handleUpdateSettings takes key, value.
+        // Let's preserve the structure.
+        const success = await settingsApi.updateSettings('restaurant_name', info.name);
+        if (success) {
+           await settingsApi.updateSettings('restaurant_address', info.address);
+           await settingsApi.updateSettings('restaurant_phone', info.phone);
+           await settingsApi.updateSettings('restaurant_email', info.email);
+           editMode.value.info = false;
+        }
       } catch (error) {
         console.error("Failed to save restaurant info:", error);
       } finally {
@@ -242,10 +249,11 @@ export default {
 
     const saveRestaurantSettings = async () => {
       try {
-        // FIXME: Replace with actual API call to save restaurant settings
-        const index = restaurantSettingsRef.value;
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("Restaurant settings saved successfully:", index);
+        const info = restaurantSettingsRef.value;
+        const success = await settingsApi.updateSettings('business_hours', info.hours);
+        if (success) {
+           editMode.value.settings = false;
+        }
       } catch (error) {
         console.error("Failed to save restaurant settings:", error);
       } finally {

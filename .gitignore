@@ -15,3 +15,21 @@ node_modules
 
 #!.yarn/cache
 .pnp.*
+
+# envs
+**/.env
+**/.env.*
+!.env.example
+
+
+# temprorary copilot/ agent instruction 
+.plan
+.knowledge
+
+# supabase as different submodule 
+supabase
+
+!libs/supabase
+
+## temprorary clasp api
+apps/api

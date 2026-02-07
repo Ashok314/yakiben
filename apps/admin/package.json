@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
+    "@supabase/supabase-js": "^2.95.3",
     "@types/chart.js": "^4.0.1",
     "chart.js": "^4.5.0",
     "pinia": "^2.1.7",

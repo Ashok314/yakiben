@@ -26,6 +26,11 @@ const routes: RouteRecordRaw[] = [
     path: '/history',
     name: 'history',
     component: () => import('./views/HistoryView.vue')
+  },
+  {
+    path: '/auth/callback',
+    name: 'authCallback',
+    component: () => import('./views/AuthCallbackView.vue')
   }
 ];
 

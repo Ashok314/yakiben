@@ -5,10 +5,7 @@
     <!-- Tabs -->
     <div class="mb-4">
       <div class="flex border-b border-gray-300">
-        <button 
-          v-for="tab in tabs" 
-          :key="tab" 
-          @click="activeTab = tab" 
+        <button v-for="tab in tabs" :key="tab" @click="activeTab = tab"
           :class="['px-4 py-2', activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500']"
           class="focus:outline-none">
           {{ tab }}
@@ -27,9 +24,9 @@
               {{ label }}
             </option>
           </select>
-            <input type="date" v-model="startDate" class="form-input" />
-            <input type="date" v-model="endDate" class="form-input" />
-            <button @click="clearFilters" class="bg-red-500 text-white px-4 py-2 rounded">Clear</button>
+          <input type="date" v-model="startDate" class="form-input" />
+          <input type="date" v-model="endDate" class="form-input" />
+          <button @click="clearFilters" class="bg-red-500 text-white px-4 py-2 rounded">Clear</button>
         </div>
 
         <!-- Grouping Filters -->
@@ -37,7 +34,8 @@
           <label class="flex items-center space-x-2">
             <span>{{ UI_TEXTS.orderSummary.groupByLabel }}</span>
             <select v-model="selectedDateRange" class="form-select">
-              <option v-for="(label, key) in UI_TEXTS.orderSummary.groupByOptions" :key="key" :value="key">{{ label }}</option>
+              <option v-for="(label, key) in UI_TEXTS.orderSummary.groupByOptions" :key="key" :value="key">{{ label }}
+              </option>
             </select>
           </label>
         </div>
@@ -87,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { ordersApi } from '../mocks/orders';
+import { ordersApi } from '../api/orders';
 import { UI_TEXTS } from '../constants/ui-texts';
 import type { OrderSummary } from '../types/types';
 import MenuPerformanceChart from '../components/MenuPerformanceChart.vue';
@@ -115,30 +113,30 @@ const applyQuickFilter = () => {
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-  switch (selectedQuickFilter.value) {
-    case 'Today':
+  switch (selectedQuickFilter.value.toLowerCase()) {
+    case 'today':
       startDate.value = new Date().toISOString().split('T')[0];
       endDate.value = startDate.value;
       break;
-    case 'Yesterday':
+    case 'yesterday':
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       startDate.value = yesterday.toISOString().split('T')[0];
       endDate.value = startDate.value;
       break;
-    case 'This Week':
+    case 'this week':
       startDate.value = startOfWeek.toISOString().split('T')[0];
       endDate.value = new Date().toISOString().split('T')[0];
       break;
-    case 'This Month':
+    case 'this month':
       startDate.value = startOfMonth.toISOString().split('T')[0];
       endDate.value = new Date().toISOString().split('T')[0];
       break;
-    case 'Last Month':
+    case 'last month':
       startDate.value = startOfLastMonth.toISOString().split('T')[0];
       endDate.value = endOfLastMonth.toISOString().split('T')[0];
       break;
-    case 'All':
+    case 'all':
       startDate.value = '';
       endDate.value = '';
       break;

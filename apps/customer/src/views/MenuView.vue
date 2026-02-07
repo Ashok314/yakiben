@@ -1,31 +1,9 @@
 <template>
   <div class="relative min-h-screen pb-32">
-     <!-- Announcement Banner -->
-      <div v-if="showAnnouncement" class="bg-primary/10 relative">
-        <div class="container mx-auto px-4 py-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-              </svg>
-              <p class="text-sm text-gray-700">
-                7月限定！からあげ弁当が¥100引き！この機会をお見逃しなく！
-              </p>
-            </div>
-            <button 
-              @click="closeAnnouncement" 
-              class="text-gray-500 hover:text-gray-700"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+
 
     <!-- Header -->
-    <header class="sticky top-0 bg-white shadow-sm z-50">
+    <header class="sticky top-16 bg-white shadow-sm z-50">
       <div class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-2">
@@ -55,13 +33,41 @@
       </div>
     </header>
 
+    <!-- Announcement Banner -->
+    <div v-if="showAnnouncement" class="bg-primary/10 relative z-40">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+            </svg>
+            <p class="text-sm text-gray-700">
+              7月限定！からあげ弁当が¥100引き！この機会をお見逃しなく！
+            </p>
+          </div>
+          <button 
+            @click="closeAnnouncement" 
+            class="text-gray-500 hover:text-gray-700"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
    
 
     <!-- Menu Items by Selected Category -->
     <div class="container mx-auto px-4 py-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div v-if="isLoading" class="col-span-full flex justify-center py-12">
+           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
         <MenuCard 
-          v-for="item in getMenuItemsByCategory(selectedCategory)"
+          v-else
+          v-for="item in currentItems"
           :key="item.id"
           :item="item"
         />
@@ -125,18 +131,21 @@
             </svg>
           </button>
         </div>
-        <div class="space-y-4">
+        <div v-if="restaurantInfo" class="space-y-4">
           <div>
             <h4 class="font-medium mb-1">住所</h4>
-            <p class="text-gray-600">〒100-0005 東京都千代田区丸の内1-1-1</p>
+            <p class="text-gray-600">
+              〒{{ restaurantInfo.address.postal }} 
+              {{ restaurantInfo.address.prefecture }}{{ restaurantInfo.address.city }}{{ restaurantInfo.address.line1 }}
+            </p>
           </div>
           <div>
             <h4 class="font-medium mb-1">営業時間</h4>
-            <p class="text-gray-600">平日 10:00-15:00</p>
+            <p class="text-gray-600">平日 {{ restaurantInfo.hours.open }}:00-{{ restaurantInfo.hours.close }}:00</p>
           </div>
           <div>
             <h4 class="font-medium mb-1">電話番号</h4>
-            <p class="text-gray-600">03-1234-5678</p>
+            <p class="text-gray-600">{{ restaurantInfo.phone }}</p>
           </div>
           <div>
             <h4 class="font-medium mb-2">アクセス</h4>
@@ -152,26 +161,59 @@
             </div>
           </div>
         </div>
+        <div v-else class="text-center py-12 text-gray-400">
+           読み込み中...
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { getCategories, getMenuItemsByCategory } from '../data/menu';
+import { ref, onMounted, computed, watch } from 'vue';
+import { categories as categoryList, getMenuItemsByCategory, fetchMenu, isLoading } from '../data/menu';
 import MenuCard from '../components/MenuCard.vue';
 import { useCart } from '../stores/cart';
+import type { MenuItem } from '../types'; 
+import { useRestaurantStore } from '../stores/restaurant';
 
-const categories = getCategories();
-const selectedCategory = ref(categories[0]);
+const { info: restaurantInfo } = useRestaurantStore();
+
+onMounted(() => {
+  fetchMenu();
+  checkAnnouncement();
+});
+
+// Categories are loaded async, so we watch them to set initial selectedCategory
+const categories = categoryList;
+const selectedCategory = ref('');
+
+watch(categories, (newCats) => {
+  if (newCats.length > 0 && !selectedCategory.value) {
+    selectedCategory.value = newCats[0];
+  }
+}, { immediate: true });
+
+const currentItems = computed(() => {
+    if (!selectedCategory.value) return [];
+    return getMenuItemsByCategory(selectedCategory.value).value;
+});
+
 const { cartItemCount, cartTotal } = useCart();
 
-const showAnnouncement = ref(true);
+const ANNOUNCEMENT_ID = 'banner-2025-07-limit'; 
+
+function checkAnnouncement() {
+  const dismissed = localStorage.getItem(`yakiben-banner-dismissed-${ANNOUNCEMENT_ID}`);
+  showAnnouncement.value = !dismissed;
+}
+
+const showAnnouncement = ref(false); 
 const showInfo = ref(false);
 
 function closeAnnouncement() {
   showAnnouncement.value = false;
+  localStorage.setItem(`yakiben-banner-dismissed-${ANNOUNCEMENT_ID}`, 'true');
 }
 </script>
 
