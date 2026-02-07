@@ -92,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
     console.log('[AuthStore] Checking profile role...');
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, f_name, l_name')
       .eq('id', data.user?.id)
       .single();
 
@@ -141,7 +141,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Check if the user has an admin role after logging in
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, f_name, l_name')
       .eq('id', data.user?.id)
       .single();
 

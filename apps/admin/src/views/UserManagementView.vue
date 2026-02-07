@@ -91,7 +91,8 @@ import ConfirmDialog from '../components/ConfirmDialog.vue';
 import type { User, UserRole } from '../types/types';
 import { usersApi } from '../api/users';
 import { UI_TEXTS } from "../constants/ui-texts";
-import { USER_ROLES, USER_MANAGEMENT_TABS, UserManagementTab } from '../constants/auth';
+import { USER_ROLES, USER_MANAGEMENT_TABS } from '../constants/auth';
+import type { UserManagementTab } from '../constants/auth';
 
 const users = ref<User[]>([]);
 const isEditModalOpen = ref(false);
@@ -102,7 +103,7 @@ const activeTab = ref<UserManagementTab>(USER_MANAGEMENT_TABS.STAFF);
 
 const filteredUsers = computed(() => {
   if (activeTab.value === USER_MANAGEMENT_TABS.STAFF) {
-    return users.value.filter(u => [USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER].includes(u.role));
+    return users.value.filter(u => ([USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER] as UserRole[]).includes(u.role));
   }
   return users.value.filter(u => u.role === USER_ROLES.CUSTOMER);
 });
