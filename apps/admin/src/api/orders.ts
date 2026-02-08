@@ -4,10 +4,9 @@ import type { Order, OrderItem } from '../types/types';
 export const ordersApi = {
     async getOrders(): Promise<Order[]> {
         const { data, error } = await supabase
-            .from('orders')
+            .from('orders_with_customer')
             .select(`
                 *,
-                profile:profiles(f_name, l_name, tel, address, postcode),
                 items:order_items(
                     *,
                     menu_item:menu_items(name, price),
@@ -18,20 +17,24 @@ export const ordersApi = {
             `)
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error fetching orders:', error);
+            throw error;
+        }
 
         return (data || []).map((order: any) => ({
             id: order.id,
             trackingId: order.tracking_id || order.id.slice(0, 8),
             customer: {
-                name: `${order.profile?.f_name || ''} ${order.profile?.l_name || ''}`.trim() || 'Unknown',
-                phone: order.profile?.tel || '',
+                name: `${order.customer_f_name || ''} ${order.customer_l_name || ''}`.trim() || 'Unknown',
+                phone: order.customer_tel || '',
                 address: {
-                    street: order.profile?.address || '',
+                    street: order.customer_address || '',
                     city: '',
-                    postalCode: order.profile?.postcode || '',
+                    postalCode: order.customer_postcode || '',
                     instructions: order.notes || ''
-                }
+                },
+                company: order.customer_company || ''
             },
             items: (order.items || []).map((i: any) => ({
                 id: i.menu_item_id,
@@ -60,7 +63,13 @@ export const ordersApi = {
             .from('orders')
             .update({ status, updated_at: new Date().toISOString() })
             .eq('id', orderId);
-        return !error;
+
+        if (error) {
+            console.error('Failed to update order status:', error);
+            return false;
+        }
+
+        return true;
     },
 
     async assignDriver(orderId: string, driverId: string): Promise<boolean> {
@@ -75,7 +84,7 @@ export const ordersApi = {
         // This might need careful handling if user_id is NOT NULL
         const { error } = await supabase
             .from('orders')
-            .update({ user_id: null, updated_at: new Date().toISOString() })
+            .update({ user_id: null as any, updated_at: new Date().toISOString() })
             .eq('id', orderId);
         return !error;
     },

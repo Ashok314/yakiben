@@ -34,7 +34,9 @@ export interface Order {
   customer: {
     name: string;
     phone: string;
-    address: {
+    company?: string;
+    postalCode?: string; // Add explicit postalCode
+    address: string | {
       street: string;
       city: string;
       postalCode: string;

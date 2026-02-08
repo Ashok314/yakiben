@@ -28,6 +28,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/HistoryView.vue')
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('./views/ProfileView.vue')
+  },
+  {
     path: '/auth/callback',
     name: 'authCallback',
     component: () => import('./views/AuthCallbackView.vue')

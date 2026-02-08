@@ -5,28 +5,128 @@ import { STORAGE_KEYS } from '../../constants';
 export const ordersApi = {
   // Create a new order
   async createOrder(orderData: Partial<Order>): Promise<any> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Unauthorized');
 
     console.log('Creating order with payload:', orderData);
-    // Call the Edge Function via the Supabase client
-    const { data, error } = await supabase.functions.invoke('create-order', {
-      body: { orderData }
-    });
 
-    if (error) {
-      console.error('Edge Function Error:', error);
-      throw new Error(error.message || 'Failed to create order');
+    // Cast to any to cleanly access properties and avoid Partial<T> checks
+    const payload = orderData as any;
+
+    // 1. Update Profile (if customer data exists)
+    if (payload.customer) {
+      const { name, phone, address: customerAddress, company, postalCode: custPostalCode } = payload.customer;
+      const nameParts = (name || '').split(' ');
+      const fName = nameParts[0] || '';
+      const lName = nameParts.slice(1).join(' ') || '';
+
+      const addressStr = typeof customerAddress === 'string' ? customerAddress :
+        `${customerAddress?.postalCode || ''} ${customerAddress?.prefecture || ''} ${customerAddress?.city || ''} ${customerAddress?.street || ''}`.trim();
+
+      let postcode = custPostalCode || ''; // Prefer top-level postalCode
+
+      if (!postcode && typeof customerAddress === 'object') {
+        postcode = customerAddress?.postalCode || '';
+      } else if (!postcode && typeof customerAddress === 'string') {
+        // Try to extract postcode from string if not provided separately
+        const match = customerAddress.match(/[〒]?\s*(\d{3}-?\d{4})/);
+        if (match) {
+          postcode = match[1];
+        }
+      }
+
+      const updatePayload: any = {
+        f_name: fName,
+        l_name: lName,
+        tel: phone,
+        address: addressStr,
+        postcode: postcode,
+        updated_at: new Date().toISOString()
+      };
+      if (company) updatePayload.corporate_name = company;
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update(updatePayload)
+        .eq('id', user.id);
+
+      if (profileError) {
+        console.error('Failed to update profile:', profileError);
+        // Non-blocking, continue
+      }
     }
 
-    // Save to local storage for immediate visibility (handles redirect latency)
+    // 2. Insert Order
+    // Construct payload strictly for DB
+    const orderInsertPayload: any = {
+      user_id: user.id,
+      tracking_id: payload.trackingId,
+      total: payload.total,
+      delivery_datetime: payload.deliveryTime,
+      status: 'pending',
+      payment_method: payload.paymentMethod || 'cash',
+      payment_status: payload.paymentMethod === 'paypay' ? 'pending' : 'pending',
+      notes: payload.notes
+    };
+
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert(orderInsertPayload)
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error('Order insertion failed:', orderError);
+      throw orderError;
+    }
+
+    // 3. Insert Order Items (Sequential)
+    const items = payload.items || [];
+    for (const item of items) {
+      const { data: orderItem, error: itemError } = await supabase
+        .from('order_items')
+        .insert({
+          order_id: order.id,
+          menu_item_id: item.item.id,
+          quantity: item.quantity,
+          price_at_order: item.item.price,
+          line_total: item.subtotal
+        })
+        .select()
+        .single();
+
+      if (itemError) {
+        console.error('Order item insertion failed:', itemError);
+        throw itemError;
+      }
+
+      // 4. Insert Customizations
+      if (item.customizations && item.customizations.length > 0) {
+        const customizationInserts = item.customizations.map((optId: any) => ({
+          order_item_id: orderItem.id,
+          customization_option_id: typeof optId === 'string' ? optId : optId.id
+        }));
+
+        const { error: custError } = await supabase
+          .from('order_item_customizations')
+          .insert(customizationInserts);
+
+        if (custError) {
+          console.error('Customization insertion failed:', custError);
+          throw custError;
+        }
+      }
+    }
+
+    // Save to local storage
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.ORDERS);
       const orders = saved ? JSON.parse(saved) : [];
 
       const finalOrder = {
-        ...orderData,
-        id: data.orderId || orderData.id,
-        trackingId: data.trackingId || orderData.trackingId
+        ...orderData, // Use original payload for local state
+        id: order.id || payload.id,
+        trackingId: order.tracking_id || payload.trackingId
       };
 
       const existingIndex = orders.findIndex((o: any) => o.id === finalOrder.id);
@@ -41,7 +141,7 @@ export const ordersApi = {
       console.warn('Failed to save order locally:', e);
     }
 
-    return data;
+    return { orderId: order.id, trackingId: order.tracking_id, success: true };
   },
 
   // Get all orders

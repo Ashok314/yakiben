@@ -20,6 +20,12 @@ export const UI_TEXTS = {
       minAdvanceTimeLabel: "Minimum Advance Time (Hours)",
       maxAdvanceDaysLabel: "Maximum Advance Days",
       businessDaysLabel: "Business Days",
+      specialDaysLabel: "Special Open Days (Override Closed days)",
+      addSpecialDayButton: "Add Open Day",
+      removeSpecialDayButton: "Remove",
+      holidaysLabel: "Special Holidays (Closed Dates)",
+      addHolidayButton: "Add Holiday",
+      removeHolidayButton: "Remove",
       saveButton: "Save Restaurant Settings",
     },
     orderingEnabled: {
@@ -79,7 +85,17 @@ export const UI_TEXTS = {
   menuManagement: {
     title: "Menu Management",
     description: "Manage your restaurant's menu items here.",
+    tabs: {
+      items: "Menu Items",
+      customizations: "Customizations",
+    },
+    noImage: "No Image",
+    customizations: {
+      masterListTitle: "Customizations Master List",
+      noGroups: "No customization groups found.",
+    },
     tableHeaders: {
+      image: "Image",
       name: "Name",
       price: "Price",
       description: "Description",
@@ -94,6 +110,7 @@ export const UI_TEXTS = {
       edit: "Edit",
       delete: "Delete",
       addNewItem: "Add New Item",
+      addNewGroup: "Add New Customization Group",
     },
     modals: {
       editItem: {
@@ -102,8 +119,13 @@ export const UI_TEXTS = {
       addItem: {
         title: "Add Item",
       },
+      addGroup: {
+        title: "Add Customization Group",
+      },
       form: {
         nameLabel: "Name",
+        groupNameLabel: "Group Name",
+        groupNamePlaceholder: "e.g. Drink Size",
         priceLabel: "Price",
         categoryLabel: "Category",
         addNewCategory: "Add New Category",
@@ -114,6 +136,9 @@ export const UI_TEXTS = {
         outOfStockLabel: "Out of Stock",
         cancelButton: "Cancel",
         saveButton: "Save",
+        addOption: "+ Add Option",
+        optionsLabel: "Options",
+        noCustomizationsFound: "No customizations found.",
       },
       confirmDialogs: {
         save: {
@@ -124,6 +149,10 @@ export const UI_TEXTS = {
           title: "Confirm Delete",
           message: "Are you sure you want to delete this item?",
         },
+        deleteGroup: {
+          title: "Delete Customization Group",
+          message: "Are you sure you want to delete this group and all its options?",
+        },
         unsavedChanges: {
           title: "Unsaved Changes",
           message: "You have unsaved changes. Are you sure you want to close?",
@@ -133,6 +162,43 @@ export const UI_TEXTS = {
   },
   orders: {
     title: "Orders",
+    tabs: {
+      kitchenPrep: "Kitchen Prep (Batch)",
+      deliveryList: "Delivery List (Daily)",
+      singleOrders: "Single Orders",
+    },
+    deliveryList: {
+      title: "Delivery List for the Day",
+      headers: {
+        time: "Time",
+        customer: "Customer",
+        company: "Company",
+        address: "Address",
+        postalCode: "Postal Code",
+        phone: "Phone",
+        items: "Items",
+        total: "Total",
+        notes: "Notes",
+        status: "Status",
+      },
+      filters: {
+        searchPlaceholder: "Search ID or Company...",
+        postalCodeLabel: "Postal Code:",
+      },
+      batchActions: {
+        markDelivering: "Mark All as Delivering",
+        markCompleted: "Mark All as Completed",
+      },
+    },
+    kitchenPrep: {
+      title: "Items for the Day",
+      headers: {
+        item: "Item",
+        customs: "Customizations",
+        qty: "Qty",
+        comments: "Comments",
+      },
+    },
     hideDeliveredLabel: "Hide Delivered",
     hideNonTodayLabel: "Hide Non-Today",
     hideDeliveringLabel: "Hide Delivering",

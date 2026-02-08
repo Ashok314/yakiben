@@ -22,10 +22,11 @@ export interface Order {
       postalCode: string;
       instructions?: string;
     };
+    company?: string;
   };
   items: OrderItem[];
   total: number;
-  status: 'pending' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+  status: 'pending' | 'accepted' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled';
   paymentMethod: 'cash' | 'card' | 'paypay';
   paymentStatus: 'pending' | 'completed';
   deliveryTime?: string;
@@ -65,7 +66,7 @@ export interface MenuItem {
   category: string;
   imageUrl?: string;
   outOfStock?: boolean;
-  options?: Customization[];
+  groups?: any[]; // Using any for now to avoid deep type nesting
 }
 
 export interface RestaurantSettings {

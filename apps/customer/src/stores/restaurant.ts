@@ -7,6 +7,9 @@ interface BusinessHours {
     minAdvanceTime: number;
     maxAdvanceDays: number;
     businessDays: readonly number[];
+
+    holidays?: readonly string[]; // ISO Date strings "YYYY-MM-DD"
+    specialDays?: readonly string[]; // ISO Date strings "YYYY-MM-DD"
 }
 
 interface RestaurantInfo {
@@ -20,11 +23,6 @@ interface RestaurantInfo {
     phone: string;
     email: string;
     hours: BusinessHours;
-    support: {
-        phone: string;
-        hours: string;
-        email: string;
-    };
 }
 
 import { supabase } from '@yakiben/supabase';
@@ -57,9 +55,42 @@ export const useRestaurantStore = () => {
                     ...RESTAURANT_INFO,
                     ...settingsObj,
                     address: { ...RESTAURANT_INFO.address, ...(settingsObj.restaurant_address || {}) },
-                    hours: { ...RESTAURANT_INFO.hours, ...(settingsObj.business_hours || {}) },
-                    support: { ...RESTAURANT_INFO.support, ...(settingsObj.support_info || {}) }
+                    phone: settingsObj.restaurant_phone || RESTAURANT_INFO.phone,
+                    email: settingsObj.restaurant_email || RESTAURANT_INFO.email,
+                    hours: {
+                        ...RESTAURANT_INFO.hours,
+                        ...(settingsObj.business_hours || {}),
+                    }
                 } as RestaurantInfo;
+
+                // Normalize Hours (Handle "10:00" strings from Admin)
+                if (info.value.hours) {
+                    const h = info.value.hours as any;
+
+                    // Helper to parse "10:00" or 10 to number 10
+                    const parseHour = (val: any) => {
+                        if (typeof val === 'string') return parseInt(val.split(':')[0], 10);
+                        return Number(val);
+                    };
+
+                    if (h.open !== undefined) info.value.hours.open = parseHour(h.open);
+                    if (h.close !== undefined) info.value.hours.close = parseHour(h.close);
+                    if (h.orderDeadline !== undefined) info.value.hours.orderDeadline = parseHour(h.orderDeadline);
+
+                    // Normalize Business Days (Handle ["Sunday", "Monday"] strings)
+                    if (Array.isArray(h.businessDays) && h.businessDays.length > 0 && typeof h.businessDays[0] === 'string') {
+                        const dayMap: Record<string, number> = {
+                            "Sunday": 0, "Sun": 0, "sunday": 0,
+                            "Monday": 1, "Mon": 1, "monday": 1,
+                            "Tuesday": 2, "Tue": 2, "tuesday": 2,
+                            "Wednesday": 3, "Wed": 3, "wednesday": 3,
+                            "Thursday": 4, "Thu": 4, "thursday": 4,
+                            "Friday": 5, "Fri": 5, "friday": 5,
+                            "Saturday": 6, "Sat": 6, "saturday": 6
+                        };
+                        info.value.hours.businessDays = h.businessDays.map((d: string) => dayMap[d] ?? -1).filter((d: number) => d !== -1);
+                    }
+                }
                 isFetched.value = true;
             }
         } catch (e) {

@@ -7,30 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -251,6 +231,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_with_customer"
+            referencedColumns: ["id"]
+          },
         ]
       }
       orders: {
@@ -264,6 +251,7 @@ export type Database = {
           payment_status: string | null
           status: string
           total: number
+          tracking_id: string
           updated_at: string | null
           user_id: string
         }
@@ -277,6 +265,7 @@ export type Database = {
           payment_status?: string | null
           status?: string
           total: number
+          tracking_id: string
           updated_at?: string | null
           user_id: string
         }
@@ -290,16 +279,33 @@ export type Database = {
           payment_status?: string | null
           status?: string
           total?: number
+          tracking_id?: string
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
           address: string
           corporate_name: string | null
           created_at: string | null
+          deleted_at: string | null
           f_name: string | null
           id: string
           l_name: string | null
@@ -314,6 +320,7 @@ export type Database = {
           address: string
           corporate_name?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           f_name?: string | null
           id: string
           l_name?: string | null
@@ -328,6 +335,7 @@ export type Database = {
           address?: string
           corporate_name?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           f_name?: string | null
           id?: string
           l_name?: string | null
@@ -340,12 +348,81 @@ export type Database = {
         }
         Relationships: []
       }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      admin_users_view: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          deleted_at: string | null
+          email: string | null
+          f_name: string | null
+          full_name_meta: string | null
+          id: string | null
+          l_name: string | null
+          role: string | null
+          tel: string | null
+        }
+        Relationships: []
+      }
+      orders_with_customer: {
+        Row: {
+          created_at: string | null
+          customer_address: string | null
+          customer_company: string | null
+          customer_f_name: string | null
+          customer_l_name: string | null
+          customer_postcode: string | null
+          customer_tel: string | null
+          delivery_datetime: string | null
+          id: string | null
+          notes: string | null
+          payment_method: string | null
+          payment_status: string | null
+          status: string | null
+          total: number | null
+          tracking_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      is_admin_or_manager: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -474,11 +551,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
 } as const
-
