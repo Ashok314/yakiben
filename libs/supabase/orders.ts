@@ -3,10 +3,12 @@ import type { Database } from './types';
 type OrderRow = Database['public']['Tables']['orders']['Row'];
 
 // Create a new order
-export async function createOrder(order: Database['public']['Tables']['orders']['Insert']): Promise<OrderRow[]> {
+export async function createOrder(
+  order: Database['public']['Tables']['orders']['Insert']
+): Promise<OrderRow[]> {
   const { data, error } = await supabase.from('orders').insert([order]);
   if (error) throw error;
-  return data ?? []
+  return data ?? [];
 }
 
 // Get all orders for a user
@@ -25,7 +27,12 @@ export async function updateOrderStatus(orderId: string, status: string): Promis
 
 // Get most recent pending order
 export async function getMostRecentPendingOrder(): Promise<OrderRow | null> {
-  const { data, error } = await supabase.from('orders').select('*').eq('status', 'pending').order('createdAt', { ascending: false }).limit(1);
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(1);
   if (error) throw error;
-  return (data?.[0]) || null;
+  return data?.[0] || null;
 }
