@@ -3,11 +3,17 @@ import type { MenuItem } from '../types/types';
 
 export const menuApi = {
   async getMenu(): Promise<MenuItem[]> {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select(
-        '*, category:menu_categories(name), customization_groups(*, options:customization_options(*))'
-      );
+    const { data, error } = await supabase.from('menu_items').select(
+      `*, 
+         category:menu_categories(name), 
+         menu_item_customization_groups(
+           sort_order,
+           customization_group:customization_groups(
+             *, 
+             options:customization_options(*)
+           )
+         )`
+    );
 
     if (error) throw error;
 
@@ -19,7 +25,11 @@ export const menuApi = {
       category: item.category?.name || 'その他',
       imageUrl: item.image_url,
       outOfStock: !item.is_available,
-      groups: item.customization_groups || [],
+      sort_order: item.sort_order || 0,
+      // Flatten the junction table structure to match the UI expectation and sort by sort_order
+      groups: (item.menu_item_customization_groups || [])
+        .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+        .map((junction: any) => junction.customization_group),
     })) as any[];
   },
 
@@ -30,6 +40,7 @@ export const menuApi = {
     if (updates.price !== undefined) dbUpdates.price = Number(updates.price);
     if (updates.outOfStock !== undefined) dbUpdates.is_available = !updates.outOfStock;
     if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
+    if (updates.sort_order !== undefined) dbUpdates.sort_order = Number(updates.sort_order);
 
     // Map category name to ID
     if (updates.category) {
@@ -45,30 +56,25 @@ export const menuApi = {
 
     if (error) return false;
 
-    // Update customization groups linkage
-    if (updates.groups) {
-      // Unlink all groups first? Or just the ones that were changed?
-      // The schema has menu_item_id on customization_groups.
-      // So we need to:
-      // 1. Set menu_item_id = null for groups that were previously linked but not in updates.groups
-      // 2. Set menu_item_id = itemId for groups in updates.groups
-
+    // Update customization groups linkage using junction table
+    if (updates.groups !== undefined) {
       const currentGroupIds = updates.groups.map((g: any) => g.id);
 
-      // Link selected groups
-      if (currentGroupIds.length > 0) {
-        await supabase
-          .from('customization_groups')
-          .update({ menu_item_id: itemId })
-          .in('id', currentGroupIds);
-      }
+      // Delete all existing associations and re-insert with proper sort_order
+      // @ts-ignore - Table exists but types not yet regenerated
+      await supabase.from('menu_item_customization_groups').delete().eq('menu_item_id', itemId);
 
-      // Unlink groups not in the list
-      await supabase
-        .from('customization_groups')
-        .update({ menu_item_id: null })
-        .eq('menu_item_id', itemId)
-        .not('id', 'in', `(${currentGroupIds.join(',')})`);
+      // Insert all current groups with sort_order based on position
+      if (currentGroupIds.length > 0) {
+        // @ts-ignore - Table exists but types not yet regenerated
+        await supabase.from('menu_item_customization_groups').insert(
+          currentGroupIds.map((groupId: string, index: number) => ({
+            menu_item_id: itemId,
+            customization_group_id: groupId,
+            sort_order: index,
+          }))
+        );
+      }
     }
 
     return true;
@@ -100,13 +106,16 @@ export const menuApi = {
 
     const itemId = data.id;
 
-    // Link customization groups
+    // Link customization groups using junction table
     if (item.groups && item.groups.length > 0) {
       const groupIds = item.groups.map((g: any) => g.id);
-      await supabase
-        .from('customization_groups')
-        .update({ menu_item_id: itemId })
-        .in('id', groupIds);
+      // @ts-ignore - Table exists but types not yet regenerated
+      await supabase.from('menu_item_customization_groups').insert(
+        groupIds.map((groupId: string) => ({
+          menu_item_id: itemId,
+          customization_group_id: groupId,
+        }))
+      );
     }
 
     return itemId;

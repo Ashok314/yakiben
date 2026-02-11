@@ -32,6 +32,7 @@
             <th class="border border-gray-300 px-4 py-2">
               {{ UI_TEXTS.menuManagement.tableHeaders.price }}
             </th>
+            <th class="border border-gray-300 px-4 py-2">Sort</th>
             <th class="border border-gray-300 px-4 py-2">
               {{ UI_TEXTS.menuManagement.tableHeaders.description }}
             </th>
@@ -51,11 +52,16 @@
               </td>
             </tr>
             <tr
-              v-for="item in menuItems.filter((item) => item.category === category)"
+              v-for="item in menuItems
+                .filter((item) => item.category === category)
+                .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))"
               :key="item.id"
             >
               <td class="border border-gray-300 px-4 py-2">{{ item.name }}</td>
               <td class="border border-gray-300 px-4 py-2">{{ item.price }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-center">
+                {{ item.sort_order || 0 }}
+              </td>
               <td class="border border-gray-300 px-4 py-2">
                 {{ truncateDescription(item.description) }}
               </td>
@@ -155,7 +161,11 @@
     </div>
 
     <!-- Menu Item Modal -->
-    <div v-if="isModalOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex z-50">
+    <div
+      v-if="isModalOpen"
+      class="fixed inset-0 bg-gray-800 bg-opacity-50 flex z-50"
+      @click.self="confirmCloseModal"
+    >
       <div class="w-4/5 bg-white p-6 rounded shadow-lg overflow-auto ml-auto">
         <h2 class="text-2xl font-bold mb-4">
           {{
@@ -256,6 +266,18 @@
             </div>
           </div>
           <div class="mb-4">
+            <label for="sort_order" class="block text-sm font-medium text-gray-700"
+              >Sort Order</label
+            >
+            <input
+              v-model.number="currentItem.sort_order"
+              type="number"
+              id="sort_order"
+              min="0"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            />
+          </div>
+          <div class="mb-4">
             <label for="outOfStock" class="block text-sm font-medium text-gray-700">{{
               UI_TEXTS.menuManagement.modals.form.outOfStockLabel
             }}</label>
@@ -300,8 +322,9 @@
     <div
       v-if="isGroupModalOpen"
       class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+      @click.self="isGroupModalOpen = false"
     >
-      <div class="bg-white p-6 rounded shadow-lg max-w-md w-full">
+      <div class="bg-white p-6 rounded shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <h2 class="text-2xl font-bold mb-4">{{ UI_TEXTS.menuManagement.modals.addGroup.title }}</h2>
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700">{{
@@ -316,13 +339,22 @@
         </div>
 
         <!-- Constraints -->
-        <div class="mb-4 grid grid-cols-2 gap-4">
+        <div class="mb-4 grid grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Max Selections</label>
             <input
               v-model.number="newGroup.max_selections"
               type="number"
               min="1"
+              class="mt-1 block w-full border-gray-300 rounded shadow-sm focus:ring-primary"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Sort Order</label>
+            <input
+              v-model.number="newGroup.sort_order"
+              type="number"
+              min="0"
               class="mt-1 block w-full border-gray-300 rounded shadow-sm focus:ring-primary"
             />
           </div>
@@ -338,9 +370,15 @@
           </div>
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">{{
-            UI_TEXTS.menuManagement.modals.form.optionsLabel
-          }}</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Options</label>
+          <!-- Column headers -->
+          <div class="flex gap-2 mb-2 text-xs font-medium text-gray-600">
+            <div class="flex-1">Name</div>
+            <div class="w-20 text-center">Price</div>
+            <div class="w-16 text-center">Order</div>
+            <div class="w-20 text-center">Default</div>
+            <div class="w-5"></div>
+          </div>
           <div
             v-for="(opt, idx) in newGroup.options"
             :key="idx"
@@ -358,6 +396,14 @@
               type="number"
               :placeholder="UI_TEXTS.menuManagement.modals.form.priceLabel"
               class="w-20 border-gray-300 rounded shadow-sm"
+            />
+            <input
+              v-model.number="opt.sort_order"
+              type="number"
+              placeholder="Order"
+              min="0"
+              class="w-16 border-gray-300 rounded shadow-sm"
+              title="Sort Order"
             />
             <label class="flex items-center space-x-1 whitespace-nowrap">
               <input
@@ -381,6 +427,7 @@
                 name: '',
                 price_add: 0,
                 is_default: false,
+                sort_order: 0,
                 delete: false,
               })
             "
@@ -413,7 +460,7 @@
 
 <script setup lang="ts">
 import ConfirmDialog from '../components/ConfirmDialog.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
 import type { MenuItem } from '../types/types';
 import { menuApi } from '../api/menu';
 import { UI_TEXTS } from '../constants/ui-texts';
@@ -425,10 +472,35 @@ const menuItems = ref<MenuItem[]>([]);
 const categories = ref<string[]>([]);
 const allCustomizations = ref<any[]>([]);
 
+// Restore active tab from localStorage
+const savedTab = localStorage.getItem('admin-menu-active-tab');
+if (savedTab && (savedTab === 'items' || savedTab === 'customizations')) {
+  activeTab.value = savedTab as keyof typeof UI_TEXTS.menuManagement.tabs;
+}
+
+// Save active tab to localStorage when changed
+watch(activeTab, (newTab) => {
+  localStorage.setItem('admin-menu-active-tab', newTab);
+});
+
+// Save scroll position before unmount
+let savedScrollPosition = 0;
+onBeforeUnmount(() => {
+  savedScrollPosition = window.scrollY;
+  localStorage.setItem('admin-menu-scroll-position', String(savedScrollPosition));
+});
+
 const loadMenu = async () => {
   menuItems.value = await menuApi.getMenu();
   categories.value = await menuApi.getCategories();
   allCustomizations.value = await menuApi.getCustomizations();
+
+  // Restore scroll position after data loads
+  await nextTick();
+  const savedScroll = localStorage.getItem('admin-menu-scroll-position');
+  if (savedScroll) {
+    window.scrollTo(0, parseInt(savedScroll, 10));
+  }
 };
 
 onMounted(loadMenu);
@@ -443,6 +515,7 @@ const currentItem = ref<MenuItem>({
   description: '',
   imageUrl: '',
   outOfStock: false,
+  sort_order: 0,
   groups: [],
 });
 const isConfirmDialogOpen = ref(false);
@@ -460,12 +533,14 @@ const newGroup = ref({
   name: '',
   max_selections: 1,
   is_required: false,
+  sort_order: 0,
   options: [
     {
       id: undefined as string | undefined,
       name: '',
       price_add: 0,
       is_default: false,
+      sort_order: 0,
       delete: false,
     },
   ],
@@ -478,7 +553,10 @@ const openAddGroupModal = () => {
     name: '',
     max_selections: 1,
     is_required: false,
-    options: [{ id: undefined, name: '', price_add: 0, is_default: false, delete: false }],
+    sort_order: 0,
+    options: [
+      { id: undefined, name: '', price_add: 0, is_default: false, sort_order: 0, delete: false },
+    ],
   };
   isGroupModalOpen.value = true;
 };
@@ -492,12 +570,14 @@ const openEditGroupModal = (group: any) => {
     name: o.name,
     price_add: o.price_add,
     is_default: o.is_default || false,
+    sort_order: o.sort_order || 0,
     delete: false,
   }));
   newGroup.value = {
     name: group.name,
     max_selections: group.max_selections || 1,
     is_required: group.is_required || false,
+    sort_order: group.sort_order || 0,
     options: optionsCopy,
   };
   isGroupModalOpen.value = true;

@@ -59,7 +59,7 @@ onMounted(async () => {
         <div class="container mx-auto px-4 h-16 flex justify-between items-center">
           <router-link
             to="/"
-            class="flex items-center space-x-2 text-xl font-bold tracking-tight text-gray-900 hover:opacity-80 transition"
+            class="flex items-center space-x-2 text-base md:text-xl font-bold tracking-tight text-gray-900 hover:opacity-80 transition"
           >
             <img :src="getImageUrl('/assets/logo.webp')" alt="Yakiben" class="h-8 w-8 rounded-lg" />
             <span>{{ info.app_name }}</span>

@@ -299,7 +299,7 @@
           <div class="space-y-3">
             <div v-if="!isAuthenticated" class="text-center p-4 bg-gray-100 rounded-xl mb-4">
               <p class="text-gray-600 mb-3">注文するにはログインが必要です</p>
-              <div class="flex justify-center">
+              <div class="flex justify-center scale-75 sm:scale-100">
                 <GoogleLogin :callback="handleLoginSuccess" />
               </div>
             </div>

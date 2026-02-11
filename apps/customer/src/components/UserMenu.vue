@@ -53,7 +53,7 @@ onUnmounted(() => {
 <template>
   <div class="flex items-center gap-1.5">
     <!-- 1. Google Login (Always shown when logged out) -->
-    <div v-if="!auth.isAuthenticated.value" class="mr-1">
+    <div v-if="!auth.isAuthenticated.value" class="mr-1 scale-75 sm:scale-100 origin-right">
       <GoogleLogin :callback="handleLoginSuccess" />
     </div>
 
@@ -183,7 +183,7 @@ onUnmounted(() => {
             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <span class="text-xs font-bold">情報</span>
+        <span class="text-xs font-bold hidden md:inline">情報</span>
       </button>
 
       <!-- Info Dropdown Menu -->
@@ -227,7 +227,7 @@ onUnmounted(() => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 mr-3 text-gray-400"
+                class="h-4 w-4 mr-3 text-blue-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -248,7 +248,7 @@ onUnmounted(() => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 mr-3 text-gray-400"
+                class="h-4 w-4 mr-3 text-green-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -269,7 +269,7 @@ onUnmounted(() => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 mr-3 text-gray-400"
+                class="h-4 w-4 mr-3 text-purple-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

@@ -45,7 +45,7 @@
 
     <!-- Menu Items by Selected Category -->
     <div class="container mx-auto px-4 py-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         <div v-if="isLoading" class="col-span-full flex justify-center py-12">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -64,13 +64,19 @@
             :key="category"
             @click="selectedCategory = category"
             :class="[
-              'px-5 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-200 flex-shrink-0 transform hover:scale-105',
+              'px-5 py-2.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-200 flex-shrink-0 transform hover:scale-105 relative',
               selectedCategory === category
                 ? 'bg-primary text-white shadow-lg shadow-primary/30'
                 : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200',
             ]"
           >
             {{ category }}
+            <span
+              v-if="getCartCountForCategory(category) > 0"
+              class="absolute -top-2 -right-2 bg-white text-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md border border-primary"
+            >
+              {{ getCartCountForCategory(category) }}
+            </span>
           </button>
         </div>
       </div>
@@ -102,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue';
 import {
   categories as categoryList,
   getMenuItemsByCategory,
@@ -123,6 +129,12 @@ onMounted(() => {
 const categories = categoryList;
 const selectedCategory = ref('');
 
+// Restore selected category from localStorage
+const savedCategory = localStorage.getItem('customer-menu-selected-category');
+if (savedCategory) {
+  selectedCategory.value = savedCategory;
+}
+
 watch(
   categories,
   (newCats) => {
@@ -133,10 +145,41 @@ watch(
   { immediate: true }
 );
 
+// Save selected category when changed
+watch(selectedCategory, (newCategory) => {
+  if (newCategory) {
+    localStorage.setItem('customer-menu-selected-category', newCategory);
+  }
+});
+
+// Save scroll position before unmount
+onBeforeUnmount(() => {
+  localStorage.setItem('customer-menu-scroll-position', String(window.scrollY));
+});
+
+// Restore scroll position after menu loads
+watch(isLoading, async (loading) => {
+  if (!loading) {
+    await nextTick();
+    const savedScroll = localStorage.getItem('customer-menu-scroll-position');
+    if (savedScroll) {
+      window.scrollTo(0, parseInt(savedScroll, 10));
+    }
+  }
+});
+
 const currentItems = computed(() => {
   if (!selectedCategory.value) return [];
   return getMenuItemsByCategory(selectedCategory.value).value;
 });
+
+// Count how many items from a category are in the cart (sum of quantities)
+const { cartItems } = useCart();
+const getCartCountForCategory = (category: string) => {
+  return cartItems.value
+    .filter((cartItem) => cartItem.item.category === category)
+    .reduce((sum: number, cartItem) => sum + cartItem.quantity, 0);
+};
 
 const ANNOUNCEMENT_ID = 'banner-2025-07-limit';
 

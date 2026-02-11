@@ -52,6 +52,14 @@
         <img :src="getImageUrl(item.image)" :alt="item.name" class="w-full h-full object-cover" />
       </div>
 
+      <!-- Description (moved from bottom) -->
+      <div v-if="item.description" class="bg-white rounded-xl p-4 shadow-sm mb-6">
+        <h3 class="font-bold text-gray-900 mb-2">{{ UI_TEXT.menu.item.description }}</h3>
+        <p class="text-gray-600 whitespace-pre-line leading-relaxed">
+          {{ item.description }}
+        </p>
+      </div>
+
       <!-- Item Details -->
       <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
         <div class="flex justify-between items-start mb-2">
@@ -127,11 +135,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Description -->
-        <p class="text-gray-600 py-4 border-t whitespace-pre-line">
-          {{ item.description }}
-        </p>
       </div>
 
       <!-- Total and Add to Cart -->

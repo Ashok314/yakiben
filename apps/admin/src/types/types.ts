@@ -66,6 +66,7 @@ export interface MenuItem {
   category: string;
   imageUrl?: string;
   outOfStock?: boolean;
+  sort_order?: number;
   groups?: any[]; // Using any for now to avoid deep type nesting
 }
 

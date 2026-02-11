@@ -25,6 +25,7 @@ export const UI_TEXT = {
       title: '商品詳細',
       quantity: '数量',
       customization: 'カスタマイズ',
+      description: '商品説明',
       itemTotal: '商品合計',
       cartTotal: '注文合計',
       addToCart: '注文に追加',

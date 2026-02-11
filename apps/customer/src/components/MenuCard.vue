@@ -4,12 +4,21 @@
     class="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden relative cursor-pointer"
     :class="{ 'border-2 border-primary': quantity > 0 }"
   >
-    <div class="relative aspect-video transition-all duration-300 bg-gray-100">
+    <div class="relative aspect-square sm:aspect-[4/3] transition-all duration-300 bg-gray-100">
       <img
         :src="getImageUrl(item.image)"
         :alt="item.name"
         class="w-full h-full object-cover transition-transform duration-500"
       />
+
+      <!-- Customization Badge Overlay (bottom-left) -->
+      <span
+        v-if="item.customizations && item.customizations.length > 0"
+        class="absolute bottom-2 left-2 text-[9px] sm:text-[10px] bg-white text-primary px-1.5 py-0.5 rounded font-bold shadow-md border border-primary z-10"
+        :title="defaultOptionNames || '詳細で選択'"
+      >
+        {{ defaultOptionNames || 'トッピング可' }}
+      </span>
 
       <!-- Sold Out Overlay -->
       <div
@@ -30,12 +39,12 @@
         >
           <button
             @click.stop="handleRemoveOne"
-            class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-gray-50 transition-colors"
+            class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-red-500 hover:bg-gray-50 transition-colors"
           >
             <span v-if="quantity === 1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
+                class="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -48,14 +57,14 @@
                 />
               </svg>
             </span>
-            <span v-else class="font-bold">-</span>
+            <span v-else class="font-bold text-base">-</span>
           </button>
-          <span class="w-6 text-center text-sm font-bold bg-white">{{ quantity }}</span>
+          <span class="w-8 text-center text-base font-bold bg-white">{{ quantity }}</span>
           <button
             @click.stop="handleAddToCart"
-            class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors"
+            class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors"
           >
-            <span class="font-bold">+</span>
+            <span class="font-bold text-base">+</span>
           </button>
         </div>
 
@@ -89,26 +98,19 @@
 
     <div class="p-3 pt-2">
       <div class="space-y-1">
-        <div class="flex justify-between items-start">
-          <h3 class="font-bold text-gray-900 text-sm leading-tight line-clamp-1">
+        <div class="flex justify-between items-start mb-1">
+          <h3 class="font-bold text-gray-900 text-base leading-tight line-clamp-1">
             {{ item.name }}
           </h3>
-          <div class="font-bold text-sm text-primary whitespace-nowrap ml-2">¥{{ item.price }}</div>
+          <div class="font-bold text-base text-primary whitespace-nowrap ml-2">
+            ¥{{ item.price }}
+          </div>
         </div>
 
-        <div class="flex justify-between items-end">
-          <p class="text-[10px] text-gray-500 line-clamp-1 flex-1 mr-2">
-            {{ item.description }}
-          </p>
-
-          <span
-            v-if="item.customizations && item.customizations.length > 0"
-            class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-medium whitespace-nowrap max-w-[80px] truncate"
-            :title="defaultOptionNames || '詳細で選択'"
-          >
-            {{ defaultOptionNames || 'カスタマイズ' }}
-          </span>
-        </div>
+        <!-- Description (now 2 lines) -->
+        <p class="text-[10px] sm:text-xs text-gray-500 line-clamp-2 transition-all">
+          {{ item.description }}
+        </p>
       </div>
     </div>
   </div>
@@ -145,7 +147,9 @@ const defaultOptionNames = computed(() => {
   props.item.customizationGroups.forEach((group) => {
     // Only show if required or has defaults
     if (group.min_selection > 0 || group.options.some((o) => o.is_default)) {
-      const groupDefaults = group.options.filter((o) => o.is_default).map((o) => o.name);
+      const groupDefaults = group.options
+        .filter((o) => o.is_default)
+        .map((o) => `${group.name}: ${o.name}`);
       if (groupDefaults.length > 0) {
         names.push(...groupDefaults);
       }
