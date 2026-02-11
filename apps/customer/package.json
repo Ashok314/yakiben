@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node ../../scripts/sync-assets.js && vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "yarn run -T eslint . --ext .ts,.js,.vue",
+    "format": "yarn run -T prettier --write ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",

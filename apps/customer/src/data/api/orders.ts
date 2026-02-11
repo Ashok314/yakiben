@@ -5,23 +5,31 @@ import { STORAGE_KEYS } from '../../constants';
 export const ordersApi = {
   // Create a new order
   async createOrder(orderData: Partial<Order>): Promise<any> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('Unauthorized');
-
-    console.log('Creating order with payload:', orderData);
 
     // Cast to any to cleanly access properties and avoid Partial<T> checks
     const payload = orderData as any;
 
     // 1. Update Profile (if customer data exists)
     if (payload.customer) {
-      const { name, phone, address: customerAddress, company, postalCode: custPostalCode } = payload.customer;
+      const {
+        name,
+        phone,
+        address: customerAddress,
+        company,
+        postalCode: custPostalCode,
+      } = payload.customer;
       const nameParts = (name || '').split(' ');
       const fName = nameParts[0] || '';
       const lName = nameParts.slice(1).join(' ') || '';
 
-      const addressStr = typeof customerAddress === 'string' ? customerAddress :
-        `${customerAddress?.postalCode || ''} ${customerAddress?.prefecture || ''} ${customerAddress?.city || ''} ${customerAddress?.street || ''}`.trim();
+      const addressStr =
+        typeof customerAddress === 'string'
+          ? customerAddress
+          : `${customerAddress?.postalCode || ''} ${customerAddress?.prefecture || ''} ${customerAddress?.city || ''} ${customerAddress?.street || ''}`.trim();
 
       let postcode = custPostalCode || ''; // Prefer top-level postalCode
 
@@ -41,7 +49,7 @@ export const ordersApi = {
         tel: phone,
         address: addressStr,
         postcode: postcode,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
       if (company) updatePayload.corporate_name = company;
 
@@ -66,7 +74,7 @@ export const ordersApi = {
       status: 'pending',
       payment_method: payload.paymentMethod || 'cash',
       payment_status: payload.paymentMethod === 'paypay' ? 'pending' : 'pending',
-      notes: payload.notes
+      notes: payload.notes,
     };
 
     const { data: order, error: orderError } = await supabase
@@ -90,7 +98,7 @@ export const ordersApi = {
           menu_item_id: item.item.id,
           quantity: item.quantity,
           price_at_order: item.item.price,
-          line_total: item.subtotal
+          line_total: item.subtotal,
         })
         .select()
         .single();
@@ -104,7 +112,7 @@ export const ordersApi = {
       if (item.customizations && item.customizations.length > 0) {
         const customizationInserts = item.customizations.map((optId: any) => ({
           order_item_id: orderItem.id,
-          customization_option_id: typeof optId === 'string' ? optId : optId.id
+          customization_option_id: typeof optId === 'string' ? optId : optId.id,
         }));
 
         const { error: custError } = await supabase
@@ -126,7 +134,7 @@ export const ordersApi = {
       const finalOrder = {
         ...orderData, // Use original payload for local state
         id: order.id || payload.id,
-        trackingId: order.tracking_id || payload.trackingId
+        trackingId: order.tracking_id || payload.trackingId,
       };
 
       const existingIndex = orders.findIndex((o: any) => o.id === finalOrder.id);
@@ -163,7 +171,9 @@ export const ordersApi = {
     // 2. Fetch Fresh Data from Supabase (Source of Truth)
     const { data: apiData, error } = await supabase
       .from('orders')
-      .select('*, items:order_items(*, menu_item:menu_items(*), customizations:order_item_customizations(customization_option_id))')
+      .select(
+        '*, items:order_items(*, menu_item:menu_items(*), customizations:order_item_customizations(customization_option_id))'
+      )
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -183,14 +193,17 @@ export const ordersApi = {
             description: i.menu_item?.description || '', // Added default
             category: i.menu_item?.category || '',
             image: i.menu_item?.image || '',
-            available: true
+            available: true,
           },
           quantity: Number(i.quantity),
-          subtotal: Number(i.line_total || (i.quantity * i.price_at_order)),
-          customizations: i.customizations?.map((c: any) => c.customization_option_id) || []
+          subtotal: Number(i.line_total || i.quantity * i.price_at_order),
+          customizations: i.customizations?.map((c: any) => c.customization_option_id) || [],
         }));
 
-        const calculatedTotal = items.reduce((sum: number, item: any) => sum + (item.subtotal || 0), 0);
+        const calculatedTotal = items.reduce(
+          (sum: number, item: any) => sum + (item.subtotal || 0),
+          0
+        );
 
         return {
           id: o.id,
@@ -209,9 +222,9 @@ export const ordersApi = {
             address: {
               street: '',
               city: '',
-              postalCode: ''
-            }
-          }
+              postalCode: '',
+            },
+          },
         } as Order;
       });
 
@@ -229,7 +242,7 @@ export const ordersApi = {
     // Backend technically supports filtering by trackingId in getOrders
     // But let's reuse getOrders for now or implement specific endpoint if optimized
     const orders = await this.getOrders();
-    return orders.find(o => o.trackingId === trackingId) || null;
+    return orders.find((o) => o.trackingId === trackingId) || null;
   },
 
   // Update an order (staff/manager role usually required)
@@ -242,12 +255,15 @@ export const ordersApi = {
   // Get most recent pending order
   async getMostRecentPendingOrder(): Promise<Order | null> {
     const orders = await this.getOrders();
-    // Filter for current user if backend doesn't? 
+    // Filter for current user if backend doesn't?
     // Currently backend returns all, which is a leak, but we can't fix backend logic easily right now.
     // We assume backend might later filter.
 
-    return orders
-      .filter(order => !['completed', 'cancelled'].includes(order.status))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] || null;
-  }
+    return (
+      orders
+        .filter((order) => !['completed', 'cancelled'].includes(order.status))
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0] ||
+      null
+    );
+  },
 };

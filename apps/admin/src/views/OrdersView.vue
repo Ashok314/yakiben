@@ -3,9 +3,16 @@
     <!-- Tabs -->
     <div class="mb-4">
       <div class="flex border-b border-gray-300">
-        <button v-for="(label, key) in UI_TEXTS.orders.tabs" :key="key" @click="activeTab = key"
-          :class="['px-4 py-2', activeTab === key ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500']"
-          class="focus:outline-none">
+        <button
+          v-for="(label, key) in UI_TEXTS.orders.tabs"
+          :key="key"
+          @click="activeTab = key"
+          :class="[
+            'px-4 py-2',
+            activeTab === key ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500',
+          ]"
+          class="focus:outline-none"
+        >
           {{ label }}
         </button>
       </div>
@@ -20,28 +27,46 @@
           <option value="tomorrow">Tomorrow</option>
           <option value="specific">Specific Date</option>
         </select>
-        <input v-if="selectedDateFilter === 'specific'" type="date" v-model="specificDate"
-          class="form-input border rounded px-2 py-1 bg-white" />
+        <input
+          v-if="selectedDateFilter === 'specific'"
+          type="date"
+          v-model="specificDate"
+          class="form-input border rounded px-2 py-1 bg-white"
+        />
       </div>
 
       <div class="flex items-center space-x-2">
-        <span class="text-sm font-bold text-gray-700">{{ UI_TEXTS.orders.deliveryList.filters.postalCodeLabel }}</span>
-        <input v-model="postalCodeFilter" type="text" placeholder="e.g. 100"
-          class="border rounded px-2 py-1 w-24 bg-white" />
+        <span class="text-sm font-bold text-gray-700">{{
+          UI_TEXTS.orders.deliveryList.filters.postalCodeLabel
+        }}</span>
+        <input
+          v-model="postalCodeFilter"
+          type="text"
+          placeholder="e.g. 100"
+          class="border rounded px-2 py-1 w-24 bg-white"
+        />
       </div>
 
       <div class="flex items-center space-x-2 flex-grow">
-        <input v-model="searchQuery" type="text" :placeholder="UI_TEXTS.orders.deliveryList.filters.searchPlaceholder"
-          class="border rounded px-2 py-1 w-full max-w-xs bg-white" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          :placeholder="UI_TEXTS.orders.deliveryList.filters.searchPlaceholder"
+          class="border rounded px-2 py-1 w-full max-w-xs bg-white"
+        />
       </div>
     </div>
 
     <!-- Kitchen Prep Tab (Batch) -->
     <div v-if="activeTab === 'kitchenPrep'">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">{{ UI_TEXTS.orders.kitchenPrep.title }} - {{ selectedDateDisplay }}</h2>
-        <button @click="printBatchPrep"
-          class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center">
+        <h2 class="text-xl font-bold">
+          {{ UI_TEXTS.orders.kitchenPrep.title }} - {{ selectedDateDisplay }}
+        </h2>
+        <button
+          @click="printBatchPrep"
+          class="px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 flex items-center justify-center"
+        >
           <PrinterIcon class="h-5 w-5 mr-2" />
           {{ UI_TEXTS.orders.kanban.buttons.print }}
         </button>
@@ -49,10 +74,18 @@
       <table class="table-auto w-full text-left border-collapse border border-gray-200">
         <thead class="bg-gray-100">
           <tr>
-            <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.orders.kitchenPrep.headers.item }}</th>
-            <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.orders.kitchenPrep.headers.customs }}</th>
-            <th class="border border-gray-300 px-4 py-2 text-center">{{ UI_TEXTS.orders.kitchenPrep.headers.qty }}</th>
-            <th class="border border-gray-300 px-4 py-2">{{ UI_TEXTS.orders.kitchenPrep.headers.comments }}</th>
+            <th class="border border-gray-300 px-4 py-2">
+              {{ UI_TEXTS.orders.kitchenPrep.headers.item }}
+            </th>
+            <th class="border border-gray-300 px-4 py-2">
+              {{ UI_TEXTS.orders.kitchenPrep.headers.customs }}
+            </th>
+            <th class="border border-gray-300 px-4 py-2 text-center">
+              {{ UI_TEXTS.orders.kitchenPrep.headers.qty }}
+            </th>
+            <th class="border border-gray-300 px-4 py-2">
+              {{ UI_TEXTS.orders.kitchenPrep.headers.comments }}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -63,16 +96,22 @@
                 <li v-for="(custom, i) in item.customizations" :key="i">• {{ custom }}</li>
               </ul>
             </td>
-            <td class="border border-gray-300 px-4 py-2 text-center font-bold text-lg text-blue-600">{{ item.quantity }}
+            <td
+              class="border border-gray-300 px-4 py-2 text-center font-bold text-lg text-blue-600"
+            >
+              {{ item.quantity }}
             </td>
             <td class="border border-gray-300 px-4 py-2 text-sm">
               <div v-for="(comment, idx) in item.comments" :key="idx" class="mb-1 leading-tight">
-                <span class="text-blue-600 font-bold">#{{ comment.orderNumber }}</span>: {{ comment.text }}
+                <span class="text-blue-600 font-bold">#{{ comment.orderNumber }}</span
+                >: {{ comment.text }}
               </div>
             </td>
           </tr>
           <tr v-if="groupedPrepItems.length === 0">
-            <td colspan="4" class="text-center py-8 text-gray-400 italic">No items found for this selection.</td>
+            <td colspan="4" class="text-center py-8 text-gray-400 italic">
+              No items found for this selection.
+            </td>
           </tr>
         </tbody>
       </table>
@@ -81,18 +120,26 @@
     <!-- Delivery List Tab (Area Grouping) -->
     <div v-if="activeTab === 'deliveryList'">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">{{ UI_TEXTS.orders.deliveryList.title }} - {{ selectedDateDisplay }}</h2>
+        <h2 class="text-xl font-bold">
+          {{ UI_TEXTS.orders.deliveryList.title }} - {{ selectedDateDisplay }}
+        </h2>
         <div class="flex gap-2">
-          <button @click="batchUpdateStatus('delivering')"
-            class="px-3 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600">
+          <button
+            @click="batchUpdateStatus('delivering')"
+            class="px-3 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600"
+          >
             {{ UI_TEXTS.orders.deliveryList.batchActions.markDelivering }}
           </button>
-          <button @click="batchUpdateStatus('completed')"
-            class="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">
+          <button
+            @click="batchUpdateStatus('completed')"
+            class="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+          >
             {{ UI_TEXTS.orders.deliveryList.batchActions.markCompleted }}
           </button>
-          <button @click="printDeliveryList"
-            class="px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 flex items-center">
+          <button
+            @click="printDeliveryList"
+            class="px-3 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 flex items-center"
+          >
             <PrinterIcon class="h-4 w-4 mr-1" />
             {{ UI_TEXTS.orders.kanban.buttons.print }}
           </button>
@@ -104,12 +151,18 @@
           <thead class="bg-gray-100 text-xs font-bold uppercase text-gray-600">
             <tr>
               <th class="px-4 py-3 border-b">{{ UI_TEXTS.orders.deliveryList.headers.time }}</th>
-              <th class="px-4 py-3 border-b">{{ UI_TEXTS.orders.deliveryList.headers.customer }}</th>
+              <th class="px-4 py-3 border-b">
+                {{ UI_TEXTS.orders.deliveryList.headers.customer }}
+              </th>
               <th class="px-4 py-3 border-b">{{ UI_TEXTS.orders.deliveryList.headers.company }}</th>
               <th class="px-4 py-3 border-b">{{ UI_TEXTS.orders.deliveryList.headers.address }}</th>
               <th class="px-4 py-3 border-b">{{ UI_TEXTS.orders.deliveryList.headers.items }}</th>
-              <th class="px-4 py-3 border-b text-right">{{ UI_TEXTS.orders.deliveryList.headers.total }}</th>
-              <th class="px-4 py-3 border-b text-center">{{ UI_TEXTS.orders.deliveryList.headers.status }}</th>
+              <th class="px-4 py-3 border-b text-right">
+                {{ UI_TEXTS.orders.deliveryList.headers.total }}
+              </th>
+              <th class="px-4 py-3 border-b text-center">
+                {{ UI_TEXTS.orders.deliveryList.headers.status }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -125,7 +178,9 @@
               </tr>
               <!-- Group Orders -->
               <tr v-for="order in group" :key="order.id" class="hover:bg-gray-50 border-b text-sm">
-                <td class="px-4 py-3 font-medium text-gray-700">{{ formatTime(order.deliveryTime) }}</td>
+                <td class="px-4 py-3 font-medium text-gray-700">
+                  {{ formatTime(order.deliveryTime) }}
+                </td>
                 <td class="px-4 py-3">
                   <div class="font-bold">#{{ order.trackingId }}</div>
                   <div class="text-xs text-gray-500">{{ order.customer.name }}</div>
@@ -138,22 +193,32 @@
                 <td class="px-4 py-3 text-xs">
                   <div v-for="item in order.items" :key="item.id">
                     {{ item.quantity }}x {{ item.name }}
-                    <div v-if="item.options && item.options.length" class="text-xs text-gray-500 pl-4">
-                      {{item.options.map(o => o.name).join(', ')}}
+                    <div
+                      v-if="item.options && item.options.length"
+                      class="text-xs text-gray-500 pl-4"
+                    >
+                      {{ item.options.map((o) => o.name).join(', ') }}
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-right font-bold text-gray-900">¥{{ order.total.toFixed(0) }}</td>
+                <td class="px-4 py-3 text-right font-bold text-gray-900">
+                  ¥{{ order.total.toFixed(0) }}
+                </td>
                 <td class="px-4 py-3 text-center">
-                  <select v-model="order.status" @change="manualStatusUpdate(order)" class="text-xs border rounded p-1"
-                    :class="getStatusBg(order.status)">
+                  <select
+                    v-model="order.status"
+                    @change="manualStatusUpdate(order)"
+                    class="text-xs border rounded p-1"
+                    :class="getStatusBg(order.status)"
+                  >
                     <option v-for="s in STATUS_FLOW" :key="s" :value="s">{{ s }}</option>
                   </select>
                 </td>
               </tr>
             </template>
             <tr v-if="filteredDailyOrders.length === 0">
-              <td colspan="7" class="text-center py-12 text-gray-400 italic">No orders found for this area/selection.
+              <td colspan="7" class="text-center py-12 text-gray-400 italic">
+                No orders found for this area/selection.
               </td>
             </tr>
           </tbody>
@@ -166,7 +231,12 @@
       <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold">{{ UI_TEXTS.orders.title }}</h1>
         <label class="flex items-center space-x-2 bg-white px-2 py-1 rounded border shadow-sm">
-          <input type="checkbox" v-model="hideDeliveredAndDelivering" class="form-checkbox text-blue-500" checked>
+          <input
+            type="checkbox"
+            v-model="hideDeliveredAndDelivering"
+            class="form-checkbox text-blue-500"
+            checked
+          />
           <span class="text-sm">{{ UI_TEXTS.orders.hideDeliveredAndDeliveringLabel }}</span>
         </label>
       </div>
@@ -174,20 +244,31 @@
       <div class="flex flex-col md:flex-row gap-4 pb-16">
         <!-- Kanban Board -->
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-auto">
-          <div v-for="status in filteredStatuses" :key="status"
-            :class="getStatusColor(status) + ' p-4 rounded-xl shadow-sm border'">
-            <h2 class="text-xs font-black mb-4 uppercase tracking-widest text-gray-600 flex justify-between">
+          <div
+            v-for="status in filteredStatuses"
+            :key="status"
+            :class="getStatusColor(status) + ' p-4 rounded-xl shadow-sm border'"
+          >
+            <h2
+              class="text-xs font-black mb-4 uppercase tracking-widest text-gray-600 flex justify-between"
+            >
               {{ status }}
-              <span class="bg-white bg-opacity-50 px-2 py-0.5 rounded-full">{{ filteredOrdersByStatus[status].length
-                }}</span>
+              <span class="bg-white bg-opacity-50 px-2 py-0.5 rounded-full">{{
+                filteredOrdersByStatus[status].length
+              }}</span>
             </h2>
 
-            <div v-for="order in filteredOrdersByStatus[status]" :key="order.id"
+            <div
+              v-for="order in filteredOrdersByStatus[status]"
+              :key="order.id"
               class="bg-white p-4 rounded-lg mb-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100"
-              @click="selectOrder(order)">
+              @click="selectOrder(order)"
+            >
               <div class="flex justify-between items-start mb-2">
                 <div class="text-sm font-black">#{{ order.trackingId }}</div>
-                <div class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 uppercase">
+                <div
+                  class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 uppercase"
+                >
                   {{ formatTime(order.deliveryTime) }}
                 </div>
               </div>
@@ -196,12 +277,18 @@
               <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
                 <span class="font-black text-blue-600">¥{{ order.total.toFixed(0) }}</span>
                 <div class="flex gap-1">
-                  <button v-if="order.status !== 'pending'" @click.stop="updateOrderStatus(order, 'prev')"
-                    class="p-1 text-gray-400 hover:text-gray-600">
+                  <button
+                    v-if="order.status !== 'pending'"
+                    @click.stop="updateOrderStatus(order, 'prev')"
+                    class="p-1 text-gray-400 hover:text-gray-600"
+                  >
                     <ArrowLeftIcon class="h-4 w-4" />
                   </button>
-                  <button v-if="canUpdateStatus(order)" @click.stop="updateOrderStatus(order)"
-                    class="p-1 text-blue-500 hover:text-blue-700">
+                  <button
+                    v-if="canUpdateStatus(order)"
+                    @click.stop="updateOrderStatus(order)"
+                    class="p-1 text-blue-500 hover:text-blue-700"
+                  >
                     <ArrowRightIcon class="h-4 w-4" />
                   </button>
                 </div>
@@ -211,19 +298,30 @@
         </div>
 
         <!-- Full-Screen Modal for Order Details -->
-        <div v-if="selectedOrder"
+        <div
+          v-if="selectedOrder"
           class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 transition-all"
-          @click.self="closeOrderDetail">
-          <div class="bg-white w-full max-w-2xl p-8 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button @click="closeOrderDetail" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600">
+          @click.self="closeOrderDetail"
+        >
+          <div
+            class="bg-white w-full max-w-2xl p-8 rounded-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto"
+          >
+            <button
+              @click="closeOrderDetail"
+              class="absolute top-6 right-6 text-gray-400 hover:text-gray-600"
+            >
               <XMarkIcon class="h-6 w-6" />
             </button>
 
             <div class="flex items-center gap-3 mb-6">
               <h2 class="text-3xl font-black">#{{ selectedOrder.trackingId }}</h2>
               <span
-                :class="getStatusColor(selectedOrder.status) + ' px-3 py-1 rounded-full text-xs font-black uppercase'">{{
-                  selectedOrder.status }}</span>
+                :class="
+                  getStatusColor(selectedOrder.status) +
+                  ' px-3 py-1 rounded-full text-xs font-black uppercase'
+                "
+                >{{ selectedOrder.status }}</span
+              >
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
@@ -232,13 +330,19 @@
                   <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Customer</p>
                   <p class="font-black text-lg">{{ selectedOrder.customer.name }}</p>
                   <p class="text-sm text-gray-600">{{ selectedOrder.customer.phone }}</p>
-                  <p v-if="selectedOrder.customer.company" class="mt-2 text-xs italic text-blue-500 font-bold">{{
-                    selectedOrder.customer.company }}</p>
+                  <p
+                    v-if="selectedOrder.customer.company"
+                    class="mt-2 text-xs italic text-blue-500 font-bold"
+                  >
+                    {{ selectedOrder.customer.company }}
+                  </p>
                 </div>
               </div>
               <div class="space-y-4">
                 <div class="p-4 bg-gray-50 rounded-xl">
-                  <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Delivery Address</p>
+                  <p class="text-[10px] font-black text-gray-400 uppercase mb-2">
+                    Delivery Address
+                  </p>
                   <p class="text-sm font-bold">[{{ selectedOrder.customer.address.postalCode }}]</p>
                   <p class="text-sm">{{ selectedOrder.customer.address.street }}</p>
                 </div>
@@ -256,11 +360,18 @@
                   </tr>
                 </thead>
                 <tbody class="text-sm">
-                  <tr v-for="item in selectedOrder.items" :key="item.id" class="border-b last:border-0">
+                  <tr
+                    v-for="item in selectedOrder.items"
+                    :key="item.id"
+                    class="border-b last:border-0"
+                  >
                     <td class="py-3">
                       <div class="font-bold">{{ item.name }}</div>
-                      <div v-if="item.options && item.options.length" class="text-xs text-gray-500 mt-1">
-                        + {{item.options.map(o => o.name).join(', ')}}
+                      <div
+                        v-if="item.options && item.options.length"
+                        class="text-xs text-gray-500 mt-1"
+                      >
+                        + {{ item.options.map((o) => o.name).join(', ') }}
                       </div>
                     </td>
                     <td class="py-3 text-center align-top">x{{ item.quantity }}</td>
@@ -285,8 +396,14 @@
 import { ref, computed, onMounted } from 'vue';
 import type { Order, OrderItem } from '../types/types';
 import { ordersApi } from '../api/orders';
-import { ArrowLeftIcon, ArrowRightIcon, PrinterIcon, XMarkIcon, MapPinIcon } from '@heroicons/vue/24/solid';
-import { UI_TEXTS } from "../constants/ui-texts";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  PrinterIcon,
+  XMarkIcon,
+  MapPinIcon,
+} from '@heroicons/vue/24/solid';
+import { UI_TEXTS } from '../constants/ui-texts';
 
 const activeTab = ref<keyof typeof UI_TEXTS.orders.tabs>('deliveryList');
 const orders = ref<Order[]>([]);
@@ -314,42 +431,52 @@ const fetchOrders = async () => {
 
 const selectedDateDisplay = computed(() => {
   if (selectedDateFilter.value === 'today') return new Date().toLocaleDateString();
-  if (selectedDateFilter.value === 'tomorrow') return new Date(Date.now() + 86400000).toLocaleDateString();
-  if (selectedDateFilter.value === 'specific' && specificDate.value) return new Date(specificDate.value).toLocaleDateString();
+  if (selectedDateFilter.value === 'tomorrow')
+    return new Date(Date.now() + 86400000).toLocaleDateString();
+  if (selectedDateFilter.value === 'specific' && specificDate.value)
+    return new Date(specificDate.value).toLocaleDateString();
   return '--';
 });
 
 const filteredDailyOrders = computed(() => {
   const targetDateStr = selectedDateDisplay.value;
-  return orders.value.filter(order => {
-    // 1. Date Filter
-    const matchesDate = order.deliveryTime ? new Date(order.deliveryTime).toLocaleDateString() === targetDateStr : false;
-    if (!matchesDate) return false;
+  return orders.value
+    .filter((order) => {
+      // 1. Date Filter
+      const matchesDate = order.deliveryTime
+        ? new Date(order.deliveryTime).toLocaleDateString() === targetDateStr
+        : false;
+      if (!matchesDate) return false;
 
-    // 2. Postal Code Filter
-    if (postalCodeFilter.value && !order.customer.address.postalCode.includes(postalCodeFilter.value)) return false;
+      // 2. Postal Code Filter
+      if (
+        postalCodeFilter.value &&
+        !order.customer.address.postalCode.includes(postalCodeFilter.value)
+      )
+        return false;
 
-    // 3. Search Query
-    if (searchQuery.value) {
-      const q = searchQuery.value.toLowerCase();
-      const matchesSearch =
-        order.trackingId.toLowerCase().includes(q) ||
-        order.customer.name.toLowerCase().includes(q) ||
-        (order.customer.company && order.customer.company.toLowerCase().includes(q));
-      if (!matchesSearch) return false;
-    }
+      // 3. Search Query
+      if (searchQuery.value) {
+        const q = searchQuery.value.toLowerCase();
+        const matchesSearch =
+          order.trackingId.toLowerCase().includes(q) ||
+          order.customer.name.toLowerCase().includes(q) ||
+          (order.customer.company && order.customer.company.toLowerCase().includes(q));
+        if (!matchesSearch) return false;
+      }
 
-    return true;
-  }).sort((a, b) => {
-    const timeA = a.deliveryTime ? new Date(a.deliveryTime).getTime() : 0;
-    const timeB = b.deliveryTime ? new Date(b.deliveryTime).getTime() : 0;
-    return timeA - timeB;
-  });
+      return true;
+    })
+    .sort((a, b) => {
+      const timeA = a.deliveryTime ? new Date(a.deliveryTime).getTime() : 0;
+      const timeB = b.deliveryTime ? new Date(b.deliveryTime).getTime() : 0;
+      return timeA - timeB;
+    });
 });
 
 const ordersByPostalCode = computed(() => {
   const groups: Record<string, Order[]> = {};
-  filteredDailyOrders.value.forEach(order => {
+  filteredDailyOrders.value.forEach((order) => {
     const pc = order.customer.address.postalCode || 'Other';
     if (!groups[pc]) groups[pc] = [];
     groups[pc].push(order);
@@ -358,7 +485,15 @@ const ordersByPostalCode = computed(() => {
 });
 
 const groupedPrepItems = computed(() => {
-  const itemMap: Record<string, { name: string; customizations: string[]; quantity: number; comments: { text: string; orderNumber: string }[] }> = {};
+  const itemMap: Record<
+    string,
+    {
+      name: string;
+      customizations: string[];
+      quantity: number;
+      comments: { text: string; orderNumber: string }[];
+    }
+  > = {};
 
   filteredDailyOrders.value.forEach((order: Order) => {
     order.items.forEach((item: OrderItem) => {
@@ -368,7 +503,12 @@ const groupedPrepItems = computed(() => {
 
       if (itemName) {
         if (!itemMap[itemKey]) {
-          itemMap[itemKey] = { name: itemName, customizations: itemOptions, quantity: 0, comments: [] };
+          itemMap[itemKey] = {
+            name: itemName,
+            customizations: itemOptions,
+            quantity: 0,
+            comments: [],
+          };
         }
         itemMap[itemKey].quantity += item.quantity;
         if (order.comments) {
@@ -382,14 +522,20 @@ const groupedPrepItems = computed(() => {
 });
 
 const filteredOrdersByStatus = computed(() => {
-  return STATUS_FLOW.reduce((acc: Record<string, Order[]>, status: string) => {
-    acc[status] = filteredDailyOrders.value.filter((order: Order) => {
-      const matchesStatus = order.status === status;
-      const isVisible = !(hideDeliveredAndDelivering.value && (order.status === 'completed' || order.status === 'delivering'));
-      return matchesStatus && isVisible;
-    });
-    return acc;
-  }, {} as Record<string, Order[]>);
+  return STATUS_FLOW.reduce(
+    (acc: Record<string, Order[]>, status: string) => {
+      acc[status] = filteredDailyOrders.value.filter((order: Order) => {
+        const matchesStatus = order.status === status;
+        const isVisible = !(
+          hideDeliveredAndDelivering.value &&
+          (order.status === 'completed' || order.status === 'delivering')
+        );
+        return matchesStatus && isVisible;
+      });
+      return acc;
+    },
+    {} as Record<string, Order[]>
+  );
 });
 
 const filteredStatuses = computed(() => {
@@ -435,9 +581,14 @@ const updateOrderStatus = async (order: Order, direction: 'next' | 'prev' = 'nex
 };
 
 const batchUpdateStatus = async (status: string) => {
-  if (!confirm(`Are you sure you want to mark all ${filteredDailyOrders.value.length} orders as ${status}?`)) return;
+  if (
+    !confirm(
+      `Are you sure you want to mark all ${filteredDailyOrders.value.length} orders as ${status}?`
+    )
+  )
+    return;
 
-  const promises = filteredDailyOrders.value.map(order =>
+  const promises = filteredDailyOrders.value.map((order) =>
     ordersApi.updateOrderStatus(order.id, status)
   );
 
@@ -447,26 +598,37 @@ const batchUpdateStatus = async (status: string) => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'pending': return 'bg-orange-100 text-orange-800 border-orange-200';
-    case 'accepted': return 'bg-blue-100 text-blue-800 border-blue-200';
-    case 'preparing': return 'bg-purple-100 text-purple-800 border-purple-200';
-    case 'ready': return 'bg-green-100 text-green-800 border-green-200';
-    case 'delivering': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    case 'completed': return 'bg-gray-100 text-gray-800 border-gray-200';
-    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 'pending':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'accepted':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'preparing':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
+    case 'ready':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'delivering':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'completed':
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
 const getStatusBg = (status: string) => {
   switch (status) {
-    case 'ready': return 'bg-green-100 text-green-800';
-    case 'delivering': return 'bg-yellow-100 text-yellow-800';
-    case 'completed': return 'bg-gray-100 text-gray-800';
-    default: return 'bg-white';
+    case 'ready':
+      return 'bg-green-100 text-green-800';
+    case 'delivering':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'completed':
+      return 'bg-gray-100 text-gray-800';
+    default:
+      return 'bg-white';
   }
 };
 
-const calculateTimeRemaining = (createdAt: string) => {
+const _calculateTimeRemaining = (createdAt: string) => {
   const now = new Date();
   const createdTime = new Date(createdAt);
   const diffInMs = now.getTime() - createdTime.getTime();
@@ -492,14 +654,18 @@ const printBatchPrep = () => {
         <table>
           <thead><tr><th>Item</th><th>Customizations</th><th>Qty</th><th>Notes (Order#)</th></tr></thead>
           <tbody>
-            ${groupedPrepItems.value.map(item => `
+            ${groupedPrepItems.value
+              .map(
+                (item) => `
               <tr>
                 <td><strong>${item.name}</strong></td>
                 <td>${item.customizations.join(', ')}</td>
                 <td class="qty">${item.quantity}</td>
-                <td>${item.comments.map(c => `#${c.orderNumber}: ${c.text}`).join('<br>')}</td>
+                <td>${item.comments.map((c) => `#${c.orderNumber}: ${c.text}`).join('<br>')}</td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
           </tbody>
         </table>
       </body>
@@ -528,7 +694,9 @@ const printDeliveryList = () => {
       </head>
       <body>
         <h1>Delivery Routes - ${selectedDateDisplay.value}</h1>
-        ${Object.entries(ordersByPostalCode.value).map(([pc, group]) => `
+        ${Object.entries(ordersByPostalCode.value)
+          .map(
+            ([pc, group]) => `
           <div class="group">
             <div class="area-head">AREA: ${pc} (${group.length} orders)</div>
             <table>
@@ -538,7 +706,9 @@ const printDeliveryList = () => {
                 </tr>
               </thead>
               <tbody>
-                ${group.map(order => `
+                ${group
+                  .map(
+                    (order) => `
                   <tr>
                     <td>${formatTime(order.deliveryTime)}</td>
                     <td>#${order.trackingId}</td>
@@ -546,16 +716,25 @@ const printDeliveryList = () => {
                     <td>${order.customer.name}</td>
                     <td>${order.customer.phone}</td>
                      <td>${order.customer.address.street}</td>
-                     <td>${order.items.map(i => {
-    const opts = i.options && i.options.length ? ` (${i.options.map(o => o.name).join(', ')})` : '';
-    return `${i.quantity}x ${i.name}${opts}`;
-  }).join(', ')}</td>
+                     <td>${order.items
+                       .map((i) => {
+                         const opts =
+                           i.options && i.options.length
+                             ? ` (${i.options.map((o) => o.name).join(', ')})`
+                             : '';
+                         return `${i.quantity}x ${i.name}${opts}`;
+                       })
+                       .join(', ')}</td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </tbody>
             </table>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </body>
     </html>
   `;
@@ -566,6 +745,10 @@ const printDeliveryList = () => {
   win?.print();
 };
 
-const selectOrder = (order: Order) => { selectedOrder.value = order; };
-const closeOrderDetail = () => { selectedOrder.value = null; };
+const selectOrder = (order: Order) => {
+  selectedOrder.value = order;
+};
+const closeOrderDetail = () => {
+  selectedOrder.value = null;
+};
 </script>

@@ -31,7 +31,9 @@
     "vue-tsc": "^2.2.10"
   },
   "scripts": {
-    "lint": "eslint . --ext .ts,.vue",
+    "lint": "eslint . --ext .ts,.js,.vue",
+    "format": "prettier --write .",
+    "prepare": "husky",
     "build:customer": "yarn workspace customer build",
     "build:admin": "yarn workspace admin build"
   },

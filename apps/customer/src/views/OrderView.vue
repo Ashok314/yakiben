@@ -5,28 +5,64 @@
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
           <div class="flex items-center">
             <router-link to="/history" class="text-gray-600 hover:text-gray-900">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </router-link>
             <h1 class="text-xl font-bold ml-4">{{ UI_TEXT.order.detail.title }}</h1>
           </div>
           <div class="flex items-center space-x-2">
-            <button v-if="order" @click="printOrder" class="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-              title="印刷">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            <button
+              v-if="order"
+              @click="printOrder"
+              class="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              title="印刷"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                />
               </svg>
             </button>
-            <button v-if="order?.needReceipt" @click="printReceipt"
-              class="p-2 text-primary hover:text-primary-dark transition-colors" title="領収書を印刷">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+            <button
+              v-if="order?.needReceipt"
+              @click="printReceipt"
+              class="p-2 text-primary hover:text-primary-dark transition-colors"
+              title="領収書を印刷"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"
+                />
               </svg>
             </button>
           </div>
@@ -37,10 +73,19 @@
       <main v-if="isLoading" class="container mx-auto px-4 py-12 text-center">
         <div class="inline-block animate-spin mr-2">
           <svg class="w-8 h-8 text-primary" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-            </path>
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
         </div>
         <p class="text-gray-600 mt-4">{{ UI_TEXT.common.loading }}</p>
@@ -49,16 +94,27 @@
       <!-- Not Found -->
       <main v-else-if="!order" class="container mx-auto px-4 py-12">
         <div class="bg-white rounded-lg shadow-sm p-6 max-w-md mx-auto text-center space-y-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 mx-auto text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <h2 class="text-lg font-bold text-gray-900">{{ UI_TEXT.order.detail.notFound.title }}</h2>
           <p class="text-gray-600">{{ UI_TEXT.order.detail.notFound.message }}</p>
           <div class="pt-4">
-            <router-link to="/history"
-              class="inline-block bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary-dark transition-colors">
+            <router-link
+              to="/history"
+              class="inline-block bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary-dark transition-colors"
+            >
               {{ UI_TEXT.order.detail.notFound.action }}
             </router-link>
           </div>
@@ -75,13 +131,16 @@
               <div class="font-medium">{{ order.trackingId }}</div>
             </div>
             <div class="text-right">
-              <span :class="{
-                'text-green-600': order.status === 'completed',
-                'text-blue-600': order.status === 'delivering',
-                'text-orange-500': order.status === 'preparing',
-                'text-yellow-600': order.status === 'pending',
-                'text-red-600': order.status === 'cancelled'
-              }" class="font-medium">
+              <span
+                :class="{
+                  'text-green-600': order.status === 'completed',
+                  'text-blue-600': order.status === 'delivering',
+                  'text-orange-500': order.status === 'preparing',
+                  'text-yellow-600': order.status === 'pending',
+                  'text-red-600': order.status === 'cancelled',
+                }"
+                class="font-medium"
+              >
                 {{ (UI_TEXT.order.status as any)[order.status] || order.status }}
               </span>
               <div class="text-sm text-gray-500">
@@ -93,20 +152,26 @@
           <!-- Order Progress -->
           <div class="px-4 py-3 bg-gray-50">
             <div class="flex items-center space-x-2">
-              <span class="w-2 h-2 rounded-full" :class="{
-                'bg-green-500': order.status === 'completed',
-                'bg-blue-500 animate-pulse': order.status === 'delivering',
-                'bg-orange-500 animate-pulse': order.status === 'preparing',
-                'bg-yellow-500 animate-pulse': order.status === 'pending',
-                'bg-red-500': order.status === 'cancelled'
-              }"></span>
-              <span class="text-sm font-medium" :class="{
-                'text-green-800': order.status === 'completed',
-                'text-blue-800': order.status === 'delivering',
-                'text-orange-800': order.status === 'preparing',
-                'text-yellow-800': order.status === 'pending',
-                'text-red-800': order.status === 'cancelled'
-              }">
+              <span
+                class="w-2 h-2 rounded-full"
+                :class="{
+                  'bg-green-500': order.status === 'completed',
+                  'bg-blue-500 animate-pulse': order.status === 'delivering',
+                  'bg-orange-500 animate-pulse': order.status === 'preparing',
+                  'bg-yellow-500 animate-pulse': order.status === 'pending',
+                  'bg-red-500': order.status === 'cancelled',
+                }"
+              ></span>
+              <span
+                class="text-sm font-medium"
+                :class="{
+                  'text-green-800': order.status === 'completed',
+                  'text-blue-800': order.status === 'delivering',
+                  'text-orange-800': order.status === 'preparing',
+                  'text-yellow-800': order.status === 'pending',
+                  'text-red-800': order.status === 'cancelled',
+                }"
+              >
                 {{ (UI_TEXT.order.status as any)[order.status] || order.status }}
               </span>
             </div>
@@ -119,10 +184,17 @@
             <h2 class="font-bold">注文内容</h2>
           </div>
           <div class="divide-y">
-            <div v-for="item in order.items" :key="item.item.id" class="p-4 flex justify-between items-center">
+            <div
+              v-for="item in order.items"
+              :key="item.item.id"
+              class="p-4 flex justify-between items-center"
+            >
               <div class="flex items-center space-x-3">
-                <img :src="getImageUrl(getMenuItem(item.item.id)?.image || '')" :alt="item.item.name"
-                  class="w-16 h-16 object-cover rounded-lg" />
+                <img
+                  :src="getImageUrl(getMenuItem(item.item.id)?.image || '')"
+                  :alt="item.item.name"
+                  class="w-16 h-16 object-cover rounded-lg"
+                />
                 <div>
                   <div class="font-medium">{{ item.item.name }}</div>
                   <div class="text-sm text-gray-600">{{ item.quantity }}個</div>
@@ -131,9 +203,7 @@
                   </div>
                 </div>
               </div>
-              <div class="font-medium">
-                ¥{{ item.subtotal }}
-              </div>
+              <div class="font-medium">¥{{ item.subtotal }}</div>
             </div>
           </div>
           <div class="p-4 border-t bg-gray-50">
@@ -160,10 +230,16 @@
               <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.paymentMethod }}</div>
               <div class="flex items-center">
                 <span v-if="order.paymentMethod === 'paypay'" class="font-bold text-[#0095EE]">{{
-                  UI_TEXT.cart.payment.paypay }}</span>
+                  UI_TEXT.cart.payment.paypay
+                }}</span>
                 <span v-else>{{ UI_TEXT.cart.payment.cash }}</span>
-                <span class="text-sm text-gray-500 ml-2">({{ order.paymentStatus === 'completed' ?
-                  UI_TEXT.cart.payment.completed : UI_TEXT.cart.payment.pending }})</span>
+                <span class="text-sm text-gray-500 ml-2"
+                  >({{
+                    order.paymentStatus === 'completed'
+                      ? UI_TEXT.cart.payment.completed
+                      : UI_TEXT.cart.payment.pending
+                  }})</span
+                >
               </div>
             </div>
           </div>
@@ -171,21 +247,32 @@
 
         <!-- Action Buttons -->
         <div class="flex gap-4">
-          <button @click="reorder" :disabled="isReordering" class="flex-1 bg-primary text-white py-4 rounded-xl font-bold shadow-lg 
-                   hover:bg-primary-dark transition-all duration-300 transform 
-                   hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5
-                   disabled:opacity-50 disabled:cursor-not-allowed 
-                   disabled:transform-none disabled:shadow-none
-                   flex items-center justify-center">
+          <button
+            @click="reorder"
+            :disabled="isReordering"
+            class="flex-1 bg-primary text-white py-4 rounded-xl font-bold shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none flex items-center justify-center"
+          >
             <span v-if="isReordering" class="inline-block animate-spin mr-2">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
-            <span>{{ isReordering ? UI_TEXT.order.detail.action.reordering : UI_TEXT.order.detail.action.reorder
+            <span>{{
+              isReordering
+                ? UI_TEXT.order.detail.action.reordering
+                : UI_TEXT.order.detail.action.reorder
             }}</span>
           </button>
         </div>
@@ -195,14 +282,21 @@
       <div v-if="order" class="hidden print:block p-8">
         <div v-if="restaurantInfo" class="text-center mb-8 border-b pb-4">
           <h1 class="text-2xl font-bold mb-2">{{ restaurantInfo.name }}</h1>
-          <p class="text-sm">〒{{ restaurantInfo.address.postal }} {{ restaurantInfo.address.prefecture }}{{
-            restaurantInfo.address.city }}{{ restaurantInfo.address.line1 }}</p>
+          <p class="text-sm">
+            〒{{ restaurantInfo.address.postal }} {{ restaurantInfo.address.prefecture
+            }}{{ restaurantInfo.address.city }}{{ restaurantInfo.address.line1 }}
+          </p>
           <p class="text-sm">Tel: {{ restaurantInfo.phone }}</p>
         </div>
 
         <div class="mb-8">
-          <h2 class="text-xl font-bold mb-4 text-center border-b pb-2">{{ order.needReceipt ?
-            UI_TEXT.order.detail.print.receiptTitle : UI_TEXT.order.detail.print.orderTitle }}</h2>
+          <h2 class="text-xl font-bold mb-4 text-center border-b pb-2">
+            {{
+              order.needReceipt
+                ? UI_TEXT.order.detail.print.receiptTitle
+                : UI_TEXT.order.detail.print.orderTitle
+            }}
+          </h2>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.print.customerName }}</p>
@@ -227,7 +321,9 @@
             </div>
             <div class="text-right">
               <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.deliveryTime }}</p>
-              <p class="font-medium">{{ order.deliveryTime ? formatDateForPrint(order.deliveryTime) : '' }}</p>
+              <p class="font-medium">
+                {{ order.deliveryTime ? formatDateForPrint(order.deliveryTime) : '' }}
+              </p>
             </div>
           </div>
         </div>
@@ -295,8 +391,6 @@ const isLoading = ref(true);
 
 import { getImageUrl } from '../utils/image';
 
-const statusText = UI_TEXT.order.status;
-
 // Format date for display
 function formatDate(date: string | Date) {
   const d = new Date(date);
@@ -306,13 +400,13 @@ function formatDate(date: string | Date) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    weekday: 'short'
+    weekday: 'short',
   }).format(d);
 }
 
 // Helper to look up full menu item (including image)
 function getMenuItem(id: string) {
-  return menuItems.value.find(i => i.id === id);
+  return menuItems.value.find((i) => i.id === id);
 }
 
 // Helper for formatting address
@@ -322,13 +416,9 @@ function formatAddress(address: any) {
 
   // Handle object format
   const { postalCode, prefecture, city, street, building } = address as any;
-  return [
-    postalCode ? `〒${postalCode}` : '',
-    prefecture,
-    city,
-    street,
-    building
-  ].filter(Boolean).join(' ');
+  return [postalCode ? `〒${postalCode}` : '', prefecture, city, street, building]
+    .filter(Boolean)
+    .join(' ');
 }
 
 async function loadOrder() {
@@ -371,19 +461,25 @@ onMounted(async () => {
 
 const getCustomizationNames = (itemId: string, customizationIds: string[]) => {
   if (!customizationIds || !customizationIds.length) return '';
-  const item = menuItems.value.find(i => i.id === itemId);
+  const item = menuItems.value.find((i) => i.id === itemId);
   if (!item || !item.customizations) return '';
 
-  return customizationIds.map(id => {
-    const option = item.customizations?.find(c => c.id === id);
-    return option?.name;
-  }).filter(Boolean).join('、');
+  return customizationIds
+    .map((id) => {
+      const option = item.customizations?.find((c) => c.id === id);
+      return option?.name;
+    })
+    .filter(Boolean)
+    .join('、');
 };
 
 // Watch for route changes after initial mount
-watch(() => route.params.trackingId, (newId) => {
-  loadOrder();
-});
+watch(
+  () => route.params.trackingId,
+  (_newId) => {
+    loadOrder();
+  }
+);
 
 async function reorder() {
   if (isReordering.value || !order.value) return;
@@ -397,41 +493,24 @@ async function reorder() {
     // Add all items from the old order
     const { cartItems, saveCart } = useCart();
 
-    console.log('[Reorder] Order:', order.value);
-    console.log('[Reorder] Order Items:', order.value.items);
-    console.log('[Reorder] Order Items Type:', Array.isArray(order.value.items) ? 'Array' : typeof order.value.items);
-    console.log('[Reorder] Order Items Length:', order.value.items?.length);
-
-    order.value.items.forEach(orderItem => {
-      console.log('[Reorder] Processing Item:', orderItem);
-
+    order.value.items.forEach((orderItem) => {
       // Robust handling: Check if it's nested (formatted) or flat (legacy/raw)
       const itemData: any = orderItem.item ? orderItem.item : orderItem;
       const quantity = orderItem.quantity || 1;
-      const subtotal = orderItem.subtotal || (itemData.price * quantity);
+      const subtotal = orderItem.subtotal || itemData.price * quantity;
       const customizations = orderItem.customizations || [];
 
-      console.log('[Reorder] Pushing to cart:', { itemData, quantity });
-
-      // Look up full item from menuItems to ensure we have customization data for display
-      // itemData from Order API lacks customization definitions required by CartItem
-      const fullItem = menuItems.value.find(i => i.id === itemData.id) || itemData;
+      const fullItem = menuItems.value.find((i) => i.id === itemData.id) || itemData;
 
       cartItems.value.push({
         item: { ...fullItem },
         quantity: quantity,
         subtotal: subtotal,
-        customizations: [...customizations]
+        customizations: [...customizations],
       });
     });
 
-    console.log('[Reorder] After push, cartItems count:', cartItems.value.length);
-    console.log('[Reorder] After push, calling saveCart:', cartItems.value);
-
-    // Persist changes to local storage!
     saveCart();
-
-    console.log('[Reorder] Saved to localStorage');
 
     // Extract customer name parts
     const [lastName = '', firstName = ''] = (order.value.customer.name || '').split(' ');
@@ -448,8 +527,13 @@ async function reorder() {
       postalCode: isAddressObject ? (addressInfo as any).postalCode || '' : '',
       prefecture: isAddressObject ? (addressInfo as any).prefecture || '' : '',
       city: isAddressObject ? (addressInfo as any).city || '' : '',
-      addressLine: isAddressObject ? (addressInfo as any).street || '' : (typeof addressInfo === 'string' ? addressInfo : ''),
-      companyContact: typeof order.value.customer.phone === 'string' ? order.value.customer.phone : '',
+      addressLine: isAddressObject
+        ? (addressInfo as any).street || ''
+        : typeof addressInfo === 'string'
+          ? addressInfo
+          : '',
+      companyContact:
+        typeof order.value.customer.phone === 'string' ? order.value.customer.phone : '',
       needReceipt: !!order.value.needReceipt,
       notes: order.value.notes || '',
       paymentMethod: order.value.paymentMethod || 'cash',
@@ -462,7 +546,6 @@ async function reorder() {
 
     // Redirect to cart so user can select NEW date/time
     await router.push('/cart');
-
   } catch (error) {
     console.error('Reorder failed:', error);
   } finally {
@@ -488,7 +571,7 @@ function formatDateForPrint(date: string | Date) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    weekday: 'short'
+    weekday: 'short',
   }).format(d);
 }
 

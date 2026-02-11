@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100"
+  >
     <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
       <div class="px-8 py-10">
         <div class="text-center mb-8">
@@ -16,8 +18,8 @@
         <div class="mt-8 p-4 bg-blue-50 rounded-lg">
           <p class="text-sm text-blue-800 font-medium mb-2">ℹ️ Admin Access Required</p>
           <p class="text-xs text-blue-700">
-            Only authorized staff accounts can access this admin panel.
-            Please sign in with your registered Google account.
+            Only authorized staff accounts can access this admin panel. Please sign in with your
+            registered Google account.
           </p>
         </div>
       </div>
@@ -34,11 +36,12 @@ const router = useRouter();
 const authStore = useAuthStore();
 const error = ref('');
 
-const GOOGLE_CLIENT_ID = "228058456776-74ia8mkrg3jsqmgvmpgkfru3h6khv09v.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = '228058456776-74ia8mkrg3jsqmgvmpgkfru3h6khv09v.apps.googleusercontent.com';
 
 onMounted(() => {
   if (!GOOGLE_CLIENT_ID) {
-    error.value = 'Google Client ID not configured. Please add VITE_GOOGLE_CLIENT_ID to your .env file.';
+    error.value =
+      'Google Client ID not configured. Please add VITE_GOOGLE_CLIENT_ID to your .env file.';
     return;
   }
 
@@ -55,9 +58,7 @@ function initializeGoogleSignIn() {
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: async (response) => {
-      console.log('[LoginView] Google callback received', response);
       const result = await authStore.loginWithGoogle(response.credential);
-      console.log('[LoginView] loginWithGoogle result:', result);
 
       if (result.success) {
         router.push('/'); // Redirect to the admin dashboard

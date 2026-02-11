@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node ../../scripts/sync-assets.js && vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "yarn run -T eslint . --ext .ts,.js,.vue",
+    "format": "yarn run -T prettier --write ."
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.18",

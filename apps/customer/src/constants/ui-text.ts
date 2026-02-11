@@ -26,8 +26,8 @@ export const UI_TEXT = {
       quantity: '数量',
       customization: 'カスタマイズ',
       itemTotal: '商品合計',
-      cartTotal: 'カート合計',
-      addToCart: 'カートに追加',
+      cartTotal: '注文合計',
+      addToCart: '注文に追加',
       unavailable: '現在ご注文いただけません',
       units: '個',
     },
@@ -52,7 +52,7 @@ export const UI_TEXT = {
   },
   cart: {
     title: '注文内容',
-    empty: 'カートが空です',
+    empty: '注文が空です',
     backToMenu: 'メニューに戻る',
     total: '合計金額',
     customerInfo: 'お客様情報',
@@ -132,7 +132,8 @@ export const UI_TEXT = {
       paymentMethod: 'お支払い方法',
       notFound: {
         title: '注文が見つかりません',
-        message: '指定された注文が見つかりませんでした。\nURLを確認するか、注文履歴から選択してください。',
+        message:
+          '指定された注文が見つかりませんでした。\nURLを確認するか、注文履歴から選択してください。',
         action: '注文履歴に戻る',
       },
       print: {

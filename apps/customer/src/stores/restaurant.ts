@@ -1,109 +1,191 @@
 import { ref, computed } from 'vue';
+import { supabase } from '@yakiben/supabase';
+import { RESTAURANT_INFO } from '../config/restaurant';
 
 interface BusinessHours {
-    open: number;
-    close: number;
-    orderDeadline: number;
-    minAdvanceTime: number;
-    maxAdvanceDays: number;
-    businessDays: readonly number[];
-
-    holidays?: readonly string[]; // ISO Date strings "YYYY-MM-DD"
-    specialDays?: readonly string[]; // ISO Date strings "YYYY-MM-DD"
+  open: number;
+  close: number;
+  orderDeadline: number;
+  minAdvanceTime: number;
+  maxAdvanceDays: number;
+  businessDays: readonly number[];
+  holidays?: readonly string[];
+  specialDays?: readonly string[];
 }
 
 interface RestaurantInfo {
-    name: string;
-    address: {
-        postal: string;
-        prefecture: string;
-        city: string;
-        line1: string;
-    };
-    phone: string;
-    email: string;
-    hours: BusinessHours;
+  name: string;
+  app_name: string;
+  address: {
+    postal: string;
+    prefecture: string;
+    city: string;
+    line1: string;
+    googleMapUrl: string;
+  };
+  calendar_link: string;
+  sns: {
+    instagram: string;
+    x: string;
+    facebook: string;
+    line: string;
+    tiktok: string;
+    youtube: string;
+    google: string;
+  };
+  phone: string;
+  email: string;
+  recovery_form: string;
+  hours: BusinessHours;
 }
-
-import { supabase } from '@yakiben/supabase';
-import { RESTAURANT_INFO } from '../config/restaurant';
 
 const info = ref<RestaurantInfo>(RESTAURANT_INFO);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
-
 const isFetched = ref(false);
+const orderingEnabled = ref(true);
+const isGlobalError = ref(false);
+
+const DAY_MAP: Record<string, number> = {
+  Sunday: 0,
+  Sun: 0,
+  sunday: 0,
+  Monday: 1,
+  Mon: 1,
+  monday: 1,
+  Tuesday: 2,
+  Tue: 2,
+  tuesday: 2,
+  Wednesday: 3,
+  Wed: 3,
+  wednesday: 3,
+  Thursday: 4,
+  Thu: 4,
+  thursday: 4,
+  Friday: 5,
+  Fri: 5,
+  friday: 5,
+  Saturday: 6,
+  Sat: 6,
+  saturday: 6,
+};
+
+function parseHour(val: any): number {
+  return typeof val === 'string' ? parseInt(val.split(':')[0], 10) : Number(val);
+}
+
+function normalizeBusinessDays(days: any): readonly number[] {
+  if (!Array.isArray(days) || days.length === 0) return days;
+  if (typeof days[0] !== 'string') return days;
+
+  return days.map((d: string) => DAY_MAP[d] ?? -1).filter((d: number) => d !== -1);
+}
+
+function isObject(item: any): item is Record<string, any> {
+  return item && typeof item === 'object' && !Array.isArray(item);
+}
+
+function isEmpty(val: any): boolean {
+  if (val === null || val === undefined || val === '') return true;
+  if (Array.isArray(val) && val.length === 0) return true;
+  if (isObject(val) && Object.keys(val).length === 0) return true;
+  return false;
+}
+
+/**
+ * Deep merges server data into a fresh copy of the fallback data.
+ * If server value is "empty", the fallback value is retained.
+ */
+function mergeWithFallback<T extends Record<string, any>>(server: any, fallback: T): T {
+  // start with a deep copy of fallback
+  const result = JSON.parse(JSON.stringify(fallback));
+
+  if (!server || typeof server !== 'object') return result;
+
+  for (const key in result) {
+    const serverVal = server[key];
+
+    if (isObject(result[key])) {
+      // Nested object - recurse
+      result[key] = mergeWithFallback(serverVal, result[key]);
+    } else {
+      // Primitive or Array - take server if not empty
+      if (!isEmpty(serverVal)) {
+        result[key] = serverVal;
+      }
+    }
+  }
+  return result as T;
+}
 
 export const useRestaurantStore = () => {
-    async function fetchInfo() {
-        if (isFetched.value || isLoading.value) return;
+  async function fetchInfo() {
+    if (isFetched.value || isLoading.value) return;
 
-        isLoading.value = true;
-        try {
-            const { data, error: sbError } = await supabase
-                .from('settings')
-                .select('*');
+    isLoading.value = true;
+    isGlobalError.value = false;
 
-            if (sbError) throw sbError;
+    try {
+      const { data, error: sbError } = await supabase.from('settings').select('*');
 
-            if (data) {
-                // Convert settings array to object
-                const settingsObj: any = {};
-                data.forEach((s: any) => settingsObj[s.key] = s.value);
+      if (sbError) throw sbError;
 
-                info.value = {
-                    ...RESTAURANT_INFO,
-                    ...settingsObj,
-                    address: { ...RESTAURANT_INFO.address, ...(settingsObj.restaurant_address || {}) },
-                    phone: settingsObj.restaurant_phone || RESTAURANT_INFO.phone,
-                    email: settingsObj.restaurant_email || RESTAURANT_INFO.email,
-                    hours: {
-                        ...RESTAURANT_INFO.hours,
-                        ...(settingsObj.business_hours || {}),
-                    }
-                } as RestaurantInfo;
-
-                // Normalize Hours (Handle "10:00" strings from Admin)
-                if (info.value.hours) {
-                    const h = info.value.hours as any;
-
-                    // Helper to parse "10:00" or 10 to number 10
-                    const parseHour = (val: any) => {
-                        if (typeof val === 'string') return parseInt(val.split(':')[0], 10);
-                        return Number(val);
-                    };
-
-                    if (h.open !== undefined) info.value.hours.open = parseHour(h.open);
-                    if (h.close !== undefined) info.value.hours.close = parseHour(h.close);
-                    if (h.orderDeadline !== undefined) info.value.hours.orderDeadline = parseHour(h.orderDeadline);
-
-                    // Normalize Business Days (Handle ["Sunday", "Monday"] strings)
-                    if (Array.isArray(h.businessDays) && h.businessDays.length > 0 && typeof h.businessDays[0] === 'string') {
-                        const dayMap: Record<string, number> = {
-                            "Sunday": 0, "Sun": 0, "sunday": 0,
-                            "Monday": 1, "Mon": 1, "monday": 1,
-                            "Tuesday": 2, "Tue": 2, "tuesday": 2,
-                            "Wednesday": 3, "Wed": 3, "wednesday": 3,
-                            "Thursday": 4, "Thu": 4, "thursday": 4,
-                            "Friday": 5, "Fri": 5, "friday": 5,
-                            "Saturday": 6, "Sat": 6, "saturday": 6
-                        };
-                        info.value.hours.businessDays = h.businessDays.map((d: string) => dayMap[d] ?? -1).filter((d: number) => d !== -1);
-                    }
-                }
-                isFetched.value = true;
+      if (data && Array.isArray(data)) {
+        const settings: any = {};
+        data.forEach((s: any) => {
+          // Try to parse if it looks like JSON, otherwise keep as is
+          let val = s.value;
+          if (typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
+            try {
+              val = JSON.parse(val);
+            } catch {
+              /* ignore */
             }
-        } catch (e) {
-            error.value = String(e);
-        } finally {
-            isLoading.value = false;
-        }
-    }
+          }
+          settings[s.key] = val;
+        });
 
-    return {
-        info: computed(() => info.value),
-        isLoading: computed(() => isLoading.value),
-        error: computed(() => error.value),
-        fetchInfo
-    };
+        const serverData = {
+          name: settings.restaurant_name,
+          app_name: settings.app_name,
+          phone: settings.restaurant_phone,
+          email: settings.restaurant_email,
+          calendar_link: settings.calendar_link,
+          recovery_form: settings.recovery_form,
+          address: settings.restaurant_address,
+          sns: settings.sns,
+          hours: settings.business_hours,
+        };
+
+        info.value = mergeWithFallback(serverData, RESTAURANT_INFO);
+
+        orderingEnabled.value =
+          settings.ordering_enabled !== false && settings.ordering_enabled !== 'false';
+
+        // Normalize hours format
+        const hours = info.value.hours as any;
+        if (hours.open !== undefined) hours.open = parseHour(hours.open);
+        if (hours.close !== undefined) hours.close = parseHour(hours.close);
+        if (hours.orderDeadline !== undefined) hours.orderDeadline = parseHour(hours.orderDeadline);
+        if (hours.businessDays) hours.businessDays = normalizeBusinessDays(hours.businessDays);
+
+        isFetched.value = true;
+      }
+    } catch (e) {
+      console.error('Failed to fetch restaurant info, using fallback:', e);
+      error.value = String(e);
+      isGlobalError.value = true;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  return {
+    info: computed(() => info.value),
+    isLoading: computed(() => isLoading.value),
+    error: computed(() => error.value),
+    orderingEnabled: computed(() => orderingEnabled.value),
+    isError: computed(() => isGlobalError.value),
+    fetchInfo,
+  };
 };
