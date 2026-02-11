@@ -13,7 +13,9 @@ export async function fetchMenu() {
   try {
     const { data, error: sbError } = await supabase
       .from('menu_items')
-      .select('*, category:menu_categories(name), customization_groups(*, options:customization_options(*))')
+      .select(
+        '*, category:menu_categories(name), customization_groups(*, options:customization_options(*))'
+      )
       .eq('is_available', true);
 
     if (sbError) throw sbError;
@@ -27,28 +29,31 @@ export async function fetchMenu() {
         category: item.category?.name || 'その他',
         image: item.image_url,
         available: item.is_available,
-        customizations: item.customization_groups?.flatMap((g: any) =>
-          g.options?.map((o: any) => ({
-            id: o.id,
-            name: o.name,
-            price: o.price_add,
-            available: true,
-            is_default: o.is_default
-          })) || []
+        customizations: item.customization_groups?.flatMap(
+          (g: any) =>
+            g.options?.map((o: any) => ({
+              id: o.id,
+              name: o.name,
+              price: o.price_add,
+              available: true,
+              is_default: o.is_default,
+            })) || []
         ),
-        customizationGroups: item.customization_groups?.map((g: any) => ({
-          id: g.id,
-          name: g.name,
-          min_selection: g.is_required ? 1 : 0,
-          max_selection: g.max_selections || 1,
-          options: g.options?.map((o: any) => ({
-            id: o.id,
-            name: o.name,
-            price: o.price_add,
-            available: true,
-            is_default: o.is_default
-          })) || []
-        })) || []
+        customizationGroups:
+          item.customization_groups?.map((g: any) => ({
+            id: g.id,
+            name: g.name,
+            min_selection: g.is_required ? 1 : 0,
+            max_selection: g.max_selections || 1,
+            options:
+              g.options?.map((o: any) => ({
+                id: o.id,
+                name: o.name,
+                price: o.price_add,
+                available: true,
+                is_default: o.is_default,
+              })) || [],
+          })) || [],
       }));
     }
   } catch (e) {
@@ -61,11 +66,11 @@ export async function fetchMenu() {
 export const menuItems = computed(() => items.value);
 
 export const categories = computed(() =>
-  Array.from(new Set(items.value.map(i => i.category || 'その他')))
+  Array.from(new Set(items.value.map((i) => i.category || 'その他')))
 );
 
 export const getMenuItemsByCategory = (category: string) =>
-  computed(() => items.value.filter(i => (i.category || 'その他') === category));
+  computed(() => items.value.filter((i) => (i.category || 'その他') === category));
 
 const ORDER_CONSTANTS = {
   TRACKING_ID_LENGTH: 6,
@@ -74,7 +79,9 @@ const ORDER_CONSTANTS = {
 
 export function generateTrackingId(): string {
   return Array.from({ length: ORDER_CONSTANTS.TRACKING_ID_LENGTH }, () =>
-    ORDER_CONSTANTS.TRACKING_ID_CHARS.charAt(Math.floor(Math.random() * ORDER_CONSTANTS.TRACKING_ID_CHARS.length))
+    ORDER_CONSTANTS.TRACKING_ID_CHARS.charAt(
+      Math.floor(Math.random() * ORDER_CONSTANTS.TRACKING_ID_CHARS.length)
+    )
   ).join('');
 }
 

@@ -13,9 +13,9 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: OrdersView,
-        meta: { requiresAuth: true, roles: ['admin', 'manager', 'staff', 'driver'] }
+        meta: { requiresAuth: true, roles: ['admin', 'manager', 'staff', 'driver'] },
       },
-    ]
+    ],
   },
   {
     path: '/menu-management',
@@ -46,9 +46,9 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('./views/DeliveryView.vue'),
-        meta: { requiresAuth: true, roles: ['admin', 'driver', 'manager'] }
-      }
-    ]
+        meta: { requiresAuth: true, roles: ['admin', 'driver', 'manager'] },
+      },
+    ],
   },
   {
     path: '/settings',
@@ -57,9 +57,9 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('./views/SettingsView.vue'),
-        meta: { requiresAuth: true, roles: ['admin', 'manager'] }
-      }
-    ]
+        meta: { requiresAuth: true, roles: ['admin', 'manager'] },
+      },
+    ],
   },
   {
     path: '/account',
@@ -102,7 +102,7 @@ router.beforeEach(async (to, _from, next) => {
     // Basic polling or a more elegant watch could be used, but for simplicity:
     let attempts = 0;
     while (authStore.isInitialLoading && attempts < 20) {
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
       attempts++;
     }
   }

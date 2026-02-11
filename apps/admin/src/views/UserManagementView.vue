@@ -4,20 +4,33 @@
     <p class="mb-4">{{ UI_TEXTS.userManagement.description }}</p>
 
     <div class="mb-6 flex space-x-4 border-b">
-      <button @click="activeTab = USER_MANAGEMENT_TABS.STAFF"
-        :class="activeTab === USER_MANAGEMENT_TABS.STAFF ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
-        class="pb-2 font-medium">
+      <button
+        @click="activeTab = USER_MANAGEMENT_TABS.STAFF"
+        :class="
+          activeTab === USER_MANAGEMENT_TABS.STAFF
+            ? 'border-b-2 border-blue-500 text-blue-600'
+            : 'text-gray-500'
+        "
+        class="pb-2 font-medium"
+      >
         Admin Staff
       </button>
-      <button @click="activeTab = USER_MANAGEMENT_TABS.CUSTOMERS"
-        :class="activeTab === USER_MANAGEMENT_TABS.CUSTOMERS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
-        class="pb-2 font-medium">
+      <button
+        @click="activeTab = USER_MANAGEMENT_TABS.CUSTOMERS"
+        :class="
+          activeTab === USER_MANAGEMENT_TABS.CUSTOMERS
+            ? 'border-b-2 border-blue-500 text-blue-600'
+            : 'text-gray-500'
+        "
+        class="pb-2 font-medium"
+      >
         Customers
       </button>
     </div>
 
-
-    <table class="table-auto w-full border-collapse border border-gray-300 shadow-sm rounded-lg overflow-hidden">
+    <table
+      class="table-auto w-full border-collapse border border-gray-300 shadow-sm rounded-lg overflow-hidden"
+    >
       <thead>
         <tr class="bg-gray-50 text-left text-sm font-semibold text-gray-700">
           <th class="px-6 py-3 border-b">{{ UI_TEXTS.userManagement.tableHeaders.name }}</th>
@@ -31,20 +44,31 @@
           <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ user.name }}</td>
           <td class="px-6 py-4 text-sm text-gray-600">{{ user.email }}</td>
           <td class="px-6 py-4 text-sm">
-            <span :class="getRoleBadgeClass(user.role)" class="px-2 py-1 rounded-full text-xs font-semibold">
+            <span
+              :class="getRoleBadgeClass(user.role)"
+              class="px-2 py-1 rounded-full text-xs font-semibold"
+            >
               {{ user.role }}
             </span>
           </td>
           <td class="px-6 py-4 text-sm font-medium">
-            <button class="text-indigo-600 hover:text-indigo-900 mr-4" @click="openEditModal(user)">{{
-              UI_TEXTS.userManagement.actions.edit }}</button>
-            <button class="text-red-600 hover:text-red-900 font-medium" @click="openDeleteDialog(user.id)">{{
-              UI_TEXTS.userManagement.actions.delete }}</button>
+            <button class="text-indigo-600 hover:text-indigo-900 mr-4" @click="openEditModal(user)">
+              {{ UI_TEXTS.userManagement.actions.edit }}
+            </button>
+            <button
+              class="text-red-600 hover:text-red-900 font-medium"
+              @click="openDeleteDialog(user.id)"
+            >
+              {{ UI_TEXTS.userManagement.actions.delete }}
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
-    <div v-if="isEditModalOpen" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      v-if="isEditModalOpen"
+      class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+    >
       <div class="bg-white p-6 rounded shadow-lg w-96">
         <h2 class="text-xl font-bold mb-4">{{ UI_TEXTS.userManagement.modals.editUser.title }}</h2>
         <form @submit.prevent="saveUser">
@@ -56,8 +80,11 @@
           </div>
           <div class="mb-4">
             <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-            <select v-model="currentUser.role" id="role"
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            <select
+              v-model="currentUser.role"
+              id="role"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            >
               <optgroup label="Staff Roles">
                 <option :value="USER_ROLES.MANAGER">Manager</option>
                 <option :value="USER_ROLES.STAFF">Staff</option>
@@ -69,19 +96,26 @@
             </select>
           </div>
           <div class="flex justify-end gap-2">
-            <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="closeEditModal">{{
-              UI_TEXTS.userManagement.modals.editUser.buttons.cancel }}</button>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">{{
-              UI_TEXTS.userManagement.modals.editUser.buttons.save }}</button>
+            <button type="button" class="px-4 py-2 bg-gray-300 rounded" @click="closeEditModal">
+              {{ UI_TEXTS.userManagement.modals.editUser.buttons.cancel }}
+            </button>
+            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">
+              {{ UI_TEXTS.userManagement.modals.editUser.buttons.save }}
+            </button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Delete Confirmation Dialog -->
-    <ConfirmDialog v-if="isDeleteDialogOpen" :isOpen="isDeleteDialogOpen"
+    <ConfirmDialog
+      v-if="isDeleteDialogOpen"
+      :isOpen="isDeleteDialogOpen"
       :title="UI_TEXTS.userManagement.modals.deleteUser.title"
-      :message="UI_TEXTS.userManagement.modals.deleteUser.message" @cancel="closeDeleteDialog" @confirm="deleteUser" />
+      :message="UI_TEXTS.userManagement.modals.deleteUser.message"
+      @cancel="closeDeleteDialog"
+      @confirm="deleteUser"
+    />
   </div>
 </template>
 
@@ -90,7 +124,7 @@ import { ref, computed, onMounted } from 'vue';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
 import type { User, UserRole } from '../types/types';
 import { usersApi } from '../api/users';
-import { UI_TEXTS } from "../constants/ui-texts";
+import { UI_TEXTS } from '../constants/ui-texts';
 import { USER_ROLES, USER_MANAGEMENT_TABS } from '../constants/auth';
 import type { UserManagementTab } from '../constants/auth';
 
@@ -103,18 +137,25 @@ const activeTab = ref<UserManagementTab>(USER_MANAGEMENT_TABS.STAFF);
 
 const filteredUsers = computed(() => {
   if (activeTab.value === USER_MANAGEMENT_TABS.STAFF) {
-    return users.value.filter(u => ([USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER] as UserRole[]).includes(u.role));
+    return users.value.filter((u) =>
+      ([USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER] as UserRole[]).includes(u.role)
+    );
   }
-  return users.value.filter(u => u.role === USER_ROLES.CUSTOMER);
+  return users.value.filter((u) => u.role === USER_ROLES.CUSTOMER);
 });
 
 const getRoleBadgeClass = (role: UserRole) => {
   switch (role) {
-    case USER_ROLES.MANAGER: return 'bg-blue-100 text-blue-800';
-    case USER_ROLES.STAFF: return 'bg-green-100 text-green-800';
-    case USER_ROLES.DRIVER: return 'bg-orange-100 text-orange-800';
-    case USER_ROLES.CUSTOMER: return 'bg-gray-100 text-gray-800';
-    default: return 'bg-gray-100 text-gray-800';
+    case USER_ROLES.MANAGER:
+      return 'bg-blue-100 text-blue-800';
+    case USER_ROLES.STAFF:
+      return 'bg-green-100 text-green-800';
+    case USER_ROLES.DRIVER:
+      return 'bg-orange-100 text-orange-800';
+    case USER_ROLES.CUSTOMER:
+      return 'bg-gray-100 text-gray-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
   }
 };
 
@@ -173,5 +214,4 @@ const saveUser = async () => {
     console.error('Failed to save user:', error);
   }
 };
-
 </script>

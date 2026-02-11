@@ -8,10 +8,13 @@ const auth = useAuthStore();
 
 function parseHash(hash: string) {
   const params: Record<string, string> = {};
-  hash.replace(/^#/, '').split('&').forEach(pair => {
-    const [key, value] = pair.split('=');
-    if (key && value) params[key] = decodeURIComponent(value);
-  });
+  hash
+    .replace(/^#/, '')
+    .split('&')
+    .forEach((pair) => {
+      const [key, value] = pair.split('=');
+      if (key && value) params[key] = decodeURIComponent(value);
+    });
   return params;
 }
 

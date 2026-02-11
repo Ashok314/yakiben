@@ -5,9 +5,16 @@
     <!-- Tabs -->
     <div class="mb-4">
       <div class="flex border-b border-gray-300">
-        <button v-for="tab in tabs" :key="tab" @click="activeTab = tab"
-          :class="['px-4 py-2', activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500']"
-          class="focus:outline-none">
+        <button
+          v-for="tab in tabs"
+          :key="tab"
+          @click="activeTab = tab"
+          :class="[
+            'px-4 py-2',
+            activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500',
+          ]"
+          class="focus:outline-none"
+        >
           {{ tab }}
         </button>
       </div>
@@ -20,13 +27,19 @@
         <div class="mb-4">
           <span class="mr-2">{{ UI_TEXTS.orderSummary.quickFilterLabel }}</span>
           <select v-model="selectedQuickFilter" @change="applyQuickFilter" class="form-select">
-            <option v-for="(label, key) in UI_TEXTS.orderSummary.quickFilters" :key="key" :value="key">
+            <option
+              v-for="(label, key) in UI_TEXTS.orderSummary.quickFilters"
+              :key="key"
+              :value="key"
+            >
               {{ label }}
             </option>
           </select>
           <input type="date" v-model="startDate" class="form-input" />
           <input type="date" v-model="endDate" class="form-input" />
-          <button @click="clearFilters" class="bg-red-500 text-white px-4 py-2 rounded">Clear</button>
+          <button @click="clearFilters" class="bg-red-500 text-white px-4 py-2 rounded">
+            Clear
+          </button>
         </div>
 
         <!-- Grouping Filters -->
@@ -34,7 +47,12 @@
           <label class="flex items-center space-x-2">
             <span>{{ UI_TEXTS.orderSummary.groupByLabel }}</span>
             <select v-model="selectedDateRange" class="form-select">
-              <option v-for="(label, key) in UI_TEXTS.orderSummary.groupByOptions" :key="key" :value="key">{{ label }}
+              <option
+                v-for="(label, key) in UI_TEXTS.orderSummary.groupByOptions"
+                :key="key"
+                :value="key"
+              >
+                {{ label }}
               </option>
             </select>
           </label>
@@ -45,9 +63,15 @@
         <table class="table-auto w-full text-left border-collapse">
           <thead>
             <tr>
-              <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orderSummary.headers.date }}</th>
-              <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orderSummary.headers.totalOrders }}</th>
-              <th class="border-b border-gray-300 py-2">{{ UI_TEXTS.orderSummary.headers.totalRevenue }}</th>
+              <th class="border-b border-gray-300 py-2">
+                {{ UI_TEXTS.orderSummary.headers.date }}
+              </th>
+              <th class="border-b border-gray-300 py-2">
+                {{ UI_TEXTS.orderSummary.headers.totalOrders }}
+              </th>
+              <th class="border-b border-gray-300 py-2">
+                {{ UI_TEXTS.orderSummary.headers.totalRevenue }}
+              </th>
               <th class="border-b border-gray-300 py-2">Cash</th>
               <th class="border-b border-gray-300 py-2">Card</th>
               <th class="border-b border-gray-300 py-2">PayPay</th>
@@ -163,23 +187,38 @@ const clearFilters = () => {
 };
 
 const totalOrders = computed(() => {
-  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.totalOrders, 0);
+  return filteredSummaries.value.reduce(
+    (sum: number, summary: OrderSummary) => sum + summary.totalOrders,
+    0
+  );
 });
 
 const totalRevenue = computed(() => {
-  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.totalRevenue, 0);
+  return filteredSummaries.value.reduce(
+    (sum: number, summary: OrderSummary) => sum + summary.totalRevenue,
+    0
+  );
 });
 
 const totalCash = computed(() => {
-  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.cash, 0);
+  return filteredSummaries.value.reduce(
+    (sum: number, summary: OrderSummary) => sum + summary.cash,
+    0
+  );
 });
 
 const totalCard = computed(() => {
-  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.card, 0);
+  return filteredSummaries.value.reduce(
+    (sum: number, summary: OrderSummary) => sum + summary.card,
+    0
+  );
 });
 
 const totalPayPay = computed(() => {
-  return filteredSummaries.value.reduce((sum: number, summary: OrderSummary) => sum + summary.paypay, 0);
+  return filteredSummaries.value.reduce(
+    (sum: number, summary: OrderSummary) => sum + summary.paypay,
+    0
+  );
 });
 
 const groupedSummaries = computed(() => {
@@ -187,13 +226,30 @@ const groupedSummaries = computed(() => {
   if (selectedDateRange.value === 'daily') {
     return dataToGroup;
   } else if (selectedDateRange.value === 'weekly') {
-    const grouped: Record<string, { date: string; totalOrders: number; totalRevenue: number; cash: number; card: number; paypay: number }> = {};
+    const grouped: Record<
+      string,
+      {
+        date: string;
+        totalOrders: number;
+        totalRevenue: number;
+        cash: number;
+        card: number;
+        paypay: number;
+      }
+    > = {};
     dataToGroup.forEach((summary: OrderSummary) => {
       const week = new Date(summary.date);
       week.setDate(week.getDate() - week.getDay()); // Start of the week
       const weekKey = week.toISOString().split('T')[0];
       if (!grouped[weekKey]) {
-        grouped[weekKey] = { date: weekKey, totalOrders: 0, totalRevenue: 0, cash: 0, card: 0, paypay: 0 };
+        grouped[weekKey] = {
+          date: weekKey,
+          totalOrders: 0,
+          totalRevenue: 0,
+          cash: 0,
+          card: 0,
+          paypay: 0,
+        };
       }
       grouped[weekKey].totalOrders += summary.totalOrders;
       grouped[weekKey].totalRevenue += summary.totalRevenue;
@@ -203,12 +259,29 @@ const groupedSummaries = computed(() => {
     });
     return Object.values(grouped);
   } else if (selectedDateRange.value === 'monthly') {
-    const grouped: Record<string, { date: string; totalOrders: number; totalRevenue: number; cash: number; card: number; paypay: number }> = {};
+    const grouped: Record<
+      string,
+      {
+        date: string;
+        totalOrders: number;
+        totalRevenue: number;
+        cash: number;
+        card: number;
+        paypay: number;
+      }
+    > = {};
     dataToGroup.forEach((summary: OrderSummary) => {
       const month = new Date(summary.date);
       const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
       if (!grouped[monthKey]) {
-        grouped[monthKey] = { date: monthKey, totalOrders: 0, totalRevenue: 0, cash: 0, card: 0, paypay: 0 };
+        grouped[monthKey] = {
+          date: monthKey,
+          totalOrders: 0,
+          totalRevenue: 0,
+          cash: 0,
+          card: 0,
+          paypay: 0,
+        };
       }
       grouped[monthKey].totalOrders += summary.totalOrders;
       grouped[monthKey].totalRevenue += summary.totalRevenue;

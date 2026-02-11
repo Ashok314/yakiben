@@ -14,11 +14,15 @@ const STORAGE_KEY = 'yakiben-cart';
 const initialCart = localStorage.getItem(STORAGE_KEY);
 const cartItems = ref<CartItem[]>(initialCart ? JSON.parse(initialCart) : []);
 
-function calculateSubtotal(item: MenuItem, quantity: number, customizations: string[] = []): number {
+function calculateSubtotal(
+  item: MenuItem,
+  quantity: number,
+  customizations: string[] = []
+): number {
   let subtotal = item.price * quantity;
   if (item.customizations) {
-    customizations.forEach(customId => {
-      const customization = item.customizations?.find(c => c.id === customId);
+    customizations.forEach((customId) => {
+      const customization = item.customizations?.find((c) => c.id === customId);
       if (customization?.price) {
         subtotal += customization.price * quantity;
       }
@@ -44,8 +48,8 @@ const cartTotal = computed(() =>
 // Cart operations
 function addToCart(item: MenuItem, customizations: string[] = [], quantity: number = 1) {
   const existingItem = cartItems.value.find(
-    (i: CartItem) => i.item.id === item.id &&
-      JSON.stringify(i.customizations) === JSON.stringify(customizations)
+    (i: CartItem) =>
+      i.item.id === item.id && JSON.stringify(i.customizations) === JSON.stringify(customizations)
   );
 
   if (existingItem) {
@@ -57,7 +61,7 @@ function addToCart(item: MenuItem, customizations: string[] = [], quantity: numb
       item,
       quantity,
       customizations: customizations || [],
-      subtotal
+      subtotal,
     });
   }
   saveCart();
@@ -65,8 +69,8 @@ function addToCart(item: MenuItem, customizations: string[] = [], quantity: numb
 
 function removeFromCart(itemId: string, customizations: string[] = []) {
   const index = cartItems.value.findIndex(
-    (i: CartItem) => i.item.id === itemId &&
-      JSON.stringify(i.customizations) === JSON.stringify(customizations)
+    (i: CartItem) =>
+      i.item.id === itemId && JSON.stringify(i.customizations) === JSON.stringify(customizations)
   );
 
   if (index !== -1) {
@@ -77,8 +81,8 @@ function removeFromCart(itemId: string, customizations: string[] = []) {
 
 function updateQuantity(itemId: string, quantity: number, customizations: string[] = []) {
   const item = cartItems.value.find(
-    (i: CartItem) => i.item.id === itemId &&
-      JSON.stringify(i.customizations) === JSON.stringify(customizations)
+    (i: CartItem) =>
+      i.item.id === itemId && JSON.stringify(i.customizations) === JSON.stringify(customizations)
   );
 
   if (item) {
@@ -94,8 +98,8 @@ function updateQuantity(itemId: string, quantity: number, customizations: string
 
 function getItemQuantity(itemId: string, customizations: string[] = []): number {
   const item = cartItems.value.find(
-    (i: CartItem) => i.item.id === itemId &&
-      JSON.stringify(i.customizations) === JSON.stringify(customizations)
+    (i: CartItem) =>
+      i.item.id === itemId && JSON.stringify(i.customizations) === JSON.stringify(customizations)
   );
   return item?.quantity || 0;
 }
@@ -115,5 +119,5 @@ export const useCart = () => ({
   updateQuantity,
   getItemQuantity,
   clearCart,
-  saveCart
+  saveCart,
 });

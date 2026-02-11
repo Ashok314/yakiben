@@ -34,7 +34,14 @@ export interface CartItem {
   subtotal: number;
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled';
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'preparing'
+  | 'ready'
+  | 'delivering'
+  | 'completed'
+  | 'cancelled';
 export type PaymentStatus = 'pending' | 'completed';
 export type PaymentMethod = 'cash' | 'card' | 'paypay';
 
@@ -47,13 +54,15 @@ export interface Order {
     phone: string;
     company?: string;
     postalCode?: string; // Add explicit postalCode
-    address: string | {
-      street: string;
-      city: string;
-      postalCode: string;
-      prefecture?: string;
-      instructions?: string;
-    };
+    address:
+      | string
+      | {
+          street: string;
+          city: string;
+          postalCode: string;
+          prefecture?: string;
+          instructions?: string;
+        };
   };
   deliveryTime?: string;
   notes?: string;

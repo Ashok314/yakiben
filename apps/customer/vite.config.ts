@@ -10,12 +10,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@yakiben/supabase': path.resolve(__dirname, '../../libs/supabase/client.ts'),
-      axios: 'axios'
-    }
+      axios: 'axios',
+    },
   },
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-    }
-  }
+    },
+  },
 });

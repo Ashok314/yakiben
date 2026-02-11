@@ -1,13 +1,13 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import type { User, UserRole } from '../types/types'
-import { USER_ROLES } from '../constants/auth'
-import { supabase } from '@yakiben/supabase'
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
+import type { User, UserRole } from '../types/types';
+import { USER_ROLES } from '../constants/auth';
+import { supabase } from '@yakiben/supabase';
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
-  const isAuthenticated = ref(false)
-  const isInitialLoading = ref(true)
+  const user = ref<User | null>(null);
+  const isAuthenticated = ref(false);
+  const isInitialLoading = ref(true);
 
   // Initialize and listen to auth changes
   supabase.auth.onAuthStateChange(async (event, session) => {
@@ -18,9 +18,10 @@ export const useAuthStore = defineStore('auth', () => {
       user.value = {
         id: session.user.id,
         email: session.user.email || '',
-        name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'Admin User',
+        name:
+          session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'Admin User',
         picture: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
-        role
+        role,
       };
       isAuthenticated.value = true;
       localStorage.setItem('user', JSON.stringify(user.value));
@@ -33,7 +34,6 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   const loginWithGoogle = async (credential: string) => {
-
     // 1. Sign in with Supabase
     let data, error;
     try {
@@ -43,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       const signInPromise = supabase.auth.signInWithIdToken({
         provider: 'google',
-        token: credential
+        token: credential,
       });
 
       const result: any = await Promise.race([signInPromise, timeoutPromise]);
@@ -59,7 +59,6 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('[AuthStore] signInWithIdToken error:', error);
       return { success: false, message: error.message };
     }
-
 
     // 2. Check Role
     const { data: profile, error: profileError } = await supabase
@@ -88,12 +87,15 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
 
-    if (!profile || ![USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER].includes(profile.role as any)) {
+    if (
+      !profile ||
+      ![USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER].includes(profile.role as any)
+    ) {
       console.warn('[AuthStore] Access denied. Role:', profile?.role);
       await supabase.auth.signOut();
       return {
         success: false,
-        message: 'Access denied. Your account does not have admin privileges.'
+        message: 'Access denied. Your account does not have admin privileges.',
       };
     }
 
@@ -103,7 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
 
     if (error) return { success: false, message: error.message };
@@ -119,7 +121,7 @@ export const useAuthStore = defineStore('auth', () => {
       await supabase.auth.signOut();
       return {
         success: false,
-        message: 'Access denied. Your account does not have admin privileges.'
+        message: 'Access denied. Your account does not have admin privileges.',
       };
     }
 
@@ -136,7 +138,7 @@ export const useAuthStore = defineStore('auth', () => {
       .from('profiles')
       .update({
         f_name: updatedUser.name.split(' ')[0],
-        l_name: updatedUser.name.split(' ').slice(1).join(' ')
+        l_name: updatedUser.name.split(' ').slice(1).join(' '),
       })
       .eq('id', updatedUser.id);
 
@@ -154,5 +156,5 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     updateUser,
-  }
-})
+  };
+});
