@@ -5,8 +5,18 @@ export interface MenuItem {
   price: number;
   category: string;
   image: string;
-  customizations?: Customization[];
+  customizations?: Customization[]; // Keep for backward compatibility if needed, or deprecate
+  customizationGroups?: CustomizationGroup[];
   available: boolean;
+  quantity?: number; // UI state for menu list
+}
+
+export interface CustomizationGroup {
+  id: string;
+  name: string;
+  min_selection: number; // calculated from is_required
+  max_selection: number;
+  options: Customization[];
 }
 
 export interface Customization {
@@ -14,6 +24,7 @@ export interface Customization {
   name: string;
   price: number;
   available: boolean;
+  is_default?: boolean;
 }
 
 export interface CartItem {
@@ -23,7 +34,7 @@ export interface CartItem {
   subtotal: number;
 }
 
-export type OrderStatus = 'pending' | 'preparing' | 'delivering' | 'completed' | 'cancelled';
+export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivering' | 'completed' | 'cancelled';
 export type PaymentStatus = 'pending' | 'completed';
 export type PaymentMethod = 'cash' | 'card' | 'paypay';
 

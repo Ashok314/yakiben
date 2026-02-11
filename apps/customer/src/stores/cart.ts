@@ -42,20 +42,20 @@ const cartTotal = computed(() =>
 );
 
 // Cart operations
-function addToCart(item: MenuItem, customizations: string[] = []) {
+function addToCart(item: MenuItem, customizations: string[] = [], quantity: number = 1) {
   const existingItem = cartItems.value.find(
     (i: CartItem) => i.item.id === item.id &&
       JSON.stringify(i.customizations) === JSON.stringify(customizations)
   );
 
   if (existingItem) {
-    existingItem.quantity++;
+    existingItem.quantity += quantity;
     existingItem.subtotal = calculateSubtotal(item, existingItem.quantity, customizations);
   } else {
-    const subtotal = calculateSubtotal(item, 1, customizations);
+    const subtotal = calculateSubtotal(item, quantity, customizations);
     cartItems.value.push({
       item,
-      quantity: 1,
+      quantity,
       customizations: customizations || [],
       subtotal
     });

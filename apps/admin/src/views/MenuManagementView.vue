@@ -41,7 +41,7 @@
               </td>
               <td class="border border-gray-300 px-4 py-2">
                 <span v-if="item.outOfStock" class="text-red-500">{{ UI_TEXTS.menuManagement.itemStatus.outOfStock
-                }}</span>
+                  }}</span>
                 <span v-else class="text-green-500">{{ UI_TEXTS.menuManagement.itemStatus.available }}</span>
               </td>
               <td class="border border-gray-300 px-4 py-2">
@@ -67,13 +67,29 @@
       </div>
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="group in allCustomizations" :key="group.id" class="border p-4 rounded bg-gray-50 relative">
-          <button @click="confirmDeleteGroup(group.id)" class="absolute top-2 right-2 text-red-500 hover:text-red-700">
-            <XMarkIcon class="h-4 w-4" />
-          </button>
+          <div class="absolute top-2 right-2 flex gap-2">
+            <button @click="openEditGroupModal(group)" class="text-blue-500 hover:text-blue-700">
+              <!-- Edit Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+              </svg>
+            </button>
+            <button @click="confirmDeleteGroup(group.id)" class="text-red-500 hover:text-red-700">
+              <XMarkIcon class="h-4 w-4" />
+            </button>
+          </div>
           <h3 class="font-bold text-lg mb-2">{{ group.name }}</h3>
+          <div class="text-xs text-gray-500 mb-2">
+            <span v-if="group.is_required" class="bg-red-100 text-red-800 px-1 rounded mr-1">Required</span>
+            <span v-else class="bg-gray-200 text-gray-800 px-1 rounded mr-1">Optional</span>
+            <span class="bg-blue-100 text-blue-800 px-1 rounded">Max: {{ group.max_selections }}</span>
+          </div>
           <ul class="text-sm space-y-1">
             <li v-for="opt in group.options" :key="opt.id" class="flex justify-between">
-              <span>{{ opt.name }}</span>
+              <span>{{ opt.name }} <span v-if="opt.is_default"
+                  class="text-xs bg-green-100 text-green-800 px-1 rounded ml-1">Default</span></span>
               <span class="text-gray-600">+¥{{ opt.price_add }}</span>
             </li>
           </ul>
@@ -137,7 +153,7 @@
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
               required @input="handleImageInput" />
             <div v-if="currentItem.imageUrl && !imagePreviewError" class="mt-2">
-              <img :src="currentItem.imageUrl" alt="Preview" class="h-32 w-32 object-cover rounded border"
+              <img :src="getImageUrl(currentItem.imageUrl)" alt="Preview" class="h-32 w-32 object-cover rounded border"
                 @error="imagePreviewError = true" @load="imagePreviewError = false" />
             </div>
           </div>
@@ -149,7 +165,7 @@
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">{{
               UI_TEXTS.menuManagement.modals.form.optionsLabel
-            }}</label>
+              }}</label>
             <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border p-2 rounded">
               <label v-for="custom in allCustomizations" :key="custom.id" class="flex items-center space-x-2">
                 <input type="checkbox" :value="custom" v-model="currentItem.groups"
@@ -176,26 +192,47 @@
         <h2 class="text-2xl font-bold mb-4">{{ UI_TEXTS.menuManagement.modals.addGroup.title }}</h2>
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700">{{ UI_TEXTS.menuManagement.modals.form.groupNameLabel
-          }}</label>
+            }}</label>
           <input v-model="newGroup.name" type="text"
             class="mt-1 block w-full border-gray-300 rounded shadow-sm focus:ring-primary"
             :placeholder="UI_TEXTS.menuManagement.modals.form.groupNamePlaceholder" />
         </div>
+
+        <!-- Constraints -->
+        <div class="mb-4 grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Max Selections</label>
+            <input v-model.number="newGroup.max_selections" type="number" min="1"
+              class="mt-1 block w-full border-gray-300 rounded shadow-sm focus:ring-primary" />
+          </div>
+          <div class="flex items-end mb-2">
+            <label class="flex items-center space-x-2">
+              <input v-model="newGroup.is_required" type="checkbox" class="rounded text-primary focus:ring-primary" />
+              <span class="text-sm font-medium text-gray-700">Required (Min 1)</span>
+            </label>
+          </div>
+        </div>
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 mb-2">{{
             UI_TEXTS.menuManagement.modals.form.optionsLabel
-          }}</label>
-          <div v-for="(opt, idx) in newGroup.options" :key="idx" class="flex gap-2 mb-2">
+            }}</label>
+          <div v-for="(opt, idx) in newGroup.options" :key="idx" class="flex gap-2 mb-2 items-center"
+            v-show="!opt.delete">
             <input v-model="opt.name" type="text" :placeholder="UI_TEXTS.menuManagement.modals.form.nameLabel"
               class="flex-1 border-gray-300 rounded shadow-sm" />
             <input v-model.number="opt.price_add" type="number"
               :placeholder="UI_TEXTS.menuManagement.modals.form.priceLabel"
               class="w-20 border-gray-300 rounded shadow-sm" />
-            <button @click="newGroup.options.splice(idx, 1)" class="text-red-500">
+            <label class="flex items-center space-x-1 whitespace-nowrap">
+              <input v-model="opt.is_default" type="checkbox" class="rounded text-primary focus:ring-primary" />
+              <span class="text-xs text-gray-500">Default</span>
+            </label>
+            <button @click="opt.id ? opt.delete = true : newGroup.options.splice(idx, 1)" class="text-red-500">
               <XMarkIcon class="h-5 w-5" />
             </button>
           </div>
-          <button @click="newGroup.options.push({ name: '', price_add: 0 })"
+          <button
+            @click="newGroup.options.push({ id: undefined, name: '', price_add: 0, is_default: false, delete: false })"
             class="text-sm text-blue-500 hover:underline">
             {{ UI_TEXTS.menuManagement.modals.form.addOption }}
           </button>
@@ -221,6 +258,7 @@ import type { MenuItem } from '../types/types';
 import { menuApi } from '../api/menu';
 import { UI_TEXTS } from "../constants/ui-texts";
 import { XMarkIcon } from '@heroicons/vue/24/solid';
+import { getImageUrl } from '../utils/image';
 
 const activeTab = ref<keyof typeof UI_TEXTS.menuManagement.tabs>('items');
 const menuItems = ref<MenuItem[]>([]);
@@ -247,20 +285,72 @@ const unsavedChanges = ref(false);
 const imagePreviewError = ref(false);
 
 const isGroupModalOpen = ref(false);
-const newGroup = ref({ name: '', options: [{ name: '', price_add: 0 }] });
+const isEditingGroup = ref(false);
+const currentGroupId = ref<string | null>(null);
+const newGroup = ref({
+  name: '',
+  max_selections: 1,
+  is_required: false,
+  options: [{ id: undefined as string | undefined, name: '', price_add: 0, is_default: false, delete: false }]
+});
 
 const openAddGroupModal = () => {
-  newGroup.value = { name: '', options: [{ name: '', price_add: 0 }] };
+  isEditingGroup.value = false;
+  currentGroupId.value = null;
+  newGroup.value = {
+    name: '',
+    max_selections: 1,
+    is_required: false,
+    options: [{ id: undefined, name: '', price_add: 0, is_default: false, delete: false }]
+  };
+  isGroupModalOpen.value = true;
+};
+
+const openEditGroupModal = (group: any) => {
+  isEditingGroup.value = true;
+  currentGroupId.value = group.id;
+  // Deep copy options to avoid mutating original pending save
+  const optionsCopy = group.options.map((o: any) => ({ id: o.id, name: o.name, price_add: o.price_add, is_default: o.is_default || false, delete: false }));
+  newGroup.value = {
+    name: group.name,
+    max_selections: group.max_selections || 1,
+    is_required: group.is_required || false,
+    options: optionsCopy
+  };
   isGroupModalOpen.value = true;
 };
 
 const saveGroup = async () => {
   if (!newGroup.value.name) return;
-  const filteredOptions = newGroup.value.options.filter(o => o.name);
-  const id = await menuApi.addCustomizationGroup(newGroup.value.name, filteredOptions);
-  if (id) {
-    allCustomizations.value = await menuApi.getCustomizations();
-    isGroupModalOpen.value = false;
+  const filteredOptions = newGroup.value.options.filter(o => o.name && !o.delete); // Don't send empty new options
+  const deletedOptions = newGroup.value.options.filter(o => o.delete && o.id); // Options marked for deletion
+
+  const constraints = {
+    max_selection: newGroup.value.max_selections,
+    is_required: newGroup.value.is_required
+  };
+
+  if (isEditingGroup.value && currentGroupId.value) {
+    // Prepare options for update
+    // We need to send all: new, updated, deleted
+    const allOptions = [...filteredOptions, ...deletedOptions];
+
+    const success = await menuApi.updateCustomizationGroup(
+      currentGroupId.value,
+      newGroup.value.name,
+      allOptions,
+      constraints
+    );
+    if (success) {
+      allCustomizations.value = await menuApi.getCustomizations();
+      isGroupModalOpen.value = false;
+    }
+  } else {
+    const id = await menuApi.addCustomizationGroup(newGroup.value.name, filteredOptions, constraints);
+    if (id) {
+      allCustomizations.value = await menuApi.getCustomizations();
+      isGroupModalOpen.value = false;
+    }
   }
 };
 
@@ -385,24 +475,9 @@ const closeConfirmDialog = () => {
   isConfirmDialogOpen.value = false;
 };
 
-const convertGoogleDriveLink = (url: string): string => {
-  if (!url) return '';
-  // Check if it's a Google Drive "view" link
-  // Pattern: https://drive.google.com/file/d/{ID}/view...
-  const driveRegex = /\/file\/d\/([a-zA-Z0-9_-]+)\//;
-  const match = url.match(driveRegex);
-
-  if (match && match[1]) {
-    return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-  }
-  return url;
-};
 
 const handleImageInput = () => {
   imagePreviewError.value = false;
-  if (currentItem.value.imageUrl) {
-    currentItem.value.imageUrl = convertGoogleDriveLink(currentItem.value.imageUrl);
-  }
 };
 
 const addCategory = async (cat: string) => {

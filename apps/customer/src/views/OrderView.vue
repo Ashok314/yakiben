@@ -77,12 +77,12 @@
             <div class="text-right">
               <span :class="{
                 'text-green-600': order.status === 'completed',
-                'text-blue-600': order.status === 'delivering' || order.status === 'ready',
+                'text-blue-600': order.status === 'delivering',
                 'text-orange-500': order.status === 'preparing',
-                'text-yellow-600': order.status === 'pending' || order.status === 'confirmed',
+                'text-yellow-600': order.status === 'pending',
                 'text-red-600': order.status === 'cancelled'
               }" class="font-medium">
-                {{ statusText[order.status] }}
+                {{ (UI_TEXT.order.status as any)[order.status] || order.status }}
               </span>
               <div class="text-sm text-gray-500">
                 {{ formatDate(order.createdAt) }}
@@ -95,19 +95,19 @@
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 rounded-full" :class="{
                 'bg-green-500': order.status === 'completed',
-                'bg-blue-500 animate-pulse': order.status === 'delivering' || order.status === 'ready',
+                'bg-blue-500 animate-pulse': order.status === 'delivering',
                 'bg-orange-500 animate-pulse': order.status === 'preparing',
-                'bg-yellow-500 animate-pulse': order.status === 'pending' || order.status === 'confirmed',
+                'bg-yellow-500 animate-pulse': order.status === 'pending',
                 'bg-red-500': order.status === 'cancelled'
               }"></span>
               <span class="text-sm font-medium" :class="{
                 'text-green-800': order.status === 'completed',
-                'text-blue-800': order.status === 'delivering' || order.status === 'ready',
+                'text-blue-800': order.status === 'delivering',
                 'text-orange-800': order.status === 'preparing',
-                'text-yellow-800': order.status === 'pending' || order.status === 'confirmed',
+                'text-yellow-800': order.status === 'pending',
                 'text-red-800': order.status === 'cancelled'
               }">
-                {{ statusText[order.status] }}
+                {{ (UI_TEXT.order.status as any)[order.status] || order.status }}
               </span>
             </div>
           </div>
@@ -121,13 +121,13 @@
           <div class="divide-y">
             <div v-for="item in order.items" :key="item.item.id" class="p-4 flex justify-between items-center">
               <div class="flex items-center space-x-3">
-                <img :src="`/yakiben/customer${item.item.image}`" :alt="item.item.name"
+                <img :src="getImageUrl(getMenuItem(item.item.id)?.image || '')" :alt="item.item.name"
                   class="w-16 h-16 object-cover rounded-lg" />
                 <div>
                   <div class="font-medium">{{ item.item.name }}</div>
                   <div class="text-sm text-gray-600">{{ item.quantity }}個</div>
                   <div v-if="item.customizations?.length" class="text-sm text-gray-500">
-                    {{ item.customizations.join('、') }}
+                    {{ getCustomizationNames(item.item.id, item.customizations) }}
                   </div>
                 </div>
               </div>
@@ -145,33 +145,10 @@
         </div>
 
         <!-- Customer Info -->
-        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div class="p-4 border-b">
-            <h2 class="font-bold">お客様情報</h2>
-          </div>
-          <div class="p-4 space-y-3">
-            <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.name }}</div>
-              <div>{{ order.customerName }}</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.address }}</div>
-              <div>{{ order.companyAddress }}</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.phone }}</div>
-              <div>{{ order.companyContact }}</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.deliveryTime }}</div>
-              <div>{{ formatDate(order.deliveryTime) }}</div>
-            </div>
-            <div v-if="order.notes">
-              <div class="text-sm text-gray-500">{{ UI_TEXT.order.detail.notes }}</div>
-              <div>{{ order.notes }}</div>
-            </div>
-          </div>
-        </div>
+        <!-- Customer Info (Hidden as per request) -->
+        <!-- <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+             ... (Customer info hidden)
+        </div> -->
 
         <!-- Payment Info -->
         <div class="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -209,7 +186,7 @@
               </svg>
             </span>
             <span>{{ isReordering ? UI_TEXT.order.detail.action.reordering : UI_TEXT.order.detail.action.reorder
-              }}</span>
+            }}</span>
           </button>
         </div>
       </main>
@@ -229,7 +206,7 @@
           <div class="grid grid-cols-2 gap-2">
             <div>
               <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.print.customerName }}</p>
-              <p class="font-medium">{{ order.customerName }} 様</p>
+              <p class="font-medium">{{ order.customer.name }} 様</p>
             </div>
             <div class="text-right">
               <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.orderNumber }}</p>
@@ -238,8 +215,10 @@
           </div>
           <div class="mt-4">
             <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.print.deliveryAddress }}</p>
-            <p class="font-medium">{{ order.companyAddress }}</p>
-            <p class="font-medium">TEL: {{ order.companyContact }}</p>
+            <p class="font-medium">
+              {{ formatAddress(order.customer.address) }}
+            </p>
+            <p class="font-medium">TEL: {{ order.customer.phone }}</p>
           </div>
           <div class="mt-4 grid grid-cols-2 gap-2">
             <div>
@@ -248,7 +227,7 @@
             </div>
             <div class="text-right">
               <p class="text-sm text-gray-600">{{ UI_TEXT.order.detail.deliveryTime }}</p>
-              <p class="font-medium">{{ formatDateForPrint(order.deliveryTime) }}</p>
+              <p class="font-medium">{{ order.deliveryTime ? formatDateForPrint(order.deliveryTime) : '' }}</p>
             </div>
           </div>
         </div>
@@ -268,7 +247,7 @@
                 <td class="py-2">
                   {{ item.item.name }}
                   <div v-if="item.customizations?.length" class="text-sm text-gray-600">
-                    {{ item.customizations.join('、') }}
+                    {{ getCustomizationNames(item.item.id, item.customizations) }}
                   </div>
                 </td>
                 <td class="text-center py-2">{{ item.quantity }}</td>
@@ -298,6 +277,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { STORAGE_KEYS } from '../constants';
 import { useRestaurantStore } from '../stores/restaurant';
+import { menuItems, fetchMenu } from '../data/menu';
 
 const { info: restaurantInfo } = useRestaurantStore();
 import { UI_TEXT } from '../constants/ui-text';
@@ -313,6 +293,8 @@ const order = ref<Order | null>(null);
 const isReordering = ref(false);
 const isLoading = ref(true);
 
+import { getImageUrl } from '../utils/image';
+
 const statusText = UI_TEXT.order.status;
 
 // Format date for display
@@ -326,6 +308,27 @@ function formatDate(date: string | Date) {
     minute: '2-digit',
     weekday: 'short'
   }).format(d);
+}
+
+// Helper to look up full menu item (including image)
+function getMenuItem(id: string) {
+  return menuItems.value.find(i => i.id === id);
+}
+
+// Helper for formatting address
+function formatAddress(address: any) {
+  if (!address) return '住所情報なし';
+  if (typeof address === 'string') return address;
+
+  // Handle object format
+  const { postalCode, prefecture, city, street, building } = address as any;
+  return [
+    postalCode ? `〒${postalCode}` : '',
+    prefecture,
+    city,
+    street,
+    building
+  ].filter(Boolean).join(' ');
 }
 
 async function loadOrder() {
@@ -346,7 +349,9 @@ async function loadOrder() {
     }
 
     // Load order from API
-    const result = await ordersApi.getOrderByTrackingId(trackingId);
+    // Ensure trackingId is a string
+    const id = Array.isArray(trackingId) ? trackingId[0] : trackingId;
+    const result = await ordersApi.getOrderByTrackingId(id);
     order.value = result;
   } catch (error) {
     console.error('Failed to load order:', error);
@@ -357,9 +362,23 @@ async function loadOrder() {
 }
 
 // Initialize and handle route changes
-onMounted(() => {
+onMounted(async () => {
+  if (menuItems.value.length === 0) {
+    await fetchMenu();
+  }
   loadOrder();
 });
+
+const getCustomizationNames = (itemId: string, customizationIds: string[]) => {
+  if (!customizationIds || !customizationIds.length) return '';
+  const item = menuItems.value.find(i => i.id === itemId);
+  if (!item || !item.customizations) return '';
+
+  return customizationIds.map(id => {
+    const option = item.customizations?.find(c => c.id === id);
+    return option?.name;
+  }).filter(Boolean).join('、');
+};
 
 // Watch for route changes after initial mount
 watch(() => route.params.trackingId, (newId) => {
@@ -387,15 +406,19 @@ async function reorder() {
       console.log('[Reorder] Processing Item:', orderItem);
 
       // Robust handling: Check if it's nested (formatted) or flat (legacy/raw)
-      const itemData = orderItem.item ? orderItem.item : orderItem;
+      const itemData: any = orderItem.item ? orderItem.item : orderItem;
       const quantity = orderItem.quantity || 1;
       const subtotal = orderItem.subtotal || (itemData.price * quantity);
       const customizations = orderItem.customizations || [];
 
       console.log('[Reorder] Pushing to cart:', { itemData, quantity });
 
+      // Look up full item from menuItems to ensure we have customization data for display
+      // itemData from Order API lacks customization definitions required by CartItem
+      const fullItem = menuItems.value.find(i => i.id === itemData.id) || itemData;
+
       cartItems.value.push({
-        item: { ...itemData },
+        item: { ...fullItem },
         quantity: quantity,
         subtotal: subtotal,
         customizations: [...customizations]
@@ -415,18 +438,19 @@ async function reorder() {
 
     // Address is now an object
     const addressInfo = order.value.customer.address;
+    const isAddressObject = typeof addressInfo === 'object' && addressInfo !== null;
 
     // Construct customer info object safely
     const customerInfo = {
       lastName,
       firstName,
       companyName: '',
-      postalCode: addressInfo.postalCode || '',
-      prefecture: addressInfo.prefecture || '',
-      city: addressInfo.city || '',
-      addressLine: addressInfo.street || '',
-      companyContact: order.value.customer.phone || '',
-      needReceipt: order.value.needReceipt || false,
+      postalCode: isAddressObject ? (addressInfo as any).postalCode || '' : '',
+      prefecture: isAddressObject ? (addressInfo as any).prefecture || '' : '',
+      city: isAddressObject ? (addressInfo as any).city || '' : '',
+      addressLine: isAddressObject ? (addressInfo as any).street || '' : (typeof addressInfo === 'string' ? addressInfo : ''),
+      companyContact: typeof order.value.customer.phone === 'string' ? order.value.customer.phone : '',
+      needReceipt: !!order.value.needReceipt,
       notes: order.value.notes || '',
       paymentMethod: order.value.paymentMethod || 'cash',
     };

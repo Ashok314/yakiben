@@ -11,10 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Initialize and listen to auth changes
   supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('[AuthStore] onAuthStateChange event:', event);
     if (session?.user) {
-      // Don't fetch profile here to avoid hanging the auth flow
-      // Just set basic info from session first
       let role = (session.user.user_metadata?.role as UserRole) || USER_ROLES.STAFF;
       if ((role as string) === 'admin') role = USER_ROLES.MANAGER;
 
@@ -36,32 +33,10 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   const loginWithGoogle = async (credential: string) => {
-    console.log('[AuthStore] loginWithGoogle called', { credentialLen: credential?.length });
-    console.log('[AuthStore] Env Vars:', {
-      VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-      HAS_ANON_KEY: !!import.meta.env.VITE_SUPABASE_ANON_KEY
-    });
-    console.log('[AuthStore] Supabase Client internal url:', (supabase as any)['supabaseUrl']);
-
-    // DIAGNOSTIC START
-    console.log('[Diagnostic] 1. Testing Timer (1s)...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('[Diagnostic] 2. Timer Works!');
-
-    console.log('[Diagnostic] 3. Testing Fetch to Supabase...');
-    try {
-      const resp = await fetch((supabase as any)['supabaseUrl'], { method: 'HEAD' });
-      console.log('[Diagnostic] 4. Fetch Response:', resp.status);
-    } catch (err) {
-      console.error('[Diagnostic] 4. Fetch FAILED:', err);
-    }
-    // DIAGNOSTIC END
 
     // 1. Sign in with Supabase
     let data, error;
     try {
-      console.log('[AuthStore] Calling signInWithIdToken...');
-
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Supabase signInWithIdToken timed out after 10s')), 10000)
       );
@@ -73,7 +48,6 @@ export const useAuthStore = defineStore('auth', () => {
 
       const result: any = await Promise.race([signInPromise, timeoutPromise]);
 
-      console.log('[AuthStore] signInWithIdToken result:', result);
       data = result.data;
       error = result.error;
     } catch (e: any) {
@@ -86,10 +60,8 @@ export const useAuthStore = defineStore('auth', () => {
       return { success: false, message: error.message };
     }
 
-    console.log('[AuthStore] signInWithIdToken success:', data.user?.id);
 
     // 2. Check Role
-    console.log('[AuthStore] Checking profile role...');
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role, f_name, l_name')
@@ -101,7 +73,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     if (profile) {
-      console.log('[AuthStore] Updating user with DB profile role:', profile.role);
       if (user.value) {
         let role = profile.role as UserRole;
         if ((role as string) === 'admin') role = USER_ROLES.MANAGER;
@@ -117,7 +88,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
 
-    if (!profile || ![USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER].includes(profile.role)) {
+    if (!profile || ![USER_ROLES.MANAGER, USER_ROLES.STAFF, USER_ROLES.DRIVER].includes(profile.role as any)) {
       console.warn('[AuthStore] Access denied. Role:', profile?.role);
       await supabase.auth.signOut();
       return {
@@ -126,7 +97,6 @@ export const useAuthStore = defineStore('auth', () => {
       };
     }
 
-    console.log('[AuthStore] Access granted.');
     return { success: true };
   };
 

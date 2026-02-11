@@ -163,7 +163,7 @@ export const ordersApi = {
     // 2. Fetch Fresh Data from Supabase (Source of Truth)
     const { data: apiData, error } = await supabase
       .from('orders')
-      .select('*, items:order_items(*, menu_item:menu_items(*))')
+      .select('*, items:order_items(*, menu_item:menu_items(*), customizations:order_item_customizations(customization_option_id))')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -187,7 +187,7 @@ export const ordersApi = {
           },
           quantity: Number(i.quantity),
           subtotal: Number(i.line_total || (i.quantity * i.price_at_order)),
-          customizations: []
+          customizations: i.customizations?.map((c: any) => c.customization_option_id) || []
         }));
 
         const calculatedTotal = items.reduce((sum: number, item: any) => sum + (item.subtotal || 0), 0);

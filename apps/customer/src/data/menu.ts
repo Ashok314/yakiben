@@ -32,9 +32,23 @@ export async function fetchMenu() {
             id: o.id,
             name: o.name,
             price: o.price_add,
-            available: true // Option availability not in schema yet
+            available: true,
+            is_default: o.is_default
           })) || []
-        )
+        ),
+        customizationGroups: item.customization_groups?.map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          min_selection: g.is_required ? 1 : 0,
+          max_selection: g.max_selections || 1,
+          options: g.options?.map((o: any) => ({
+            id: o.id,
+            name: o.name,
+            price: o.price_add,
+            available: true,
+            is_default: o.is_default
+          })) || []
+        })) || []
       }));
     }
   } catch (e) {

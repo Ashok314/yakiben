@@ -109,7 +109,9 @@ export const UI_TEXT = {
   order: {
     status: {
       title: '注文状況',
-      pending: '準備中',
+      pending: '確認中',
+      preparing: '調理中',
+      delivering: '配達中',
       completed: '完了',
       cancelled: 'キャンセル',
       completed_long: 'お渡し完了',

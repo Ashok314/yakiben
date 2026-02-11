@@ -138,6 +138,9 @@
                 <td class="px-4 py-3 text-xs">
                   <div v-for="item in order.items" :key="item.id">
                     {{ item.quantity }}x {{ item.name }}
+                    <div v-if="item.options && item.options.length" class="text-xs text-gray-500 pl-4">
+                      {{item.options.map(o => o.name).join(', ')}}
+                    </div>
                   </div>
                 </td>
                 <td class="px-4 py-3 text-right font-bold text-gray-900">¥{{ order.total.toFixed(0) }}</td>
@@ -176,7 +179,7 @@
             <h2 class="text-xs font-black mb-4 uppercase tracking-widest text-gray-600 flex justify-between">
               {{ status }}
               <span class="bg-white bg-opacity-50 px-2 py-0.5 rounded-full">{{ filteredOrdersByStatus[status].length
-              }}</span>
+                }}</span>
             </h2>
 
             <div v-for="order in filteredOrdersByStatus[status]" :key="order.id"
@@ -254,9 +257,14 @@
                 </thead>
                 <tbody class="text-sm">
                   <tr v-for="item in selectedOrder.items" :key="item.id" class="border-b last:border-0">
-                    <td class="py-3 font-bold">{{ item.name }}</td>
-                    <td class="py-3 text-center">x{{ item.quantity }}</td>
-                    <td class="py-3 text-right">¥{{ item.price.toFixed(0) }}</td>
+                    <td class="py-3">
+                      <div class="font-bold">{{ item.name }}</div>
+                      <div v-if="item.options && item.options.length" class="text-xs text-gray-500 mt-1">
+                        + {{item.options.map(o => o.name).join(', ')}}
+                      </div>
+                    </td>
+                    <td class="py-3 text-center align-top">x{{ item.quantity }}</td>
+                    <td class="py-3 text-right align-top">¥{{ item.price.toFixed(0) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -537,8 +545,11 @@ const printDeliveryList = () => {
                     <td>${order.customer.company || '-'}</td>
                     <td>${order.customer.name}</td>
                     <td>${order.customer.phone}</td>
-                    <td>${order.customer.address.street}</td>
-                    <td>${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
+                     <td>${order.customer.address.street}</td>
+                     <td>${order.items.map(i => {
+    const opts = i.options && i.options.length ? ` (${i.options.map(o => o.name).join(', ')})` : '';
+    return `${i.quantity}x ${i.name}${opts}`;
+  }).join(', ')}</td>
                   </tr>
                 `).join('')}
               </tbody>

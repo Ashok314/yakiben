@@ -33,3 +33,7 @@ supabase
 
 ## temprorary clasp api
 apps/api
+
+# Shared Assets (synced from root public/assets)
+apps/admin/public/assets
+apps/customer/public/assets

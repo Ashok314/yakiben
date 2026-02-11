@@ -6,6 +6,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [vue()],
   base: '/yakiben/admin/',
+  publicDir: path.resolve(__dirname, '../../public'),
   resolve: {
     alias: {
       '@yakiben/supabase': path.resolve(__dirname, '../../libs/supabase/client.ts'),

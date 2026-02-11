@@ -168,11 +168,20 @@ export const menuApi = {
         return data || [];
     },
 
-    async addCustomizationGroup(name: string, options: { name: string, price_add: number }[]): Promise<string | null> {
+    async addCustomizationGroup(name: string, options: { name: string, price_add: number, is_default?: boolean }[], constraints: { min_selection?: number, max_selection?: number, is_required?: boolean } = {}): Promise<string | null> {
         // 1. Insert Group
         const { data: group, error: groupError } = await supabase
             .from('customization_groups')
-            .insert({ name })
+            .insert({
+                name,
+                max_selections: constraints.max_selection ?? 1,
+                is_required: constraints.is_required ?? false,
+                // min_selections: constraints.min_selection ?? 0 // Check if column exists, user says yes but schema file didn't show it. Safe to omit if not sure, or try insert.
+                // Assuming user is right and schema has it or we use is_required/max for now.
+                // The schema file `20260201150150_init_schema.sql` showed `max_selections` and `is_required`.
+                // It did NOT show `min_selections`.
+                // I will stick to what I saw in the schema: `max_selections` and `is_required`.
+            })
             .select()
             .single();
 
@@ -186,7 +195,8 @@ export const menuApi = {
             const optionsToInsert = options.map(opt => ({
                 group_id: group.id,
                 name: opt.name,
-                price_add: opt.price_add
+                price_add: opt.price_add,
+                is_default: !!opt.is_default
             }));
 
             const { error: optionsError } = await supabase
@@ -201,11 +211,20 @@ export const menuApi = {
         return group.id;
     },
 
-    async updateCustomizationGroup(groupId: string, name: string, options: { id?: string, name: string, price_add: number, delete?: boolean }[]): Promise<boolean> {
-        // 1. Update Group Name
+    async updateCustomizationGroup(
+        groupId: string,
+        name: string,
+        options: { id?: string, name: string, price_add: number, delete?: boolean }[],
+        constraints: { min_selection?: number, max_selection?: number, is_required?: boolean } = {}
+    ): Promise<boolean> {
+        // 1. Update Group Name & Constraints
+        const updates: any = { name };
+        if (constraints.max_selection !== undefined) updates.max_selections = constraints.max_selection;
+        if (constraints.is_required !== undefined) updates.is_required = constraints.is_required;
+
         const { error: groupError } = await supabase
             .from('customization_groups')
-            .update({ name })
+            .update(updates)
             .eq('id', groupId);
 
         if (groupError) return false;
@@ -217,13 +236,15 @@ export const menuApi = {
             } else if (opt.id) {
                 await supabase.from('customization_options').update({
                     name: opt.name,
-                    price_add: opt.price_add
+                    price_add: opt.price_add,
+                    is_default: !!(opt as any).is_default
                 }).eq('id', opt.id);
             } else {
                 await supabase.from('customization_options').insert({
                     group_id: groupId,
                     name: opt.name,
-                    price_add: opt.price_add
+                    price_add: opt.price_add,
+                    is_default: !!(opt as any).is_default
                 });
             }
         }

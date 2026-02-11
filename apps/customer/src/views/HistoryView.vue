@@ -34,15 +34,16 @@
       </div>
 
       <div v-else class="space-y-4">
-        <div v-for="order in sortedOrders" :key="order.id" class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div v-for="order in sortedOrders" :key="order.id" @click="$router.push(`/order/${order.trackingId}`)"
+          class="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
           <div class="p-4 border-b">
             <div class="flex justify-between items-start">
               <div>
                 <div class="font-medium text-gray-900">
-                  {{ order.customer?.name || 'お客様' }}
+                  注文番号: {{ order.trackingId }}
                 </div>
                 <div class="text-sm text-gray-500">
-                  {{ formatDate(order.deliveryTime) }}
+                  {{ order.deliveryTime ? formatDate(order.deliveryTime) : '日時未定' }}
                 </div>
                 <div class="text-sm text-gray-500 mt-1">
                   {{ order.items.length }}品
@@ -64,18 +65,6 @@
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="px-4 py-3 bg-gray-50 flex justify-between items-center">
-            <div class="text-sm text-gray-600">
-              注文番号: {{ order.trackingId }}
-            </div>
-            <div class="flex gap-2">
-              <router-link :to="`/order/${order.trackingId}`" class="px-4 py-2 font-medium text-primary bg-primary/10 rounded-lg
-                       hover:bg-primary/20 transition-colors">
-                詳細を見る
-              </router-link>
             </div>
           </div>
         </div>

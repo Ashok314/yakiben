@@ -3,10 +3,10 @@ import type { Database } from './types';
 type OrderRow = Database['public']['Tables']['orders']['Row'];
 
 // Create a new order
-export async function createOrder(order: Partial<OrderRow>): Promise<OrderRow[]> {
+export async function createOrder(order: Database['public']['Tables']['orders']['Insert']): Promise<OrderRow[]> {
   const { data, error } = await supabase.from('orders').insert([order]);
   if (error) throw error;
-  return data ?? [] 
+  return data ?? []
 }
 
 // Get all orders for a user
