@@ -3,10 +3,7 @@ import aspectRatio from '@tailwindcss/aspect-ratio';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -17,7 +14,7 @@ export default {
         secondary: {
           DEFAULT: 'var(--color-secondary)',
           dark: 'var(--color-secondary-dark)',
-        }
+        },
       },
       fontFamily: {
         sans: [
@@ -25,13 +22,10 @@ export default {
           'Hiragino Kaku Gothic ProN',
           '-apple-system',
           'BlinkMacSystemFont',
-          'sans-serif'
-        ]
-      }
+          'sans-serif',
+        ],
+      },
     },
   },
-  plugins: [
-    forms,
-    aspectRatio,
-  ],
-}
+  plugins: [forms, aspectRatio],
+};

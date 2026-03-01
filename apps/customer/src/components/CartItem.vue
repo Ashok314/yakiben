@@ -1,16 +1,23 @@
 <template>
   <div class="bg-white p-4">
     <div class="flex items-start gap-4">
-      <img 
-        :src="`/yakiben/customer${cartItem.item.image}`"
-        :alt="cartItem.item.name"
-        class="w-20 h-20 object-cover rounded-md bg-gray-100"
-      />
-      
+      <router-link :to="`/item/${cartItem.item.id}`" class="block shrink-0">
+        <img
+          :src="getImageUrl(cartItem.item.image)"
+          :alt="cartItem.item.name"
+          class="w-20 h-20 object-cover rounded-md bg-gray-100 hover:opacity-80 transition-opacity"
+        />
+      </router-link>
+
       <div class="flex-1">
         <div class="flex justify-between items-start">
           <div>
-            <h3 class="font-medium">{{ cartItem.item.name }}</h3>
+            <router-link
+              :to="`/item/${cartItem.item.id}`"
+              class="font-medium hover:text-primary transition-colors"
+            >
+              {{ cartItem.item.name }}
+            </router-link>
             <div v-if="cartItem.customizations?.length" class="text-sm text-gray-600 mt-1">
               <div v-for="customId in cartItem.customizations" :key="customId">
                 {{ getCustomizationName(customId) }}
@@ -20,35 +27,31 @@
               </div>
             </div>
           </div>
-          
+
           <div class="text-right">
             <div class="font-medium">¥{{ cartItem.subtotal }}</div>
           </div>
         </div>
-        
+
         <div class="flex items-center justify-between mt-4">
           <div class="flex items-center space-x-2">
-            <button 
+            <button
               @click="decrementQuantity"
-              class="w-8 h-8 flex items-center justify-center rounded-full border
-                     text-gray-500 hover:text-gray-700 hover:border-gray-400 
-                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-8 h-8 flex items-center justify-center rounded-full border text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="cartItem.quantity <= 1"
             >
               -
             </button>
             <span class="w-8 text-center">{{ cartItem.quantity }}</span>
-            <button 
+            <button
               @click="incrementQuantity"
-              class="w-8 h-8 flex items-center justify-center rounded-full border
-                     text-gray-500 hover:text-gray-700 hover:border-gray-400 
-                     transition-colors"
+              class="w-8 h-8 flex items-center justify-center rounded-full border text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-colors"
             >
               +
             </button>
           </div>
-          
-          <button 
+
+          <button
             @click="removeItem"
             class="text-red-500 text-sm hover:text-red-600 transition-colors"
           >
@@ -62,6 +65,7 @@
 
 <script setup lang="ts">
 import { useCart } from '../stores/cart';
+import { getImageUrl } from '../utils/image';
 import type { MenuItem } from '../types';
 
 interface CartItemProps {
@@ -78,11 +82,11 @@ const props = defineProps<{
 const { updateQuantity, removeFromCart } = useCart();
 
 function getCustomizationName(customId: string): string {
-  return props.cartItem.item.customizations?.find(c => c.id === customId)?.name || '';
+  return props.cartItem.item.customizations?.find((c) => c.id === customId)?.name || '';
 }
 
 function getCustomizationPrice(customId: string): number | undefined {
-  return props.cartItem.item.customizations?.find(c => c.id === customId)?.price;
+  return props.cartItem.item.customizations?.find((c) => c.id === customId)?.price;
 }
 
 function incrementQuantity() {

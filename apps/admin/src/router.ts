@@ -1,54 +1,54 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from './stores/auth';
 import OrdersView from './views/OrdersView.vue';
 import BaseLayout from './layouts/BaseLayout.vue';
 import MenuManagementView from './views/MenuManagementView.vue';
 
 const routes: RouteRecordRaw[] = [
-  { path: '/', component: () => import('./views/LoginView.vue') },
-  { 
-    path: '/orders', 
+  { path: '/', redirect: '/orders' },
+  {
+    path: '/orders',
     component: BaseLayout,
     children: [
       {
         path: '',
         component: OrdersView,
-        meta: { requiresAuth: true, roles: ['manager', 'staff', 'driver'] }
+        meta: { requiresAuth: true, roles: ['admin', 'manager', 'staff', 'driver'] },
       },
-    ]
+    ],
   },
-  { 
+  {
     path: '/menu-management',
     component: BaseLayout,
     children: [
       {
         path: '',
         component: MenuManagementView,
-        meta: { requiresAuth: true, roles: ['manager'] },
+        meta: { requiresAuth: true, roles: ['admin', 'manager'] },
       },
     ],
   },
-  { 
+  {
     path: '/user-management',
     component: BaseLayout,
     children: [
       {
         path: '',
         component: () => import('./views/UserManagementView.vue'),
-        meta: { requiresAuth: true, roles: ['manager'] },
+        meta: { requiresAuth: true, roles: ['admin', 'manager'] },
       },
     ],
   },
-  { 
-    path: '/delivery', 
+  {
+    path: '/delivery',
     component: BaseLayout,
     children: [
       {
         path: '',
         component: () => import('./views/DeliveryView.vue'),
-        meta: { requiresAuth: true, roles: ['driver', 'manager'] }
-      }
-    ]
+        meta: { requiresAuth: true, roles: ['admin', 'driver', 'manager'] },
+      },
+    ],
   },
   {
     path: '/settings',
@@ -57,9 +57,9 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('./views/SettingsView.vue'),
-        meta: { requiresAuth: true, roles: ['manager'] }
-      }
-    ]
+        meta: { requiresAuth: true, roles: ['admin', 'manager'] },
+      },
+    ],
   },
   {
     path: '/account',
@@ -68,7 +68,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('./views/AccountView.vue'),
-        meta: { requiresAuth: true, roles: ['manager', 'staff', 'driver'] },
+        meta: { requiresAuth: true, roles: ['admin', 'manager', 'staff', 'driver'] },
       },
     ],
   },
@@ -79,9 +79,13 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('./views/OrderSummaryView.vue'),
-        meta: { requiresAuth: true, roles: ['manager'] },
+        meta: { requiresAuth: true, roles: ['admin', 'manager'] },
       },
     ],
+  },
+  {
+    path: '/login',
+    component: () => import('./views/LoginView.vue'),
   },
 ];
 
@@ -90,21 +94,51 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-
+router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore();
+
+  // Wait for initial auth check to complete if it hasn't already
+  if (authStore.isInitialLoading) {
+    // Basic polling or a more elegant watch could be used, but for simplicity:
+    let attempts = 0;
+    while (authStore.isInitialLoading && attempts < 20) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      attempts++;
+    }
+  }
 
   const isLoggedIn = !!authStore.user;
 
-  if (to.path === '/login' && isLoggedIn) {
-    next('/orders');
-  } else if (to.meta.requiresAuth && !isLoggedIn) {
-    next('/login');
-  } else if (to.meta.roles && Array.isArray(to.meta.roles) && !to.meta.roles.includes(authStore.user?.role)) {
-    next('/');
-  } else {
-    next();
+  if (to.path === '/login') {
+    if (isLoggedIn) {
+      next('/orders');
+    } else {
+      next();
+    }
+    return;
   }
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    next('/login');
+    return;
+  }
+
+  if (to.meta.roles && Array.isArray(to.meta.roles)) {
+    const userRole = authStore.user?.role;
+    if (!userRole || !to.meta.roles.includes(userRole)) {
+      console.warn(`Access denied for role: ${userRole}. Required: ${to.meta.roles}`);
+      // Redirect to a safe place based on role, or login if stuck
+      if (isLoggedIn) {
+        // If logged in but role doesn't match, maybe they are just a 'customer' trying to reach admin
+        next('/login');
+      } else {
+        next('/login');
+      }
+      return;
+    }
+  }
+
+  next();
 });
 
 export default router;

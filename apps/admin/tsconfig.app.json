@@ -1,0 +1,16 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "../../libs/supabase/**/*.ts"],
+  "exclude": ["src/**/__tests__/*"],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@yakiben/supabase": ["../../libs/supabase/client.ts"]
+    },
+    "types": ["node", "vue-router", "google.accounts"],
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  }
+}

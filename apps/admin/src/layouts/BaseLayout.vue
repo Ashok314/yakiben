@@ -11,7 +11,10 @@
     />
 
     <!-- Main Content -->
-    <div :class="isMobile ? 'flex-1 overflow-y-auto pb-16' : 'flex-1 overflow-y-auto'" class="transition-all duration-300">
+    <div
+      :class="isMobile ? 'flex-1 overflow-y-auto pb-16' : 'flex-1 overflow-y-auto'"
+      class="transition-all duration-300"
+    >
       <router-view />
     </div>
 

@@ -6,6 +6,8 @@
     "paths": {
       "@/*": ["apps/*/src"]
     },
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "types": ["node", "vue-router"],
     "typeRoots": ["./node_modules/@types"]
   },

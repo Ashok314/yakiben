@@ -25,9 +25,10 @@ export const UI_TEXT = {
       title: '商品詳細',
       quantity: '数量',
       customization: 'カスタマイズ',
+      description: '商品説明',
       itemTotal: '商品合計',
-      cartTotal: 'カート合計',
-      addToCart: 'カートに追加',
+      cartTotal: '注文合計',
+      addToCart: '注文に追加',
       unavailable: '現在ご注文いただけません',
       units: '個',
     },
@@ -52,7 +53,7 @@ export const UI_TEXT = {
   },
   cart: {
     title: '注文内容',
-    empty: 'カートが空です',
+    empty: '注文が空です',
     backToMenu: 'メニューに戻る',
     total: '合計金額',
     customerInfo: 'お客様情報',
@@ -95,7 +96,7 @@ export const UI_TEXT = {
       nameFormat: '有効な名前を入力してください',
       postalCode: '正しい郵便番号を入力してください（例：100-0005）',
       phone: '有効な電話番号を入力してください（10桁または11桁）',
-      delivertTime: {
+      deliveryTime: {
         required: '受け取り時間を選択してください',
         invalid: '有効な受け取り時間を選択してください',
         range: '受け取り時間は営業時間内で指定してください',
@@ -109,7 +110,9 @@ export const UI_TEXT = {
   order: {
     status: {
       title: '注文状況',
-      pending: '準備中',
+      pending: '確認中',
+      preparing: '調理中',
+      delivering: '配達中',
       completed: '完了',
       cancelled: 'キャンセル',
       completed_long: 'お渡し完了',
@@ -124,13 +127,14 @@ export const UI_TEXT = {
       companyName: '会社名',
       address: '会社住所',
       phone: '電話番号',
-      delivertTime: '受け取り時間',
+      deliveryTime: '受け取り時間',
       notes: '備考',
       paymentInfo: 'お支払い情報',
       paymentMethod: 'お支払い方法',
       notFound: {
         title: '注文が見つかりません',
-        message: '指定された注文が見つかりませんでした。\nURLを確認するか、注文履歴から選択してください。',
+        message:
+          '指定された注文が見つかりませんでした。\nURLを確認するか、注文履歴から選択してください。',
         action: '注文履歴に戻る',
       },
       print: {

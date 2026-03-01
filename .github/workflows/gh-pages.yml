@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy App
 
 on:
   push:
@@ -6,45 +6,47 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Set up Yarn 4 (Berry)
+      - name: Set up Yarn
         run: corepack enable && corepack prepare yarn@4.9.1 --activate
 
       - name: Install dependencies
         run: yarn install
 
-      - name: Build customer app
-        run: yarn workspace customer build
+      - name: Build Apps
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          yarn workspace customer build
+          yarn workspace admin build
 
-      - name: Build admin app
-        run: yarn workspace admin build
+      - name: Prepare GitHub Pages
+        run: |
+          mkdir -p deploy
+          mv apps/customer/dist deploy/customer
+          mv apps/admin/dist deploy/admin
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./deploy
           keep_files: true
           destination_dir: ./
           enable_jekyll: false
-
-      - name: Copy dist folders to root for GitHub Pages
-        run: |
-          rm -rf customer admin
-          mv apps/customer/dist customer
-          mv apps/admin/dist admin
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./

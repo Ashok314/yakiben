@@ -5,8 +5,18 @@ export interface MenuItem {
   price: number;
   category: string;
   image: string;
-  customizations?: Customization[];
+  customizations?: Customization[]; // Keep for backward compatibility if needed, or deprecate
+  customizationGroups?: CustomizationGroup[];
   available: boolean;
+  quantity?: number; // UI state for menu list
+}
+
+export interface CustomizationGroup {
+  id: string;
+  name: string;
+  min_selection: number; // calculated from is_required
+  max_selection: number;
+  options: Customization[];
 }
 
 export interface Customization {
@@ -14,6 +24,7 @@ export interface Customization {
   name: string;
   price: number;
   available: boolean;
+  is_default?: boolean;
 }
 
 export interface CartItem {
@@ -23,23 +34,43 @@ export interface CartItem {
   subtotal: number;
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled';
-export type PaymentStatus = 'pending' | 'paid' | 'failed';
-export type PaymentMethod = 'cash' | 'paypay' | 'line_pay';
+export type OrderStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'preparing'
+  | 'ready'
+  | 'delivering'
+  | 'completed'
+  | 'cancelled';
+export type PaymentStatus = 'pending' | 'completed';
+export type PaymentMethod = 'cash' | 'card' | 'paypay';
 
 export interface Order {
   id: string;
   trackingId: string;
   items: CartItem[];
-  customerName: string;
-  companyAddress: string;
-  companyContact: string;
-  delivertTime: Date;
+  customer: {
+    name: string;
+    phone: string;
+    company?: string;
+    postalCode?: string; // Add explicit postalCode
+    address:
+      | string
+      | {
+          street: string;
+          city: string;
+          postalCode: string;
+          prefecture?: string;
+          instructions?: string;
+        };
+  };
+  deliveryTime?: string;
   notes?: string;
+  needReceipt?: boolean;
   status: OrderStatus;
-  paymentMethod?: PaymentMethod;
+  paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   total: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -1,126 +1,119 @@
+import { ref, computed } from 'vue';
 import type { MenuItem } from '../types';
+import { supabase } from '@yakiben/supabase';
+
+const items = ref<MenuItem[]>([]);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+
+export async function fetchMenu() {
+  if (items.value.length > 0) return;
+
+  isLoading.value = true;
+  try {
+    const { data, error: sbError } = await supabase
+      .from('menu_items')
+      .select(
+        `*, 
+         category:menu_categories(name, sort_order), 
+         menu_item_customization_groups(
+           sort_order,
+           customization_group:customization_groups(
+             *, 
+             options:customization_options(*)
+           )
+         )`
+      )
+      .eq('is_available', true);
+
+    if (sbError) throw sbError;
+
+    if (data) {
+      items.value = data.map((item: any) => {
+        // Extract customization groups from junction table
+        const groups = (item.menu_item_customization_groups || []).map(
+          (junction: any) => junction.customization_group
+        );
+
+        return {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          category: item.category?.name || 'その他',
+          categorySort: item.category?.sort_order ?? 999, // Store sort_order for later use
+          sort_order: item.sort_order ?? 999, // Store menu item sort_order
+          image: item.image_url,
+          available: item.is_available,
+          customizations: groups?.flatMap(
+            (g: any) =>
+              g.options?.map((o: any) => ({
+                id: o.id,
+                name: o.name,
+                price: o.price_add,
+                available: true,
+                is_default: o.is_default,
+              })) || []
+          ),
+          customizationGroups:
+            groups?.map((g: any) => ({
+              id: g.id,
+              name: g.name,
+              min_selection: g.is_required ? 1 : 0,
+              max_selection: g.max_selections || 1,
+              options:
+                g.options?.map((o: any) => ({
+                  id: o.id,
+                  name: o.name,
+                  price: o.price_add,
+                  available: true,
+                  is_default: o.is_default,
+                })) || [],
+            })) || [],
+        };
+      });
+
+      // Sort menu items by sort_order
+      items.value.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0));
+    }
+  } catch (e) {
+    error.value = String(e);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+export const menuItems = computed(() => items.value);
+
+export const categories = computed(() => {
+  // Get unique categories with their sort order
+  const categoryMap = new Map<string, number>();
+  items.value.forEach((item: any) => {
+    if (!categoryMap.has(item.category)) {
+      categoryMap.set(item.category, item.categorySort || 999);
+    }
+  });
+
+  // Sort by sort_order
+  return Array.from(categoryMap.entries())
+    .sort(([, a], [, b]) => a - b)
+    .map(([name]) => name);
+});
+
+export const getMenuItemsByCategory = (category: string) =>
+  computed(() => items.value.filter((i) => (i.category || 'その他') === category));
 
 const ORDER_CONSTANTS = {
   TRACKING_ID_LENGTH: 6,
   TRACKING_ID_CHARS: '23456789ABCDEFGHJKLMNPQRSTUVWXYZ',
-  MIN_ORDER_AMOUNT: 500,
-  MAX_ITEMS_PER_ORDER: 20,
-} as const;
+};
 
-export const menuItems: MenuItem[] = [
-  {
-    id: '1',
-    name: '唐揚げ弁当',
-    description: '揚げたての唐揚げ、季節の野菜添え',
-    price: 850,
-    category: '弁当',
-    image: '/assets/menu/placeholder.jpeg',
-    customizations: [
-      { id: '1-1', name: '大盛り', price: 100, available: true },
-      { id: '1-2', name: 'ご飯少なめ', price: 0, available: true },
-      { id: '1-3', name: '唐揚げ増量', price: 200, available: true }
-    ],
-    available: true
-  },
-  {
-    id: '2',
-    name: 'サーモン弁当',
-    description: '新鮮なサーモン、わさび添え',
-    price: 950,
-    category: '弁当',
-    image: '/assets/menu/placeholder.jpeg',
-    customizations: [
-      { id: '2-1', name: 'わさび抜き', price: 0, available: true },
-      { id: '2-2', name: '大盛り', price: 100, available: true }
-    ],
-    available: true
-  },
-  {
-    id: '3',
-    name: '味噌汁',
-    description: 'あっさりとした味噌仕立て',
-    price: 150,
-    category: 'サイド',
-    image: '/assets/menu/placeholder.jpeg',
-    available: true
-  },
-  {
-    id: '4',
-    name: 'お茶',
-    description: '香り高い緑茶',
-    price: 100,
-    category: 'ドリンク',
-    image: '/assets/menu/placeholder.jpeg',
-    available: true
-  },
-  {
-    id: '5',
-    name: 'カレーライス',
-    description: '濃厚なカレールーと特製スパイス',
-    price: 800,
-    category: 'カレー',
-    image: '/assets/menu/placeholder.jpeg',
-    customizations: [
-      { id: '5-1', name: '大盛り', price: 100, available: true },
-      { id: '5-2', name: '辛さ増し', price: 50, available: true },
-      { id: '5-3', name: '温泉卵トッピング', price: 80, available: true }
-    ],
-    available: true
-  },
-  {
-    id: '6',
-    name: 'キーマカレー',
-    description: 'ひき肉たっぷり、スパイシーな味わい',
-    price: 850,
-    category: 'カレー',
-    image: '/assets/menu/placeholder.jpeg',
-    customizations: [
-      { id: '6-1', name: '大盛り', price: 100, available: true },
-      { id: '6-2', name: '辛さ増し', price: 50, available: true }
-    ],
-    available: true
-  },
-  {
-    id: '7',
-    name: 'もも焼き（2本）',
-    description: '塩とタレが選べる定番の焼き鳥',
-    price: 300,
-    category: '焼き鳥',
-    image: '/assets/menu/placeholder.jpeg',
-    customizations: [
-      { id: '7-1', name: 'タレ', price: 0, available: true },
-      { id: '7-2', name: '塩', price: 0, available: true }
-    ],
-    available: true
-  },
-  {
-    id: '8',
-    name: 'つくね（2本）',
-    description: '特製つくね、玉子黄身添え',
-    price: 350,
-    category: '焼き鳥',
-    image: '/assets/menu/placeholder.jpeg',
-    customizations: [
-      { id: '8-1', name: 'タレ', price: 0, available: true },
-      { id: '8-2', name: '塩', price: 0, available: true },
-      { id: '8-3', name: '玉子黄身なし', price: 0, available: true }
-    ],
-    available: true
-  }
-];
-
-export function getCategories(): string[] {
-  return Array.from(new Set(menuItems.map(item => item.category)));
-}
-
-export function getMenuItemsByCategory(category: string): MenuItem[] {
-  return menuItems.filter(item => item.category === category);
-}
-
-
-// Generate tracking ID
 export function generateTrackingId(): string {
-  return Array.from({ length: ORDER_CONSTANTS.TRACKING_ID_LENGTH }, () => 
-    ORDER_CONSTANTS.TRACKING_ID_CHARS.charAt(Math.floor(Math.random() * ORDER_CONSTANTS.TRACKING_ID_CHARS.length))
+  return Array.from({ length: ORDER_CONSTANTS.TRACKING_ID_LENGTH }, () =>
+    ORDER_CONSTANTS.TRACKING_ID_CHARS.charAt(
+      Math.floor(Math.random() * ORDER_CONSTANTS.TRACKING_ID_CHARS.length)
+    )
   ).join('');
 }
+
+export { isLoading, error };
