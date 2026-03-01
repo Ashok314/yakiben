@@ -308,7 +308,7 @@
                 >
                   <span>{{ date }}</span>
                   <button
-                    @click.prevent="removeSpecialDay(index)"
+                    @click.prevent="removeHoliday(index)"
                     class="text-red-500 hover:text-red-700 text-sm"
                   >
                     {{ UI_TEXTS.settings.restaurantSettings.removeHolidayButton }}
@@ -405,9 +405,9 @@ export default {
         close: '',
         minAdvanceTime: 0,
         maxAdvanceDays: 0,
-        maxAdvanceDays: 0,
         businessDays: [],
         holidays: [],
+        specialDays: [],
       },
       support: {},
     });

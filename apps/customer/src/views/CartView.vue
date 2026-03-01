@@ -643,7 +643,7 @@ function toLocalISOString(date: Date) {
 
 const isDateValid = (d: Date) => {
   const dayOfWeek = d.getDay();
-  const dateStr = toLocalISOString(d).split('T')[0];
+  const dateStr = d.toLocaleDateString('sv-SE'); // Consistent YYYY-MM-DD
   const hours = restaurantInfo.value?.hours;
   if (!hours) return false;
 
@@ -862,18 +862,15 @@ function validateForm() {
     if (hours) {
       if (hours.holidays && hours.holidays.includes(dateStr)) {
         validationErrors.value.deliveryDate = '選択された日は臨時休業日です';
+      } else if (hours.specialDays && hours.specialDays.includes(dateStr)) {
+        // Special working day, skip business day check
       } else {
-        const isSpecial = hours.specialDays && hours.specialDays.includes(dateStr);
-        if (!isSpecial) {
-          // Construct date in local time to check day of week correctly
-          const year = parseInt(dateStr.split('-')[0]);
-          const month = parseInt(dateStr.split('-')[1]) - 1;
-          const day = parseInt(dateStr.split('-')[2]);
-          const localDate = new Date(year, month, day);
+        // Construct date in local time to check day of week correctly
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const localDate = new Date(y, m - 1, d);
 
-          if (!hours.businessDays.includes(localDate.getDay())) {
-            validationErrors.value.deliveryDate = '選択された日は定休日です';
-          }
+        if (!hours.businessDays.includes(localDate.getDay())) {
+          validationErrors.value.deliveryDate = '選択された日は定休日です';
         }
       }
     }
